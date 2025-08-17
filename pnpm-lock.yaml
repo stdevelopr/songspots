@@ -1,0 +1,180 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      '@tanstack/react-query':
+        specifier: ^5.84.2
+        version: 5.84.2(react@19.1.1)
+      ic-use-internet-identity:
+        specifier: ^0.4.0
+        version: 0.4.0(@dfinity/agent@3.2.0(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/hashes@1.8.0))(@dfinity/auth-client@3.2.0(@dfinity/agent@3.2.0(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/hashes@1.8.0))(@dfinity/identity@3.2.0(@dfinity/agent@3.2.0(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/hashes@1.8.0))(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/curves@1.9.6)(@noble/hashes@1.8.0))(@dfinity/principal@3.2.0))(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/identity@3.2.0(@dfinity/agent@3.2.0(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/hashes@1.8.0))(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/curves@1.9.6)(@noble/hashes@1.8.0))(@dfinity/principal@3.2.0)(react@19.1.1)
+    devDependencies:
+      '@types/leaflet':
+        specifier: ^1.9.20
+        version: 1.9.20
+
+packages:
+
+  '@dfinity/agent@3.2.0':
+    resolution: {integrity: sha512-GIobACWPxhjdnFMKR7GS4nMqlq1rMYEImYvSWfNAtPbAAwNqfNk7Sgr6/2qLt4XWxiRhbShk65w+hLJGor0xlw==}
+    peerDependencies:
+      '@dfinity/candid': 3.2.0
+      '@dfinity/principal': 3.2.0
+      '@noble/hashes': ^1.8.0
+
+  '@dfinity/auth-client@3.2.0':
+    resolution: {integrity: sha512-aYDevfOkFaDdliRzUiqLfGTVevRJK/lwrIausCasA4uua2myRVMTnlz7yXDMLmdLbtgL9a9XpGxMh3k/eBDcUQ==}
+    peerDependencies:
+      '@dfinity/agent': 3.2.0
+      '@dfinity/identity': 3.2.0
+      '@dfinity/principal': 3.2.0
+
+  '@dfinity/candid@3.2.0':
+    resolution: {integrity: sha512-HbyXp1QGHU/xa2lBSL9GjoHFAGbPiFrgJwabK0/VZzrcjQPKjv7G/krMKCIMm4pfaGl3ChWan9FyV9Ax/an3/g==}
+    peerDependencies:
+      '@dfinity/principal': 3.2.0
+
+  '@dfinity/cbor@0.2.2':
+    resolution: {integrity: sha512-GPJpH73kDEKbUBdUjY80lz7cq9l0vm1h/7ppejPV6O0ZTqCLrYspssYvqjRmK4aNnJ/SKXsP0rg9LYX7zpegaA==}
+
+  '@dfinity/identity@3.2.0':
+    resolution: {integrity: sha512-sZ4130KIxcqguK1heS+BPHCdN8Pnaisz6qYJoI+mEH3g7EmE8l/5GlxlZHmhX12KMloHIDd5UFHBSXlLL96vJw==}
+    peerDependencies:
+      '@dfinity/agent': 3.2.0
+      '@dfinity/candid': 3.2.0
+      '@dfinity/principal': 3.2.0
+      '@noble/curves': ^1.9.2
+      '@noble/hashes': ^1.8.0
+
+  '@dfinity/principal@3.2.0':
+    resolution: {integrity: sha512-2VY3dLKLCxiZdJmgj+5LPZxb5DeJ0EJABUXGeYitAx6EikRpNYnpZUOXpb6TjPOUT67AednA7aLAP6xnXNV3nA==}
+
+  '@noble/curves@1.9.6':
+    resolution: {integrity: sha512-GIKz/j99FRthB8icyJQA51E8Uk5hXmdyThjgQXRKiv9h0zeRlzSCLIzFw6K1LotZ3XuB7yzlf76qk7uBmTdFqA==}
+    engines: {node: ^14.21.3 || >=16}
+
+  '@noble/hashes@1.8.0':
+    resolution: {integrity: sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==}
+    engines: {node: ^14.21.3 || >=16}
+
+  '@tanstack/query-core@5.83.1':
+    resolution: {integrity: sha512-OG69LQgT7jSp+5pPuCfzltq/+7l2xoweggjme9vlbCPa/d7D7zaqv5vN/S82SzSYZ4EDLTxNO1PWrv49RAS64Q==}
+
+  '@tanstack/react-query@5.84.2':
+    resolution: {integrity: sha512-cZadySzROlD2+o8zIfbD978p0IphuQzRWiiH3I2ugnTmz4jbjc0+TdibpwqxlzynEen8OulgAg+rzdNF37s7XQ==}
+    peerDependencies:
+      react: ^18 || ^19
+
+  '@types/geojson@7946.0.16':
+    resolution: {integrity: sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg==}
+
+  '@types/leaflet@1.9.20':
+    resolution: {integrity: sha512-rooalPMlk61LCaLOvBF2VIf9M47HgMQqi5xQ9QRi7c8PkdIe0WrIi5IxXUXQjAdL0c+vcQ01mYWbthzmp9GHWw==}
+
+  '@xstate/store@3.8.5':
+    resolution: {integrity: sha512-XzuEv/xWkoLDh6PMHX+uTCTRzPMi96/hwhg263h7d4JMPlL+0FIa/5xIyx45+zxHcWzM7OLAhr29kGW7qPNoYA==}
+    peerDependencies:
+      react: ^18.2.0 || ^19.0.0
+      solid-js: ^1.7.6
+    peerDependenciesMeta:
+      react:
+        optional: true
+      solid-js:
+        optional: true
+
+  ic-use-internet-identity@0.4.0:
+    resolution: {integrity: sha512-aqozXoR6WPnYE6scpJCBOPBKkmQ57JtvPVwzl6ZrI/sHOMgekB8HuJ51ZyFmsAtg7bmmsKosuxp1e6GBPynbVg==}
+    peerDependencies:
+      '@dfinity/agent': '>=3.1.0'
+      '@dfinity/auth-client': '>=3.1.0'
+      '@dfinity/candid': '>=3.1.0'
+      '@dfinity/identity': '>=3.1.0'
+      '@dfinity/principal': '>=3.1.0'
+      react: '>=18.0.0'
+
+  idb@7.1.1:
+    resolution: {integrity: sha512-gchesWBzyvGHRO9W8tzUWFDycow5gwjvFKfyV9FF32Y7F50yZMp7mP+T2mJIWFx49zicqyC4uefHM17o6xKIVQ==}
+
+  react@19.1.1:
+    resolution: {integrity: sha512-w8nqGImo45dmMIfljjMwOGtbmC/mk4CMYhWIicdSflH91J9TyCyczcPFXJzrZ/ZXcgGRFeP6BU0BEJTw6tZdfQ==}
+    engines: {node: '>=0.10.0'}
+
+snapshots:
+
+  '@dfinity/agent@3.2.0(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/hashes@1.8.0)':
+    dependencies:
+      '@dfinity/candid': 3.2.0(@dfinity/principal@3.2.0)
+      '@dfinity/cbor': 0.2.2
+      '@dfinity/principal': 3.2.0
+      '@noble/curves': 1.9.6
+      '@noble/hashes': 1.8.0
+
+  '@dfinity/auth-client@3.2.0(@dfinity/agent@3.2.0(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/hashes@1.8.0))(@dfinity/identity@3.2.0(@dfinity/agent@3.2.0(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/hashes@1.8.0))(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/curves@1.9.6)(@noble/hashes@1.8.0))(@dfinity/principal@3.2.0)':
+    dependencies:
+      '@dfinity/agent': 3.2.0(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/hashes@1.8.0)
+      '@dfinity/identity': 3.2.0(@dfinity/agent@3.2.0(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/hashes@1.8.0))(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/curves@1.9.6)(@noble/hashes@1.8.0)
+      '@dfinity/principal': 3.2.0
+      idb: 7.1.1
+
+  '@dfinity/candid@3.2.0(@dfinity/principal@3.2.0)':
+    dependencies:
+      '@dfinity/principal': 3.2.0
+
+  '@dfinity/cbor@0.2.2': {}
+
+  '@dfinity/identity@3.2.0(@dfinity/agent@3.2.0(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/hashes@1.8.0))(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/curves@1.9.6)(@noble/hashes@1.8.0)':
+    dependencies:
+      '@dfinity/agent': 3.2.0(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/hashes@1.8.0)
+      '@dfinity/candid': 3.2.0(@dfinity/principal@3.2.0)
+      '@dfinity/principal': 3.2.0
+      '@noble/curves': 1.9.6
+      '@noble/hashes': 1.8.0
+
+  '@dfinity/principal@3.2.0':
+    dependencies:
+      '@noble/hashes': 1.8.0
+
+  '@noble/curves@1.9.6':
+    dependencies:
+      '@noble/hashes': 1.8.0
+
+  '@noble/hashes@1.8.0': {}
+
+  '@tanstack/query-core@5.83.1': {}
+
+  '@tanstack/react-query@5.84.2(react@19.1.1)':
+    dependencies:
+      '@tanstack/query-core': 5.83.1
+      react: 19.1.1
+
+  '@types/geojson@7946.0.16': {}
+
+  '@types/leaflet@1.9.20':
+    dependencies:
+      '@types/geojson': 7946.0.16
+
+  '@xstate/store@3.8.5(react@19.1.1)':
+    optionalDependencies:
+      react: 19.1.1
+
+  ic-use-internet-identity@0.4.0(@dfinity/agent@3.2.0(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/hashes@1.8.0))(@dfinity/auth-client@3.2.0(@dfinity/agent@3.2.0(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/hashes@1.8.0))(@dfinity/identity@3.2.0(@dfinity/agent@3.2.0(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/hashes@1.8.0))(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/curves@1.9.6)(@noble/hashes@1.8.0))(@dfinity/principal@3.2.0))(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/identity@3.2.0(@dfinity/agent@3.2.0(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/hashes@1.8.0))(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/curves@1.9.6)(@noble/hashes@1.8.0))(@dfinity/principal@3.2.0)(react@19.1.1):
+    dependencies:
+      '@dfinity/agent': 3.2.0(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/hashes@1.8.0)
+      '@dfinity/auth-client': 3.2.0(@dfinity/agent@3.2.0(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/hashes@1.8.0))(@dfinity/identity@3.2.0(@dfinity/agent@3.2.0(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/hashes@1.8.0))(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/curves@1.9.6)(@noble/hashes@1.8.0))(@dfinity/principal@3.2.0)
+      '@dfinity/candid': 3.2.0(@dfinity/principal@3.2.0)
+      '@dfinity/identity': 3.2.0(@dfinity/agent@3.2.0(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/hashes@1.8.0))(@dfinity/candid@3.2.0(@dfinity/principal@3.2.0))(@dfinity/principal@3.2.0)(@noble/curves@1.9.6)(@noble/hashes@1.8.0)
+      '@dfinity/principal': 3.2.0
+      '@xstate/store': 3.8.5(react@19.1.1)
+      react: 19.1.1
+    transitivePeerDependencies:
+      - solid-js
+
+  idb@7.1.1: {}
+
+  react@19.1.1: {}

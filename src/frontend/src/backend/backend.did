@@ -1,0 +1,103 @@
+type UserRole = 
+ variant {
+   admin;
+   guest;
+   user;
+ };
+type UserProfile = 
+ record {
+   name: text;
+   profilePicture: opt text;
+ };
+type UserInfo = 
+ record {
+   approval: ApprovalStatus;
+   "principal": principal;
+   role: UserRole;
+ };
+type StreamingToken = 
+ record {
+   index: nat;
+   resource: text;
+ };
+type StreamingStrategy = variant {
+                           Callback:
+                            record {
+                              callback: StreamingCallback;
+                              token: StreamingToken;
+                            };};
+type StreamingCallbackHttpResponse = 
+ record {
+   body: blob;
+   token: opt StreamingToken;
+ };
+type StreamingCallback = func (StreamingToken) ->
+                          (StreamingCallbackHttpResponse) query;
+type Pin = 
+ record {
+   description: text;
+   id: nat;
+   isPrivate: bool;
+   latitude: text;
+   longitude: text;
+   name: text;
+   owner: principal;
+ };
+type HttpResponse = 
+ record {
+   body: blob;
+   headers: vec HeaderField;
+   status_code: nat16;
+   streaming_strategy: opt StreamingStrategy;
+ };
+type HttpRequest = 
+ record {
+   body: blob;
+   headers: vec HeaderField;
+   method: text;
+   url: text;
+ };
+type HeaderField = 
+ record {
+   text;
+   text;
+ };
+type FileMetadata = 
+ record {
+   mimeType: text;
+   path: text;
+   size: nat;
+ };
+type ApprovalStatus = 
+ variant {
+   approved;
+   pending;
+   rejected;
+ };
+service : {
+  assignRole: (user: principal, newRole: UserRole) -> ();
+  createPin: (name: text, description: text, latitude: text, longitude: 
+   text, isPrivate: bool) -> ();
+  deletePin: (id: nat) -> ();
+  fileDelete: (path: text) -> ();
+  fileList: () -> (vec FileMetadata) query;
+  fileUpload: (path: text, mimeType: text, chunk: blob, complete: bool) -> ();
+  getAllPins: () -> (vec Pin) query;
+  getApprovalStatus: (user: principal) -> (ApprovalStatus) query;
+  getCurrentUserApprovalStatus: () -> (ApprovalStatus) query;
+  getCurrentUserRole: () -> (UserRole) query;
+  getPin: (id: nat) -> (opt Pin) query;
+  getPinsByOwner: (owner: principal) -> (vec Pin) query;
+  getProfileByPrincipal: ("principal": principal) -> (opt UserProfile) query;
+  getUserProfile: () -> (opt UserProfile) query;
+  httpStreamingCallback: (token: StreamingToken) ->
+   (StreamingCallbackHttpResponse) query;
+  http_request: (request: HttpRequest) -> (HttpResponse) query;
+  initializeAuth: () -> ();
+  isCurrentUserAdmin: () -> (bool) query;
+  listUsers: () -> (vec UserInfo) query;
+  saveUserProfile: (profile: UserProfile) -> ();
+  setApproval: (user: principal, approval: ApprovalStatus) -> ();
+  updatePin: (id: nat, name: text, description: text, latitude: text,
+   longitude: text, isPrivate: bool) -> ();
+}

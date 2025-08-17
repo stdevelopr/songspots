@@ -13,6 +13,21 @@
   },
   "type": "module",
   "workspaces": [
-    "src/music-memories-frontend"
-  ]
+    "src/frontend"
+  ],
+  "dependencies": {
+    "@tanstack/react-query": "^5.84.2",
+    "ic-use-internet-identity": "^0.4.0"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.20",
+    "@typescript-eslint/eslint-plugin": "^8.39.1",
+    "@typescript-eslint/parser": "^8.39.1",
+    "eslint": "^9.33.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "prettier": "^3.6.2"
+  }
 }

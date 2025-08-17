@@ -11,19 +11,15 @@
       "type": "custom",
       "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz"
     },
-    "music-memories-backend": {
-      "main": "src/music-memories-backend/main.mo",
+    "backend": {
+      "main": "src/backend/main.mo",
       "type": "motoko"
     },
-    "music-memories-frontend": {
-      "dependencies": [
-        "music-memories-backend"
-      ],
-      "source": [
-        "src/music-memories-frontend/dist"
-      ],
+    "frontend": {
+      "dependencies": ["backend"],
+      "source": ["src/frontend/dist"],
       "type": "assets",
-      "workspace": "music-memories-frontend"
+      "workspace": "src/frontend"
     }
   },
   "defaults": {
