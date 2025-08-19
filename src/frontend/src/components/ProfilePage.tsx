@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useGetUserProfile, useSaveUserProfile, useGetUserProfileByPrincipal, useGetPinsByOwner, useDeletePin, useUpdatePin } from '../hooks/useQueries';
+import {
+  useGetUserProfile,
+  useSaveUserProfile,
+  useGetUserProfileByPrincipal,
+  useGetPinsByOwner,
+  useDeletePin,
+  useUpdatePin,
+} from '../hooks/useQueries';
 import { useInternetIdentity } from 'ic-use-internet-identity';
 import { useFileUpload } from '../file-storage/FileUpload';
 import { useFileUrl, sanitizeUrl } from '../file-storage/FileList';
@@ -10,27 +17,31 @@ import PinEditModal from './PinEditModal';
 interface ProfilePageProps {
   onBackToMap: () => void;
   userId?: string | null; // If provided, view another user's profile
-  onViewPinOnMap: (pinId: string, lat: number, lng: number) => void;
+  onViewPinOnMap: (pinId: string, lat: number, lng: number, fromProfile?: boolean) => void;
 }
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPinOnMap }) => {
   const { identity } = useInternetIdentity();
   const isViewingOwnProfile = !userId;
-  
+
   // Queries for own profile or other user's profile
   const { data: ownProfile, isLoading: isLoadingOwnProfile } = useGetUserProfile();
-  const { data: otherUserProfile, isLoading: isLoadingOtherProfile } = useGetUserProfileByPrincipal(userId || '');
-  
+  const { data: otherUserProfile, isLoading: isLoadingOtherProfile } = useGetUserProfileByPrincipal(
+    userId || ''
+  );
+
   const userProfile = isViewingOwnProfile ? ownProfile : otherUserProfile;
   const isLoading = isViewingOwnProfile ? isLoadingOwnProfile : isLoadingOtherProfile;
-  
+
   // Get pins for the user being viewed
-  const { data: userPins = [], isLoading: isLoadingPins } = useGetPinsByOwner(userId || identity?.getPrincipal().toString() || '');
+  const { data: userPins = [], isLoading: isLoadingPins } = useGetPinsByOwner(
+    userId || identity?.getPrincipal().toString() || ''
+  );
   const saveProfileMutation = useSaveUserProfile();
   const deletePinMutation = useDeletePin();
   const updatePinMutation = useUpdatePin();
   const { uploadFile, isUploading } = useFileUpload();
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState('');
   const [error, setError] = useState('');
@@ -52,7 +63,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
   const { data: profilePictureUrl } = useFileUrl(urlParam);
 
   // Only show public pins if viewing another user's profile
-  const visiblePins = isViewingOwnProfile ? userPins : userPins.filter(pin => !pin.isPrivate);
+  const visiblePins = isViewingOwnProfile ? userPins : userPins.filter((pin) => !pin.isPrivate);
 
   // Initialize form when profile data loads or component mounts
   useEffect(() => {
@@ -80,7 +91,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
         setError('Please select an image file');
         return;
       }
-      
+
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setError('Image file must be smaller than 5MB');
@@ -89,7 +100,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
 
       setProfilePictureFile(file);
       setError('');
-      
+
       // Create preview
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -101,7 +112,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!name.trim()) {
       setError('Name is required');
       return;
@@ -132,9 +143,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
 
       await saveProfileMutation.mutateAsync({
         name: name.trim(),
-        profilePicture: finalProfilePictureForBackend
+        profilePicture: finalProfilePictureForBackend,
       });
-      
+
       setIsEditing(false);
       setError('');
       setProfilePictureFile(null);
@@ -183,7 +194,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
     setShowEditModal(true);
   };
 
-  const handleEditSubmit = async (pinData: { name: string; description: string; musicLink: string; isPrivate: boolean }) => {
+  const handleEditSubmit = async (pinData: {
+    name: string;
+    description: string;
+    musicLink: string;
+    isPrivate: boolean;
+  }) => {
     if (!pinToEdit) return;
 
     try {
@@ -193,7 +209,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
         description: pinData.description || '',
         latitude: pinToEdit.latitude,
         longitude: pinToEdit.longitude,
-        isPrivate: pinData.isPrivate
+        isPrivate: pinData.isPrivate,
       });
 
       setShowEditModal(false);
@@ -213,7 +229,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
     const lat = parseFloat(pin.latitude);
     const lng = parseFloat(pin.longitude);
     const pinId = pin.id.toString();
-    onViewPinOnMap(pinId, lat, lng);
+    onViewPinOnMap(pinId, lat, lng, true); // Pass fromProfile=true
   };
 
   const formatDate = (pinId: bigint) => {
@@ -277,8 +293,18 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
             onClick={onBackToMap}
             className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors group"
           >
-            <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            <svg
+              className="w-5 h-5 group-hover:-translate-x-1 transition-transform"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
             </svg>
             <span className="font-medium">Back to Map</span>
           </button>
@@ -288,11 +314,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
           {/* Profile Card */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100">
-              <div className={`bg-gradient-to-br ${getProfileHeaderGradient()} px-6 py-10 relative`}>
+              <div
+                className={`bg-gradient-to-br ${getProfileHeaderGradient()} px-6 py-10 relative`}
+              >
                 {/* Decorative elements */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white bg-opacity-10 rounded-full -translate-y-16 translate-x-16"></div>
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-white bg-opacity-5 rounded-full translate-y-12 -translate-x-12"></div>
-                
+
                 <div className="text-center relative z-10">
                   {/* Profile Picture */}
                   <div className="mb-6">
@@ -310,33 +338,73 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                       />
                     ) : (
                       <div className="w-24 h-24 bg-white bg-opacity-20 rounded-full mx-auto border-4 border-white shadow-xl flex items-center justify-center backdrop-blur-sm ring-4 ring-white ring-opacity-20">
-                        <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        <svg
+                          className="w-12 h-12 text-white"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                          />
                         </svg>
                       </div>
                     )}
                   </div>
-                  
+
                   <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">
                     {getDisplayName()}
                   </h1>
-                  
+
                   <div className="flex items-center justify-center space-x-4 text-white text-opacity-90">
                     <div className="flex items-center space-x-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
                       </svg>
                       <span className="font-medium">
                         {visiblePins.length} pin{visiblePins.length !== 1 ? 's' : ''}
                       </span>
                     </div>
-                    
+
                     {!isViewingOwnProfile && (
                       <div className="flex items-center space-x-2">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
                         </svg>
                         <span className="text-sm">Public Profile</span>
                       </div>
@@ -356,8 +424,18 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                     {/* User Identity Info */}
                     <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
                       <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V4a2 2 0 114 0v2m-4 0a2 2 0 104 0m-4 0v2m4-2v2" />
+                        <svg
+                          className="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V4a2 2 0 114 0v2m-4 0a2 2 0 104 0m-4 0v2m4-2v2"
+                          />
                         </svg>
                         Account Information
                       </h3>
@@ -370,7 +448,10 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                     {isViewingOwnProfile && (
                       <form onSubmit={handleSave} className="space-y-6">
                         <div>
-                          <label htmlFor="profileName" className="block text-sm font-medium text-gray-700 mb-2">
+                          <label
+                            htmlFor="profileName"
+                            className="block text-sm font-medium text-gray-700 mb-2"
+                          >
                             Name *
                           </label>
                           {isEditing ? (
@@ -407,7 +488,10 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                         {/* Profile Picture Upload */}
                         {isEditing && (
                           <div>
-                            <label htmlFor="profilePicture" className="block text-sm font-medium text-gray-700 mb-2">
+                            <label
+                              htmlFor="profilePicture"
+                              className="block text-sm font-medium text-gray-700 mb-2"
+                            >
                               Profile Picture
                             </label>
                             <input
@@ -427,8 +511,18 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                         {error && (
                           <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                             <p className="text-sm text-red-600 flex items-center">
-                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              <svg
+                                className="w-4 h-4 mr-2"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
                               </svg>
                               {error}
                             </p>
@@ -449,8 +543,18 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                                 </>
                               ) : (
                                 <>
-                                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                  <svg
+                                    className="w-5 h-5 mr-2"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M5 13l4 4L19 7"
+                                    />
                                   </svg>
                                   Save Profile
                                 </>
@@ -504,10 +608,14 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
 
                     {/* Other user profile info */}
                     {!isViewingOwnProfile && (
-                      <div className={`bg-${getProfileAccentColor()}-50 border border-${getProfileAccentColor()}-200 rounded-lg p-4`}>
+                      <div
+                        className={`bg-${getProfileAccentColor()}-50 border border-${getProfileAccentColor()}-200 rounded-lg p-4`}
+                      >
                         <div className="flex items-center">
                           <div className={`w-5 h-5 text-${getProfileAccentColor()}-600`}>👤</div>
-                          <span className={`ml-3 text-sm text-${getProfileAccentColor()}-700 font-medium`}>
+                          <span
+                            className={`ml-3 text-sm text-${getProfileAccentColor()}-700 font-medium`}
+                          >
                             Viewing {getDisplayName()}'s public profile
                           </span>
                         </div>
@@ -525,20 +633,38 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
           {/* Pins List */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100">
-              <div className={`bg-gradient-to-r ${getProfileHeaderGradient()} px-6 py-6 border-b border-gray-200`}>
+              <div
+                className={`bg-gradient-to-r ${getProfileHeaderGradient()} px-6 py-6 border-b border-gray-200`}
+              >
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-2xl font-bold text-white">
                       {isViewingOwnProfile ? 'Your Pins' : `${getDisplayName()}'s Public Pins`}
                     </h2>
                     <p className="text-white text-opacity-90 mt-1">
-                      {visiblePins.length} pin{visiblePins.length !== 1 ? 's' : ''} {isViewingOwnProfile ? 'created' : 'visible'}
+                      {visiblePins.length} pin{visiblePins.length !== 1 ? 's' : ''}{' '}
+                      {isViewingOwnProfile ? 'created' : 'visible'}
                     </p>
                   </div>
                   <div className="bg-white bg-opacity-20 rounded-full p-3 backdrop-blur-sm">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
                     </svg>
                   </div>
                 </div>
@@ -548,19 +674,33 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                 {visiblePins.length === 0 ? (
                   <div className="text-center py-16">
                     <div className="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-6 flex items-center justify-center">
-                      <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <svg
+                        className="w-10 h-10 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
                       </svg>
                     </div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-3">
                       {isViewingOwnProfile ? 'No pins yet' : 'No public pins'}
                     </h3>
                     <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                      {isViewingOwnProfile 
-                        ? 'Start creating pins by clicking on the map to mark your favorite places and memories!' 
-                        : 'This user hasn\'t created any public pins yet. Check back later to see their contributions!'
-                      }
+                      {isViewingOwnProfile
+                        ? 'Start creating pins by clicking on the map to mark your favorite places and memories!'
+                        : "This user hasn't created any public pins yet. Check back later to see their contributions!"}
                     </p>
                     {isViewingOwnProfile && (
                       <button
@@ -574,18 +714,23 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                 ) : (
                   <div className="grid gap-6">
                     {visiblePins.map((pin) => (
-                      <div key={pin.id.toString()} className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-200 bg-gradient-to-r from-white to-gray-50">
+                      <div
+                        key={pin.id.toString()}
+                        className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-200 bg-gradient-to-r from-white to-gray-50"
+                      >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
                             <div className="flex items-center space-x-3 mb-2">
                               <h3 className="text-xl font-semibold text-gray-900">
                                 {pin.name || 'Unnamed Pin'}
                               </h3>
-                              <div className={`flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-semibold ${
-                                pin.isPrivate 
-                                  ? 'bg-gray-100 text-gray-700' 
-                                  : 'bg-green-100 text-green-700'
-                              }`}>
+                              <div
+                                className={`flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-semibold ${
+                                  pin.isPrivate
+                                    ? 'bg-gray-100 text-gray-700'
+                                    : 'bg-green-100 text-green-700'
+                                }`}
+                              >
                                 <span>{pin.isPrivate ? '🔒' : '🌐'}</span>
                                 <span>{pin.isPrivate ? 'Private' : 'Public'}</span>
                               </div>
@@ -605,8 +750,18 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                                 className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 group"
                                 title="Edit pin"
                               >
-                                <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                <svg
+                                  className="w-5 h-5 group-hover:scale-110 transition-transform"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                  />
                                 </svg>
                               </button>
                               <button
@@ -615,8 +770,18 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                                 className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 group"
                                 title="Delete pin"
                               >
-                                <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                <svg
+                                  className="w-5 h-5 group-hover:scale-110 transition-transform"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                  />
                                 </svg>
                               </button>
                             </div>
@@ -626,8 +791,18 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                           <div className="bg-white rounded-lg p-3 border border-gray-100">
                             <span className="font-semibold text-gray-700 flex items-center mb-1">
-                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <svg
+                                className="w-4 h-4 mr-2"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                />
                               </svg>
                               Location
                             </span>
@@ -637,14 +812,22 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                           </div>
                           <div className="bg-white rounded-lg p-3 border border-gray-100">
                             <span className="font-semibold text-gray-700 flex items-center mb-1">
-                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              <svg
+                                className="w-4 h-4 mr-2"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
                               </svg>
                               Created
                             </span>
-                            <p className="text-xs text-gray-600">
-                              {formatDate(pin.id)}
-                            </p>
+                            <p className="text-xs text-gray-600">{formatDate(pin.id)}</p>
                           </div>
                         </div>
 
@@ -653,13 +836,38 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                             onClick={() => handleViewPinOnMap(pin)}
                             className={`text-${getProfileAccentColor()}-600 hover:text-${getProfileAccentColor()}-700 text-sm font-medium flex items-center space-x-2 group bg-${getProfileAccentColor()}-50 hover:bg-${getProfileAccentColor()}-100 px-4 py-2 rounded-lg transition-all duration-200`}
                           >
-                            <svg className="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <svg
+                              className="w-4 h-4 group-hover:scale-110 transition-transform"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                              />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
                             </svg>
                             <span>View on Map</span>
-                            <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            <svg
+                              className="w-4 h-4 group-hover:translate-x-1 transition-transform"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 5l7 7-7 7"
+                              />
                             </svg>
                           </button>
                         </div>
@@ -671,18 +879,26 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
             </div>
 
             {/* Additional Information */}
-            <div className={`mt-6 bg-${getProfileAccentColor()}-50 border border-${getProfileAccentColor()}-200 rounded-xl p-6`}>
-              <h3 className={`text-sm font-semibold text-${getProfileAccentColor()}-800 mb-3 flex items-center`}>
+            <div
+              className={`mt-6 bg-${getProfileAccentColor()}-50 border border-${getProfileAccentColor()}-200 rounded-xl p-6`}
+            >
+              <h3
+                className={`text-sm font-semibold text-${getProfileAccentColor()}-800 mb-3 flex items-center`}
+              >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
-                About {isViewingOwnProfile ? 'Your' : 'This User\'s'} Data
+                About {isViewingOwnProfile ? 'Your' : "This User's"} Data
               </h3>
               <p className={`text-sm text-${getProfileAccentColor()}-700 leading-relaxed`}>
-                {isViewingOwnProfile 
+                {isViewingOwnProfile
                   ? 'Your profile and pin data are securely stored and associated with your Internet Identity. Private pins are only visible to you, while public pins can be seen by all users. You have full control over your data and can edit or delete your content at any time.'
-                  : 'This user\'s public profile and pins are visible to all users. Private pins remain hidden and are only visible to the owner. All data is securely stored and managed through the Internet Computer blockchain.'
-                }
+                  : "This user's public profile and pins are visible to all users. Private pins remain hidden and are only visible to the owner. All data is securely stored and managed through the Internet Computer blockchain."}
               </p>
             </div>
           </div>
@@ -701,13 +917,17 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
       {/* Pin Edit Modal */}
       <PinEditModal
         isOpen={showEditModal}
-        pin={pinToEdit ? {
-          id: pinToEdit.id.toString(),
-          name: pinToEdit.name,
-          description: pinToEdit.description,
-          musicLink: undefined, // Music links are not stored in backend
-          isPrivate: pinToEdit.isPrivate
-        } : null}
+        pin={
+          pinToEdit
+            ? {
+                id: pinToEdit.id.toString(),
+                name: pinToEdit.name,
+                description: pinToEdit.description,
+                musicLink: undefined, // Music links are not stored in backend
+                isPrivate: pinToEdit.isPrivate,
+              }
+            : null
+        }
         onSubmit={handleEditSubmit}
         onCancel={handleEditCancel}
         isSubmitting={updatePinMutation.isPending}

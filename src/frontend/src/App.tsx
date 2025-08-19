@@ -100,16 +100,24 @@ function App() {
     setIsLoadingMapTransition(false); // Ensure loading is dismissed
   };
 
-  const handleViewPinOnMap = (pinId: string, lat: number, lng: number) => {
+  const [fromProfile, setFromProfile] = useState(false);
+  const handleViewPinOnMap = (
+    pinId: string,
+    lat: number,
+    lng: number,
+    fromProfileFlag?: boolean
+  ) => {
     setSelectedPin({ id: pinId, lat, lng });
     setIsLoadingMapTransition(true); // Show loading indicator only when navigating to map
     setCurrentView('map');
     setProfileUserId(null);
+    setFromProfile(!!fromProfileFlag);
   };
 
   const handleMapReady = () => {
     // Hide loading indicator when map is ready and centered
     setIsLoadingMapTransition(false);
+    setFromProfile(false); // Reset fromProfile so future pin selections fly over
   };
 
   const handleMapInitialized = () => {
@@ -195,12 +203,13 @@ function App() {
             onViewUserProfile={handleViewUserProfile}
             selectedPin={selectedPin}
             onPinSelected={(pin) => setSelectedPin(pin)}
-            onMapReady={handleMapReady} // Callback for when map is ready
-            onMapInitialized={handleMapInitialized} // Callback for when map is initialized
-            onLocationProcessed={handleLocationProcessed} // Callback for when location is processed
-            onMapCentered={handleMapCentered} // Callback for when map is centered
-            isLoadingTransition={isLoadingMapTransition} // Pass loading state
-            isInitialLoading={isInitialLoading} // Pass initial loading state
+            onMapReady={handleMapReady}
+            onMapInitialized={handleMapInitialized}
+            onLocationProcessed={handleLocationProcessed}
+            onMapCentered={handleMapCentered}
+            isLoadingTransition={isLoadingMapTransition}
+            isInitialLoading={isInitialLoading}
+            fromProfile={fromProfile}
           />
         ) : (
           <ProfilePage

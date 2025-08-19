@@ -31,6 +31,7 @@ interface Props {
   isLoadingTransition?: boolean;
   isInitialLoading?: boolean;
   backendPins: BackendPin[];
+  fromProfile?: boolean;
 }
 
 const InteractiveMap: React.FC<Props> = ({
@@ -44,6 +45,7 @@ const InteractiveMap: React.FC<Props> = ({
   backendPins = [],
   isLoadingTransition = false,
   isInitialLoading = false,
+  fromProfile = false,
 }) => {
   const { mapRef, mapInstance } = useMap();
   const { identity } = useInternetIdentity();
@@ -132,9 +134,29 @@ const InteractiveMap: React.FC<Props> = ({
       return;
     }
 
-    // Offset the map center vertically so popup is visible (especially on mobile)
+    if (fromProfile) {
+      // Instantly center and open popup when coming from profile
+      mapInstance.setView([target.lat, target.lng], 16, { animate: false });
+      const markerLayer = Object.values((mapInstance as any)._layers).find(
+        (layer: any) =>
+          layer instanceof L.Marker &&
+          layer.getLatLng().lat === target.lat &&
+          layer.getLatLng().lng === target.lng
+      ) as L.Marker | undefined;
+      if (markerLayer && typeof markerLayer.openPopup === 'function') {
+        markerLayer.openPopup();
+      }
+      onMapReady?.();
+      return;
+    }
+    // ...existing code for animated flyTo...
     const mapHeight = mapInstance.getSize().y;
-    const offsetPixels = mapHeight > 0 ? Math.round(mapHeight / 4) : 100; // 1/4 from top
+    let offsetPixels;
+    if (isMobile) {
+      offsetPixels = mapHeight > 0 ? Math.round(mapHeight / 4) : 100; // 1/4 from top for mobile
+    } else {
+      offsetPixels = mapHeight > 0 ? Math.round(mapHeight / 10) : 40; // smaller offset for desktop
+    }
     const targetPoint = mapInstance.project([target.lat, target.lng], mapInstance.getZoom());
     const offsetPoint = L.point(targetPoint.x, targetPoint.y - offsetPixels);
     const offsetLatLng = mapInstance.unproject(offsetPoint, mapInstance.getZoom());
@@ -252,7 +274,9 @@ const InteractiveMap: React.FC<Props> = ({
         onClose={() => setPinDetailModalOpen(false)}
         onViewProfile={onViewUserProfile}
         onEdit={setPinToEdit}
-        onDelete={(pin) => {/* open delete modal */ console.log('delete', pin); }}
+        onDelete={(pin) => {
+          /* open delete modal */ console.log('delete', pin);
+        }}
       />
       <MapHUD
         status={status}
