@@ -17,15 +17,15 @@ interface PinData {
 
 interface PinEditModalProps {
   isOpen: boolean;
-  pin: Pin | null;
+
   onSubmit: (pinData: PinData) => void;
   onCancel: () => void;
   isSubmitting?: boolean;
 }
 
-const PinEditModal: React.FC<PinEditModalProps> = ({
+const PinCreateModal: React.FC<PinEditModalProps> = ({
   isOpen,
-  pin,
+
   onSubmit,
   onCancel,
   isSubmitting = false,
@@ -35,16 +35,6 @@ const PinEditModal: React.FC<PinEditModalProps> = ({
   const [musicLink, setMusicLink] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    if (isOpen && pin) {
-      setName(pin.name || '');
-      setDescription(pin.description || '');
-      setMusicLink(pin.musicLink || '');
-      setIsPrivate(pin.isPrivate || false);
-      setError('');
-    }
-  }, [isOpen, pin]);
 
   const validateMusicLink = (link: string): boolean => {
     if (!link.trim()) return true; // Empty link is allowed
@@ -80,7 +70,7 @@ const PinEditModal: React.FC<PinEditModalProps> = ({
     }
   };
 
-  if (!isOpen || !pin) return null;
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex items-center justify-center">
@@ -246,4 +236,4 @@ const PinEditModal: React.FC<PinEditModalProps> = ({
   );
 };
 
-export default PinEditModal;
+export default PinCreateModal;

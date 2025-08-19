@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import InteractiveMap from './components/InteractiveMap';
+import { useState, useEffect } from 'react';
+
 import LoginButton from './components/LoginButton';
 import ProfileButton from './components/ProfileButton';
 import ProfilePage from './components/ProfilePage';
 import { useInternetIdentity } from 'ic-use-internet-identity';
 import { useGetAllPins } from './hooks/useQueries';
 import { useQueryClient } from '@tanstack/react-query';
+import InteractiveMap from './components/interactive-map';
+import { Loader } from './components/Loader';
 
 interface SelectedPin {
   lat: number;
@@ -14,9 +16,8 @@ interface SelectedPin {
 }
 
 function App() {
-  const { identity } = useInternetIdentity();
+  const { identity, status } = useInternetIdentity();
 
-  console.log({ identity });
   const queryClient = useQueryClient();
   const isAuthenticated = !!identity;
 
@@ -31,6 +32,8 @@ function App() {
   const [isLocationProcessed, setIsLocationProcessed] = useState(false);
   const [isPinsLoaded, setIsPinsLoaded] = useState(false);
   const [isMapCentered, setIsMapCentered] = useState(false);
+
+  console.log('selected pin:', selectedPin);
 
   // Get pins data to check if they're loaded
   const { data: pins = [], isLoading: isLoadingPins, isFetching: isFetchingPins } = useGetAllPins();
@@ -68,18 +71,6 @@ function App() {
       return () => clearTimeout(timer);
     }
   }, [isMapInitialized, isPinsLoaded, isLocationProcessed, isMapCentered, isInitialLoading]);
-
-  // Fallback timeout to prevent loading indicator from getting stuck
-  useEffect(() => {
-    if (isInitialLoading) {
-      const fallbackTimer = setTimeout(() => {
-        console.warn('Loading indicator timeout reached, forcing dismissal');
-        setIsInitialLoading(false);
-      }, 20000); // 20 second fallback timeout
-
-      return () => clearTimeout(fallbackTimer);
-    }
-  }, [isInitialLoading]);
 
   // Clear all cached data when logging out
   useEffect(() => {
@@ -154,44 +145,12 @@ function App() {
     }
   }, [currentView]);
 
+  if (status === 'initializing' || isLoadingPins) return <Loader />;
+
+  console.log('ready', pins);
   return (
     <div className="h-screen w-screen flex flex-col">
       {/* Initial loading overlay - covers entire app until all conditions are met */}
-      {isInitialLoading && (
-        <div className="fixed inset-0 bg-white z-[9999] flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-6"></div>
-            <h3 className="text-2xl font-semibold text-gray-900 mb-3">Loading Music Memories</h3>
-            <p className="text-gray-600 max-w-md mx-auto mb-4">
-              Initializing map, loading pins, requesting location, and centering map...
-            </p>
-            <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
-              <div className="flex space-x-1">
-                <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div>
-                <div
-                  className="w-2 h-2 bg-purple-600 rounded-full animate-bounce"
-                  style={{ animationDelay: '0.1s' }}
-                ></div>
-                <div
-                  className="w-2 h-2 bg-purple-600 rounded-full animate-bounce"
-                  style={{ animationDelay: '0.2s' }}
-                ></div>
-              </div>
-              <span>Please wait</span>
-            </div>
-
-            {/* Debug info in development */}
-            {process.env.NODE_ENV === 'development' && (
-              <div className="mt-4 text-xs text-gray-400 space-y-1">
-                <div>Map: {isMapInitialized ? '✓' : '⏳'}</div>
-                <div>Pins: {isPinsLoaded ? '✓' : '⏳'}</div>
-                <div>Location: {isLocationProcessed ? '✓' : '⏳'}</div>
-                <div>Centered: {isMapCentered ? '✓' : '⏳'}</div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       <header className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 shadow-lg border-b border-purple-200 px-6 py-3 z-10">
         <div className="flex items-center justify-between">
@@ -206,11 +165,6 @@ function App() {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            {currentView === 'map' && !isLoadingMapTransition && !isInitialLoading && (
-              <p className="text-sm text-purple-100 font-medium bg-white bg-opacity-10 px-3 py-1.5 rounded-full backdrop-blur-sm">
-                Click anywhere on the map to add pins
-              </p>
-            )}
             <div className="flex items-center space-x-2">
               {isAuthenticated && (
                 <ProfileButton onProfileClick={handleProfileClick} currentView={currentView} />
@@ -224,8 +178,8 @@ function App() {
       <main className="flex-1 relative">
         {/* Loading overlay for map transitions - only show when transitioning to map */}
         {isLoadingMapTransition && currentView === 'map' && !isInitialLoading && (
-          <div className="absolute inset-0 bg-white bg-opacity-95 flex items-center justify-center z-50">
-            <div className="text-center">
+          <div className="absolute inset-0 bg-white bg-opacity-95 flex items-center justify-center z-40 pointer-events-none">
+            <div className="absolute inset-0 bg-white bg-opacity-95 flex items-center justify-center z-50">
               <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-6"></div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Preparing Map</h3>
               <p className="text-gray-600 max-w-md mx-auto">
@@ -237,9 +191,10 @@ function App() {
 
         {currentView === 'map' ? (
           <InteractiveMap
+            backendPins={pins}
             onViewUserProfile={handleViewUserProfile}
             selectedPin={selectedPin}
-            onPinSelected={() => setSelectedPin(null)} // Clear selection after highlighting
+            onPinSelected={(pin) => setSelectedPin(pin)}
             onMapReady={handleMapReady} // Callback for when map is ready
             onMapInitialized={handleMapInitialized} // Callback for when map is initialized
             onLocationProcessed={handleLocationProcessed} // Callback for when location is processed
