@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
-import type { Pin } from '../types/map';
-import { pinIcons } from '../utils/icons';
-import PinPopup from '../components/PinPopup';
-import { bindReactPopup } from '../utils/bindReactPopup';
+import type { Pin } from '../map/types/map';
+
+import PinPopup from './PinPopup';
+
+import { pinIcons } from '../common';
+import { bindReactPopup } from '../common/utils/bindReactPopup';
 
 interface Options {
   map: L.Map | null;

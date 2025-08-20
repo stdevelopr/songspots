@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 
-import LoginButton from './components/LoginButton';
-import ProfileButton from './components/ProfileButton';
-import ProfilePage from './components/ProfilePage';
+import LoginButton from './features/common/LoginButton';
+import ProfileButton from './features/profile/ProfileButton';
+import ProfilePage from './features/profile/ProfilePage';
 import { useInternetIdentity } from 'ic-use-internet-identity';
-import { useGetAllPins } from './hooks/useQueries';
+import { useGetAllPins } from './features/common/useQueries';
 import { useQueryClient } from '@tanstack/react-query';
-import InteractiveMap from './components/interactive-map';
-import { Loader } from './components/Loader';
+import InteractiveMap from './features/map/interactive-map';
+import { Loader } from './features/common/Loader';
 
 interface SelectedPin {
   lat: number;
@@ -202,7 +202,7 @@ function App() {
             backendPins={pins}
             onViewUserProfile={handleViewUserProfile}
             selectedPin={selectedPin}
-            onPinSelected={(pin) => setSelectedPin(pin)}
+            onPinSelected={(pin: { id: string; lat: number; lng: number }) => setSelectedPin(pin)}
             onMapReady={handleMapReady}
             onMapInitialized={handleMapInitialized}
             onLocationProcessed={handleLocationProcessed}
