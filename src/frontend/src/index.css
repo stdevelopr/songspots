@@ -1,3 +1,182 @@
+.redesigned-popup {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  min-width: 300px;
+  max-width: 370px;
+  border-radius: 18px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+  animation: fade-in 0.3s ease-out;
+  border: 1px solid #e5e7eb;
+}
+.redesigned-header {
+  background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+  padding: 24px 24px 16px 24px;
+  color: white;
+  position: relative;
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+}
+.redesigned-title-section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.redesigned-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  color: white;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.privacy-badge {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(99,102,241,0.12);
+  color: #6366f1;
+  border: 1px solid #a5b4fc;
+}
+.privacy-badge.private {
+  background: rgba(107, 114, 128, 0.15);
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+.privacy-badge.public {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid #bbf7d0;
+}
+.privacy-icon {
+  font-size: 16px;
+  margin-right: 4px;
+}
+.redesigned-description {
+  padding: 18px 24px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+  font-size: 15px;
+  border-radius: 0 0 12px 12px;
+}
+.redesigned-metadata {
+  padding: 12px 24px;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+}
+.redesigned-owner-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.metadata-icon {
+  font-size: 18px;
+  color: #6366f1;
+}
+.metadata-label {
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+}
+.redesigned-owner-link {
+  color: #6366f1;
+  font-size: 14px;
+  font-weight: 600;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 8px;
+  transition: background 0.2s, color 0.2s;
+}
+.redesigned-owner-link:hover {
+  background: #eef2ff;
+  color: #7c3aed;
+}
+.redesigned-actions {
+  padding: 16px 24px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.redesigned-music-button {
+  background: linear-gradient(135deg, #6366f1, #7c3aed);
+  color: white;
+  box-shadow: 0 4px 12px -2px rgba(99,102,241,0.18);
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.redesigned-music-button:hover {
+  background: linear-gradient(135deg, #7c3aed, #6366f1);
+  box-shadow: 0 8px 16px -2px rgba(99,102,241,0.28);
+}
+.button-icon {
+  font-size: 16px;
+  margin-right: 8px;
+}
+.redesigned-owner-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+.redesigned-edit-button {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  box-shadow: 0 4px 12px -2px rgba(34,197,94,0.18);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.redesigned-edit-button:hover {
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  box-shadow: 0 8px 16px -2px rgba(34,197,94,0.28);
+}
+.redesigned-delete-button {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  box-shadow: 0 4px 12px -2px rgba(239,68,68,0.18);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.redesigned-delete-button:hover {
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  box-shadow: 0 8px 16px -2px rgba(239,68,68,0.28);
+}
+.redesigned-footer {
+  padding: 12px 24px;
+  background: #f3f4f6;
+  border-top: 1px solid #e5e7eb;
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
+}
+.redesigned-timestamp {
+  color: #6b7280;
+  font-size: 12px;
+  font-style: italic;
+  display: block;
+  text-align: center;
+}
 /* Center Leaflet popup content for mobile */
 .leaflet-popup-content {
   text-align: center;
@@ -298,10 +477,49 @@
 /* Enhanced Pin Popup Content */
 .enhanced-pin-popup {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.6;
   min-width: 280px;
-  max-width: 320px;
+  max-width: 340px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+  animation: fade-in 0.3s ease-out;
+}
+.pin-popup-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255,255,255,0.95);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 26px;
+  color: #4b5563;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  cursor: pointer;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+  border: 1px solid #e5e7eb;
+}
+.pin-popup-close span {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.pin-popup-close:hover {
+  background: #f3f4f6;
+  color: #374151;
+  transform: scale(1.08);
 }
 
 .popup-header {

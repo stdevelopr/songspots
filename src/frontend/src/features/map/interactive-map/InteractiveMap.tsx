@@ -56,6 +56,7 @@ const InteractiveMap: React.FC<Props> = ({
   const [pinDetailModalOpen, setPinDetailModalOpen] = useState(false);
   const [selectedPinDetail, setSelectedPinDetail] = useState<Pin | null>(null);
   const [pinCreateModalOpen, setPinCreateModalOpen] = useState(false);
+  const [popupOpen, setPopupOpen] = useState(false);
 
   // Pins state (converted from backend)
   const [pins, setPins] = useState<Pin[]>([]);
@@ -189,15 +190,17 @@ const InteractiveMap: React.FC<Props> = ({
   useEffect(() => {
     if (!mapInstance) return;
     const onClick = (e: L.LeafletMouseEvent) => {
+      mapInstance.closePopup();
       if (!identity) return alert('Please log in to create pins');
       setPinCreateModalOpen(true);
+      setPopupOpen(true);
     };
     mapInstance.on('click', onClick);
     onMapInitialized?.();
     return () => {
       mapInstance.off('click', onClick);
     };
-  }, [mapInstance, identity, onMapInitialized]);
+  }, [mapInstance, identity, popupOpen, onMapInitialized]);
 
   // Leaflet user location marker
   const userMarkerRef = useRef<L.Marker | null>(null);
@@ -222,27 +225,36 @@ const InteractiveMap: React.FC<Props> = ({
     onViewProfile: onViewUserProfile,
     onEdit: (pin) => {
       setPinToEdit(pin);
+      setPopupOpen(true);
     },
     onDelete: (pin) => {
       /* open delete modal */ console.log('delete', pin);
+      setPopupOpen(true);
+    },
+    onClose: () => {
+      // setPopupOpen(false);
     },
     onPinClick: (pin) => {
+      console.log('Pin clicked:', pin);
       if (isMobile) {
         if (mapInstance) {
           mapInstance.panTo([pin.lat, pin.lng], { animate: true });
           const handleMoveEnd = () => {
             setSelectedPinDetail(pin);
             setPinDetailModalOpen(true);
+            setPopupOpen(true);
             mapInstance.off('moveend', handleMoveEnd);
           };
           mapInstance.on('moveend', handleMoveEnd);
         } else {
           setSelectedPinDetail(pin);
           setPinDetailModalOpen(true);
+          setPopupOpen(true);
         }
       } else {
         if (onPinSelected) {
           onPinSelected(pin);
+          setPopupOpen(true);
         }
       }
     },
@@ -271,11 +283,18 @@ const InteractiveMap: React.FC<Props> = ({
       <PinDetailModal
         pin={selectedPinDetail}
         isOpen={pinDetailModalOpen}
-        onClose={() => setPinDetailModalOpen(false)}
+        onClose={() => {
+          setPinDetailModalOpen(false);
+          setPopupOpen(false);
+        }}
         onViewProfile={onViewUserProfile}
-        onEdit={setPinToEdit}
+        onEdit={(pin) => {
+          setPinToEdit(pin);
+          setPopupOpen(true);
+        }}
         onDelete={(pin) => {
           /* open delete modal */ console.log('delete', pin);
+          setPopupOpen(true);
         }}
       />
       <MapHUD
@@ -303,7 +322,7 @@ const InteractiveMap: React.FC<Props> = ({
 
       {/* Pin Edit Modal */}
       <PinEditModal
-        isOpen={true}
+        isOpen={!!pinToEdit}
         pin={
           pinToEdit
             ? {
@@ -316,13 +335,19 @@ const InteractiveMap: React.FC<Props> = ({
             : null
         }
         onSubmit={handleEditSubmit}
-        onCancel={() => setPinToEdit(null)}
+        onCancel={() => {
+          setPinToEdit(null);
+          setPopupOpen(false);
+        }}
         isSubmitting={updatePinMutation.isPending}
       />
       <PinCreateModal
         isOpen={pinCreateModalOpen}
         onSubmit={handleEditSubmit}
-        onCancel={() => setPinCreateModalOpen(false)}
+        onCancel={() => {
+          setPinCreateModalOpen(false);
+          setPopupOpen(false);
+        }}
         isSubmitting={updatePinMutation.isPending}
       />
     </div>

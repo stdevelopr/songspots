@@ -1,5 +1,5 @@
 import React from 'react';
-import type { LocationStatus, UserLocation } from '../types/map';
+import { LocationStatus, UserLocation } from './types/map';
 
 interface Props {
   status: LocationStatus;
