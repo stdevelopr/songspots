@@ -70,14 +70,12 @@ const InteractiveMap: React.FC<Props> = ({
     backendPins,
     currentUser,
     onViewUserProfile,
-    setPopupOpen,
     onPinSelected,
     userLocation,
     selectedPin,
     onMapReady,
     fromProfile,
     isLoadingTransition,
-    setSelectedPin,
   });
 
   useEffect(() => {

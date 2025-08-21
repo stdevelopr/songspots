@@ -10,7 +10,7 @@ export function bindReactPopup(
   marker: L.Marker,
   elementFactory: () => ReactElement,
   options: L.PopupOptions = {
-    closeButton: true,
+    closeButton: false,
     autoClose: true,
     closeOnEscapeKey: true,
     closeOnClick: false,
@@ -27,14 +27,7 @@ export function bindReactPopup(
   const root: Root = createRoot(container);
 
   const handleOpen = () => {
-    // render fresh element each time
     root.render(elementFactory());
-  };
-
-  const handleClose = () => {
-    // do NOT unmount here; render null to detach children safely
-    root.render(<></>);
-    onClose?.();
   };
 
   const handleRemove = () => {
@@ -48,7 +41,6 @@ export function bindReactPopup(
   };
 
   marker.on('popupopen', handleOpen);
-  marker.on('popupclose', handleClose);
   marker.on('remove', handleRemove);
 
   return popup;

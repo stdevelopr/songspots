@@ -13,28 +13,24 @@ export const usePins = ({
   backendPins,
   currentUser,
   onViewUserProfile,
-  setPopupOpen,
   onPinSelected,
   userLocation,
   selectedPin,
   onMapReady,
   fromProfile,
   isLoadingTransition,
-  setSelectedPin,
 }: {
   mapInstance: L.Map | null;
   isMobile: boolean;
   backendPins: BackendPin[];
   currentUser: string | undefined;
   onViewUserProfile: IOnViewUserProfile;
-  setPopupOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onPinSelected: ((pin: Pin) => void) | undefined;
   userLocation: { lat: number; lng: number } | null;
   selectedPin: SelectedPin | null | undefined;
   onMapReady: (() => void) | undefined;
   fromProfile: boolean | undefined;
   isLoadingTransition: boolean | undefined;
-  setSelectedPin?: React.Dispatch<React.SetStateAction<SelectedPin | null>>;
 }) => {
   const [pins, setPins] = useState<Pin[]>([]);
   const [pinToEdit, setPinToEdit] = useState<any | null>(null);
@@ -47,20 +43,15 @@ export const usePins = ({
   const updatePinMutation = useUpdatePin();
 
   usePinLayer({
+    isMobile,
     map: mapInstance,
     pins,
     onViewProfile: onViewUserProfile,
     onEdit: (pin) => {
       setPinToEdit(pin);
-      setPopupOpen(true);
     },
     onDelete: (pin) => {
       /* open delete modal */ console.log('delete', pin);
-      setPopupOpen(true);
-    },
-    onClose: () => {
-      // console.log('Popup closed');
-      // setSelectedPin && setSelectedPin(null);
     },
     onPinClick: (pin) => {
       if (isMobile) {
@@ -69,19 +60,17 @@ export const usePins = ({
           const handleMoveEnd = () => {
             setSelectedPinDetail(pin);
             setPinDetailModalOpen(true);
-            setPopupOpen(true);
+
             mapInstance.off('moveend', handleMoveEnd);
           };
           mapInstance.on('moveend', handleMoveEnd);
         } else {
           setSelectedPinDetail(pin);
           setPinDetailModalOpen(true);
-          setPopupOpen(true);
         }
       } else {
         if (onPinSelected) {
           onPinSelected(pin);
-          setPopupOpen(true);
         }
       }
     },

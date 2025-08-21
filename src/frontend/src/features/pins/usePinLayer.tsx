@@ -15,7 +15,6 @@ interface Options {
   onDelete: (pin: Pin) => void;
   onPinClick?: (pin: Pin) => void;
   isMobile?: boolean;
-  onClose?: () => void;
 }
 
 export function usePinLayer({
@@ -25,14 +24,12 @@ export function usePinLayer({
   onEdit,
   onDelete,
   onPinClick,
-  onClose,
+  isMobile,
 }: Options) {
-  const layerRef = useRef<L.LayerGroup | null>(null);
-
   useEffect(() => {
     if (!map) return;
-    if (!layerRef.current) layerRef.current = L.layerGroup().addTo(map);
-    const layer = layerRef.current;
+
+    const layer = L.layerGroup().addTo(map);
 
     layer.clearLayers();
 
@@ -48,23 +45,16 @@ export function usePinLayer({
       const m = L.marker([pin.lat, pin.lng], { icon });
 
       // Only bind popup on desktop
-      if (!(typeof window !== 'undefined' && window.innerWidth <= 600)) {
+      if (!isMobile) {
         bindReactPopup(m, () => (
           <PinPopup
             pin={pin}
             onViewProfile={onViewProfile}
             onEdit={onEdit}
             onDelete={onDelete}
-            onClose={onClose}
+            onClose={() => m.closePopup()}
           />
         ));
-
-        // Detect popup close event
-        if (onClose) {
-          m.on('popupclose', () => {
-            onClose();
-          });
-        }
       }
       m.on('click', () => {
         m.openPopup();
@@ -74,5 +64,5 @@ export function usePinLayer({
       });
       m.addTo(layer);
     });
-  }, [map, pins, onViewProfile, onEdit, onDelete, onPinClick]);
+  }, [map, pins, isMobile]);
 }
