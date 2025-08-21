@@ -33,8 +33,6 @@ function App() {
   const [isPinsLoaded, setIsPinsLoaded] = useState(false);
   const [isMapCentered, setIsMapCentered] = useState(false);
 
-  console.log('selected pin:', selectedPin);
-
   // Get pins data to check if they're loaded
   const { data: pins = [], isLoading: isLoadingPins, isFetching: isFetchingPins } = useGetAllPins();
 
@@ -155,7 +153,6 @@ function App() {
 
   if (status === 'initializing' || isLoadingPins) return <Loader />;
 
-  console.log('ready', pins);
   return (
     <div className="h-screen w-screen flex flex-col">
       {/* Initial loading overlay - covers entire app until all conditions are met */}
@@ -202,6 +199,7 @@ function App() {
             backendPins={pins}
             onViewUserProfile={handleViewUserProfile}
             selectedPin={selectedPin}
+            setSelectedPin={setSelectedPin}
             onPinSelected={(pin: { id: string; lat: number; lng: number }) => setSelectedPin(pin)}
             onMapReady={handleMapReady}
             onMapInitialized={handleMapInitialized}

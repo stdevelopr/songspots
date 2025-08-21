@@ -5,9 +5,6 @@ export const useMap = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
 
-  console.log('Map ref:', mapRef.current);
-  console.log('Map instance:', mapInstance);
-
   // initialize map
   useEffect(() => {
     if (!mapRef.current) return;
@@ -26,6 +23,20 @@ export const useMap = () => {
 
     setMapInstance(map);
   }, []);
+
+  useEffect(() => {
+    if (!mapInstance) return;
+
+    const close = () => mapInstance.closePopup();
+
+    mapInstance.on('dragstart', close);
+    mapInstance.on('zoomstart', close);
+
+    return () => {
+      mapInstance.off('dragstart', close);
+      mapInstance.off('zoomstart', close);
+    };
+  }, [mapInstance]);
 
   return { mapInstance, setMapInstance, mapRef };
 };

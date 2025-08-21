@@ -31,7 +31,7 @@ export interface SelectedPin {
 }
 
 export interface InteractiveMapProps {
-  onViewUserProfile: (userId: string) => void;
+  onViewUserProfile: IOnViewUserProfile;
   selectedPin?: SelectedPin | null;
   onPinSelected?: () => void;
   onMapReady?: () => void; // Callback for when map is ready
@@ -40,4 +40,8 @@ export interface InteractiveMapProps {
   onMapCentered?: () => void; // Callback for when map is centered
   isLoadingTransition?: boolean; // Prop to indicate loading state
   isInitialLoading?: boolean; // Prop to indicate initial loading state
+}
+
+export interface IOnViewUserProfile {
+  (userId: string): void;
 }
