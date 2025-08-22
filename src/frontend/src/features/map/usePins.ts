@@ -186,7 +186,6 @@ export const usePins = ({
         longitude: String(pinToEdit.lng), // text
         isPrivate: !!pinData.isPrivate, // bool
       });
-
       setPinToEdit(null);
     } catch (error) {
       console.error('Failed to update pin:', error);

@@ -36,13 +36,20 @@ const PinEditModal: React.FC<PinEditModalProps> = ({
   const [isPrivate, setIsPrivate] = useState(false);
   const [error, setError] = useState('');
 
+  // Only reset fields when modal opens for a new pin
+  const prevPinIdRef = React.useRef<string | null>(null);
   useEffect(() => {
-    if (isOpen && pin) {
+    if (isOpen && pin && pin.id !== prevPinIdRef.current) {
       setName(pin.name || '');
       setDescription(pin.description || '');
       setMusicLink(pin.musicLink || '');
       setIsPrivate(pin.isPrivate || false);
       setError('');
+      prevPinIdRef.current = pin.id;
+    }
+    // If modal closes, reset ref
+    if (!isOpen) {
+      prevPinIdRef.current = null;
     }
   }, [isOpen, pin]);
 

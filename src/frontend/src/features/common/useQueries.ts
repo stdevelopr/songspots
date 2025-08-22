@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import { Principal } from '@dfinity/principal';
-import type { UserProfile, Pin } from '../backend/backend.did';
+import type { UserProfile, Pin } from '../../backend/backend.did';
 
 // User profile queries
 export function useGetUserProfile() {
@@ -14,7 +14,11 @@ export function useGetUserProfile() {
       const profileResult = await actor.getUserProfile();
       // The backend might return UserProfile, null, undefined, [] or [UserProfile].
       // We need to normalize it to UserProfile | null.
-      if (profileResult === undefined || profileResult === null || (Array.isArray(profileResult) && profileResult.length === 0)) {
+      if (
+        profileResult === undefined ||
+        profileResult === null ||
+        (Array.isArray(profileResult) && profileResult.length === 0)
+      ) {
         return null;
       }
       if (Array.isArray(profileResult)) {
@@ -33,12 +37,16 @@ export function useGetUserProfileByPrincipal(principalId: string) {
     queryKey: ['userProfile', principalId],
     queryFn: async () => {
       if (!actor || !principalId) return null;
-      
+
       try {
         const profileResult = await actor.getProfileByPrincipal(Principal.fromText(principalId));
         // The backend might return UserProfile, null, undefined, [] or [UserProfile].
         // We need to normalize it to UserProfile | null.
-        if (profileResult === undefined || profileResult === null || (Array.isArray(profileResult) && profileResult.length === 0)) {
+        if (
+          profileResult === undefined ||
+          profileResult === null ||
+          (Array.isArray(profileResult) && profileResult.length === 0)
+        ) {
           return null;
         }
         if (Array.isArray(profileResult)) {
@@ -94,7 +102,7 @@ export function useSaveUserProfile() {
 // Admin check query
 export function useIsCurrentUserAdmin() {
   const { actor, isFetching } = useActor();
-  
+
   return useQuery<boolean>({
     queryKey: ['isCurrentUserAdmin'],
     queryFn: async () => {
@@ -129,7 +137,11 @@ export function useGetPin(id: bigint) {
       const pinResult = await actor.getPin(id);
       // The backend might return Pin, null, undefined, [] or [Pin].
       // We need to normalize it to Pin | null.
-      if (pinResult === undefined || pinResult === null || (Array.isArray(pinResult) && pinResult.length === 0)) {
+      if (
+        pinResult === undefined ||
+        pinResult === null ||
+        (Array.isArray(pinResult) && pinResult.length === 0)
+      ) {
         return null;
       }
       if (Array.isArray(pinResult)) {
@@ -146,7 +158,19 @@ export function useCreatePin() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ name, description, latitude, longitude, isPrivate }: { name: string; description: string; latitude: string; longitude: string; isPrivate: boolean }) => {
+    mutationFn: async ({
+      name,
+      description,
+      latitude,
+      longitude,
+      isPrivate,
+    }: {
+      name: string;
+      description: string;
+      latitude: string;
+      longitude: string;
+      isPrivate: boolean;
+    }) => {
       if (!actor) throw new Error('Actor not available');
       return actor.createPin(name, description, latitude, longitude, isPrivate);
     },
@@ -162,7 +186,21 @@ export function useUpdatePin() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, name, description, latitude, longitude, isPrivate }: { id: bigint; name: string; description: string; latitude: string; longitude: string; isPrivate: boolean }) => {
+    mutationFn: async ({
+      id,
+      name,
+      description,
+      latitude,
+      longitude,
+      isPrivate,
+    }: {
+      id: bigint;
+      name: string;
+      description: string;
+      latitude: string;
+      longitude: string;
+      isPrivate: boolean;
+    }) => {
       if (!actor) throw new Error('Actor not available');
       return actor.updatePin(id, name, description, latitude, longitude, isPrivate);
     },
@@ -225,7 +263,15 @@ export function useUpdateData() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, content, metadata }: { id: bigint; content: string; metadata: string }) => {
+    mutationFn: async ({
+      id,
+      content,
+      metadata,
+    }: {
+      id: bigint;
+      content: string;
+      metadata: string;
+    }) => {
       if (!actor) throw new Error('Actor not available');
       // This would need to be implemented in the backend if needed
       throw new Error('updateData not implemented');

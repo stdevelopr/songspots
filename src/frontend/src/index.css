@@ -185,16 +185,7 @@
   flex-direction: column;
   align-items: center;
 }
-/* Responsive Leaflet popup centering and sizing for mobile */
-.leaflet-popup-content-wrapper,
-.enhanced-popup,
-.enhanced-pin-popup {
-  max-width: 95vw !important;
-  min-width: 0;
-  word-break: break-word;
-  padding: 0.5rem 1rem;
-  border-radius: 0.75rem;
-}
+
 
 @media (max-width: 600px) {
   .leaflet-popup-content-wrapper,

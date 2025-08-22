@@ -26,12 +26,18 @@ export function usePinLayer({
   onPinClick,
   isMobile,
 }: Options) {
+  const layerRef = useRef<L.LayerGroup | null>(null);
+
   useEffect(() => {
     if (!map) return;
 
-    const layer = L.layerGroup().addTo(map);
+    // Remove previous layer group
+    if (layerRef.current) {
+      map.removeLayer(layerRef.current);
+    }
 
-    layer.clearLayers();
+    const layer = L.layerGroup().addTo(map);
+    layerRef.current = layer;
 
     pins.forEach((pin) => {
       const icon = pin.isPrivate
@@ -48,6 +54,7 @@ export function usePinLayer({
       if (!isMobile) {
         bindReactPopup(m, () => (
           <PinPopup
+            key={pin.id + pin.name}
             pin={pin}
             onViewProfile={onViewProfile}
             onEdit={onEdit}
