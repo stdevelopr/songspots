@@ -161,18 +161,20 @@ export function useCreatePin() {
     mutationFn: async ({
       name,
       description,
+      musicLink,
       latitude,
       longitude,
       isPrivate,
     }: {
       name: string;
       description: string;
+      musicLink: string;
       latitude: string;
       longitude: string;
       isPrivate: boolean;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.createPin(name, description, latitude, longitude, isPrivate);
+      return actor.createPin(name, description, musicLink, latitude, longitude, isPrivate);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pins'] });
@@ -190,6 +192,7 @@ export function useUpdatePin() {
       id,
       name,
       description,
+      musicLink,
       latitude,
       longitude,
       isPrivate,
@@ -197,12 +200,13 @@ export function useUpdatePin() {
       id: bigint;
       name: string;
       description: string;
+      musicLink: string;
       latitude: string;
       longitude: string;
       isPrivate: boolean;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.updatePin(id, name, description, latitude, longitude, isPrivate);
+      return actor.updatePin(id, name, description, musicLink, latitude, longitude, isPrivate);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pins'] });

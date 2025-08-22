@@ -40,6 +40,7 @@ type Pin =
    isPrivate: bool;
    latitude: text;
    longitude: text;
+   musicLink: text;
    name: text;
    owner: principal;
  };
@@ -76,8 +77,8 @@ type ApprovalStatus =
  };
 service : {
   assignRole: (user: principal, newRole: UserRole) -> ();
-  createPin: (name: text, description: text, latitude: text, longitude: 
-   text, isPrivate: bool) -> ();
+  createPin: (name: text, description: text, musicLink: text, latitude: 
+   text, longitude: text, isPrivate: bool) -> ();
   deletePin: (id: nat) -> ();
   fileDelete: (path: text) -> ();
   fileList: () -> (vec FileMetadata) query;
@@ -98,6 +99,6 @@ service : {
   listUsers: () -> (vec UserInfo) query;
   saveUserProfile: (profile: UserProfile) -> ();
   setApproval: (user: principal, approval: ApprovalStatus) -> ();
-  updatePin: (id: nat, name: text, description: text, latitude: text,
-   longitude: text, isPrivate: bool) -> ();
+  updatePin: (id: nat, name: text, description: text, musicLink: text,
+   latitude: text, longitude: text, isPrivate: bool) -> ();
 }

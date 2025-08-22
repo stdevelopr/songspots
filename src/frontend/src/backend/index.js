@@ -12,13 +12,8 @@ export { idlFactory } from "./backend.did.js";
 export const canisterId =
   process.env.CANISTER_ID_BACKEND;
 
-export const createActor = async (canisterId, options = {}) => {
-  const agentOptions = {
-    host: process.env.DFX_NETWORK === "ic" ? "https://ic0.app" : "http://localhost:4943",
-    ...options.agentOptions
-  };
-  
-  const agent = options.agent || new HttpAgent(agentOptions);
+export const createActor = (canisterId, options = {}) => {
+  const agent = options.agent || new HttpAgent({ ...options.agentOptions });
 
   if (options.agent && options.agentOptions) {
     console.warn(
@@ -28,16 +23,12 @@ export const createActor = async (canisterId, options = {}) => {
 
   // Fetch root key for certificate validation during development
   if (process.env.DFX_NETWORK !== "ic") {
-    try {
-      await agent.fetchRootKey();
-      console.log("Root key fetched successfully");
-    } catch (err) {
+    agent.fetchRootKey().catch((err) => {
       console.warn(
         "Unable to fetch root key. Check to ensure that your local replica is running"
       );
       console.error(err);
-      throw err;
-    }
+    });
   }
 
   // Creates an actor with using the candid interface and the HttpAgent
@@ -48,5 +39,4 @@ export const createActor = async (canisterId, options = {}) => {
   });
 };
 
-// Create backend actor lazily when needed
-export const backend = undefined;
+export const backend = canisterId ? createActor(canisterId) : undefined;

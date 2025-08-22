@@ -17,15 +17,15 @@ interface PinData {
 
 interface PinEditModalProps {
   isOpen: boolean;
-
-  onSubmit: (pinData: PinData) => void;
+  location?: { lat: number; lng: number } | null;
+  onSubmit: (pinData: PinData, location?: { lat: number; lng: number } | null) => void;
   onCancel: () => void;
   isSubmitting?: boolean;
 }
 
 const PinCreateModal: React.FC<PinEditModalProps> = ({
   isOpen,
-
+  location,
   onSubmit,
   onCancel,
   isSubmitting = false,
@@ -35,6 +35,16 @@ const PinCreateModal: React.FC<PinEditModalProps> = ({
   const [musicLink, setMusicLink] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      setName('');
+      setDescription('');
+      setMusicLink('');
+      setIsPrivate(false);
+      setError('');
+    }
+  }, [isOpen]);
 
   const validateMusicLink = (link: string): boolean => {
     if (!link.trim()) return true; // Empty link is allowed
@@ -53,12 +63,15 @@ const PinCreateModal: React.FC<PinEditModalProps> = ({
       return;
     }
 
-    onSubmit({
-      name: name.trim(),
-      description: description.trim(),
-      musicLink: musicLink.trim(),
-      isPrivate,
-    });
+    onSubmit(
+      {
+        name: name.trim(),
+        description: description.trim(),
+        musicLink: musicLink.trim(),
+        isPrivate,
+      },
+      location
+    );
   };
 
   const handleMusicLinkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,7 +98,7 @@ const PinCreateModal: React.FC<PinEditModalProps> = ({
       >
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">Edit Pin</h2>
+            <h2 className="text-xl font-semibold text-gray-900">Create Pin</h2>
             <button
               onClick={onCancel}
               disabled={isSubmitting}

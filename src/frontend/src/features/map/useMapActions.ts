@@ -27,6 +27,7 @@ export const useMapActions = () => {
         id: toNat(pinToEdit.id), // nat (bigint)
         name: pinData.name ?? '', // text
         description: pinData.description ?? '', // text
+        musicLink: pinData.musicLink ?? '', // text
         latitude: String(pinToEdit.lat), // text
         longitude: String(pinToEdit.lng), // text
         isPrivate: !!pinData.isPrivate, // bool

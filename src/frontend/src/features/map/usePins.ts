@@ -19,6 +19,7 @@ export const usePins = ({
   onMapReady,
   fromProfile,
   isLoadingTransition,
+  onDeletePin,
 }: {
   mapInstance: L.Map | null;
   isMobile: boolean;
@@ -31,6 +32,7 @@ export const usePins = ({
   onMapReady: (() => void) | undefined;
   fromProfile: boolean | undefined;
   isLoadingTransition: boolean | undefined;
+  onDeletePin: (pin: Pin) => void;
 }) => {
   const [pins, setPins] = useState<Pin[]>([]);
   const [pinToEdit, setPinToEdit] = useState<any | null>(null);
@@ -51,7 +53,9 @@ export const usePins = ({
       setPinToEdit(pin);
     },
     onDelete: (pin) => {
-      /* open delete modal */ console.log('delete', pin);
+      if (onDeletePin) {
+        onDeletePin(pin);
+      }
     },
     onPinClick: (pin) => {
       if (isMobile) {
@@ -176,12 +180,12 @@ export const usePins = ({
     isPrivate: boolean;
   }) => {
     if (!pinToEdit) return;
-
     try {
       await updatePinMutation.mutateAsync({
         id: toNat(pinToEdit.id), // nat (bigint)
         name: pinData.name ?? '', // text
         description: pinData.description ?? '', // text
+        musicLink: pinData.musicLink ?? '', // text
         latitude: String(pinToEdit.lat), // text
         longitude: String(pinToEdit.lng), // text
         isPrivate: !!pinData.isPrivate, // bool
@@ -190,6 +194,32 @@ export const usePins = ({
     } catch (error) {
       console.error('Failed to update pin:', error);
       alert('Failed to update pin. Please try again.');
+    }
+  };
+
+  const handleCreateSubmit = async (
+    pinData: {
+      name: string;
+      description: string;
+      musicLink: string;
+      isPrivate: boolean;
+    },
+    location?: { lat: number; lng: number } | null
+  ) => {
+    try {
+      await createPinMutation.mutateAsync({
+        name: pinData.name ?? '',
+        description: pinData.description ?? '',
+        musicLink: pinData.musicLink ?? '',
+        latitude: location ? String(location.lat) : userLocation ? String(userLocation.lat) : '',
+        longitude: location ? String(location.lng) : userLocation ? String(userLocation.lng) : '',
+        isPrivate: !!pinData.isPrivate,
+      });
+      setPinCreateModalOpen(false);
+      setPinToEdit(null); // Clear edit state after creating
+    } catch (error) {
+      console.error('Failed to create pin:', error);
+      alert('Failed to create pin. Please try again.');
     }
   };
 
@@ -204,6 +234,9 @@ export const usePins = ({
     pinCreateModalOpen,
     setPinCreateModalOpen,
     handleEditSubmit,
+    handleCreateSubmit,
     updatePinMutation,
+    createPinMutation,
+    deletePinMutation,
   };
 };

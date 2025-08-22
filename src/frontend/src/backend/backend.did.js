@@ -17,6 +17,7 @@ export const idlFactory = ({ IDL }) => {
     'description' : IDL.Text,
     'isPrivate' : IDL.Bool,
     'longitude' : IDL.Text,
+    'musicLink' : IDL.Text,
   });
   const ApprovalStatus = IDL.Variant({
     'pending' : IDL.Null,
@@ -67,7 +68,7 @@ export const idlFactory = ({ IDL }) => {
   return IDL.Service({
     'assignRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'createPin' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Bool],
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Bool],
         [],
         [],
       ),
@@ -107,7 +108,7 @@ export const idlFactory = ({ IDL }) => {
     'saveUserProfile' : IDL.Func([UserProfile], [], []),
     'setApproval' : IDL.Func([IDL.Principal, ApprovalStatus], [], []),
     'updatePin' : IDL.Func(
-        [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Bool],
+        [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Bool],
         [],
         [],
       ),

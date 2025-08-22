@@ -101,6 +101,7 @@ persistent actor {
     id : Nat;
     name : Text;
     description : Text;
+    musicLink : Text;
     latitude : Text;
     longitude : Text;
     owner : Principal;
@@ -111,7 +112,7 @@ persistent actor {
   var pins : Map.Map<Nat, Pin> = pinMap.empty<Pin>();
   var nextPinId : Nat = 0;
 
-  public shared ({ caller }) func createPin(name : Text, description : Text, latitude : Text, longitude : Text, isPrivate : Bool) : async () {
+  public shared ({ caller }) func createPin(name : Text, description : Text, musicLink : Text, latitude : Text, longitude : Text, isPrivate : Bool) : async () {
     if (not (MultiUserSystem.hasPermission(multiUserState, caller, #user, false))) {
       Debug.trap("Unauthorized: Only authenticated users can create pins");
     };
@@ -119,6 +120,7 @@ persistent actor {
       id = nextPinId;
       name;
       description;
+      musicLink;
       latitude;
       longitude;
       owner = caller;
@@ -128,7 +130,7 @@ persistent actor {
     nextPinId += 1;
   };
 
-  public shared ({ caller }) func updatePin(id : Nat, name : Text, description : Text, latitude : Text, longitude : Text, isPrivate : Bool) : async () {
+  public shared ({ caller }) func updatePin(id : Nat, name : Text, description : Text, musicLink : Text, latitude : Text, longitude : Text, isPrivate : Bool) : async () {
     if (not (MultiUserSystem.hasPermission(multiUserState, caller, #user, false))) {
       Debug.trap("Unauthorized: Only authenticated users can update pins");
     };
@@ -136,6 +138,7 @@ persistent actor {
       id;
       name;
       description;
+      musicLink;
       latitude;
       longitude;
       owner = caller;

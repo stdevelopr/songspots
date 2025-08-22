@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { toNat } from '../../common/utils/nat';
+import { DeleteConfirmationModal } from '../../common';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Pin, SelectedPin } from '../types/map';
@@ -31,20 +33,26 @@ interface Props {
   setSelectedPin: React.Dispatch<React.SetStateAction<SelectedPin | null>>;
 }
 
-const InteractiveMap: React.FC<Props> = ({
-  onViewUserProfile,
-  selectedPin,
-  onPinSelected,
-  onMapReady,
-  onMapInitialized,
-  onLocationProcessed,
-  onMapCentered,
-  backendPins = [],
-  isLoadingTransition = false,
-  isInitialLoading = false,
-  fromProfile = false,
-  setSelectedPin,
-}) => {
+const InteractiveMap: React.FC<Props> = (props) => {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [pinToDelete, setPinToDelete] = useState<Pin | null>(null);
+  const {
+    onViewUserProfile,
+    selectedPin,
+    onPinSelected,
+    onMapReady,
+    onMapInitialized,
+    onLocationProcessed,
+    onMapCentered,
+    backendPins = [],
+    isLoadingTransition = false,
+    isInitialLoading = false,
+    fromProfile = false,
+    setSelectedPin,
+  } = props;
+  const [newPinLocation, setNewPinLocation] = React.useState<{ lat: number; lng: number } | null>(
+    null
+  );
   const { identity } = useInternetIdentity();
   const isMobile = useIsMobile();
   const currentUser = identity?.getPrincipal().toString();
@@ -63,7 +71,10 @@ const InteractiveMap: React.FC<Props> = ({
     pinCreateModalOpen,
     setPinCreateModalOpen,
     handleEditSubmit,
+    handleCreateSubmit,
     updatePinMutation,
+    createPinMutation,
+    deletePinMutation,
   } = usePins({
     mapInstance,
     isMobile,
@@ -76,6 +87,11 @@ const InteractiveMap: React.FC<Props> = ({
     onMapReady,
     fromProfile,
     isLoadingTransition,
+    onDeletePin: (pin) => {
+      setPinToDelete(pin);
+      setShowDeleteModal(true);
+      setPopupOpen(true);
+    },
   });
 
   useEffect(() => {
@@ -101,6 +117,8 @@ const InteractiveMap: React.FC<Props> = ({
     const onClick = (e: L.LeafletMouseEvent) => {
       mapInstance.closePopup();
       if (!identity) return alert('Please log in to create pins');
+      setPinToEdit(null); // Clear previous edit state
+      setNewPinLocation({ lat: e.latlng.lat, lng: e.latlng.lng });
       setPinCreateModalOpen(true);
       setPopupOpen(true);
     };
@@ -109,7 +127,7 @@ const InteractiveMap: React.FC<Props> = ({
     return () => {
       mapInstance.off('click', onClick);
     };
-  }, [mapInstance, identity, popupOpen, onMapInitialized]);
+  }, [mapInstance, identity, popupOpen, onMapInitialized, setPinToEdit]);
 
   const publicCount = useMemo(() => pins.filter((p) => !p.isPrivate).length, [pins]);
   const privateCount = useMemo(() => pins.filter((p) => p.isPrivate && p.isOwner).length, [pins]);
@@ -130,7 +148,8 @@ const InteractiveMap: React.FC<Props> = ({
           setPopupOpen(true);
         }}
         onDelete={(pin) => {
-          /* open delete modal */ console.log('delete', pin);
+          setPinToDelete(pin);
+          setShowDeleteModal(true);
           setPopupOpen(true);
         }}
       />
@@ -152,13 +171,26 @@ const InteractiveMap: React.FC<Props> = ({
       <div ref={mapRef} className="w-full h-full" />
 
       {/* Delete Confirmation Modal */}
-      {/* <DeleteConfirmationModal
+      <DeleteConfirmationModal
         isOpen={showDeleteModal}
-        onConfirm={handleDeleteConfirm}
-        onCancel={handleDeleteCancel}
+        onConfirm={async () => {
+          if (!pinToDelete) return;
+          try {
+            await deletePinMutation.mutateAsync(toNat(pinToDelete.id));
+            setShowDeleteModal(false);
+            setPinToDelete(null);
+            setPopupOpen(false);
+          } catch (error) {
+            alert('Failed to delete pin.');
+          }
+        }}
+        onCancel={() => {
+          setShowDeleteModal(false);
+          setPinToDelete(null);
+        }}
         isDeleting={deletePinMutation.isPending}
         pinName={pinToDelete?.name || 'Unnamed Pin'}
-      /> */}
+      />
 
       {/* Pin Edit Modal */}
       <PinEditModal
@@ -169,7 +201,7 @@ const InteractiveMap: React.FC<Props> = ({
                 id: pinToEdit.id.toString(),
                 name: pinToEdit.name,
                 description: pinToEdit.description,
-                musicLink: undefined, // Music links are not stored in backend
+                musicLink: pinToEdit.musicLink,
                 isPrivate: pinToEdit.isPrivate,
               }
             : null
@@ -183,12 +215,14 @@ const InteractiveMap: React.FC<Props> = ({
       />
       <PinCreateModal
         isOpen={pinCreateModalOpen}
-        onSubmit={handleEditSubmit}
+        location={newPinLocation}
+        onSubmit={handleCreateSubmit}
         onCancel={() => {
           setPinCreateModalOpen(false);
           setPopupOpen(false);
+          setNewPinLocation(null);
         }}
-        isSubmitting={updatePinMutation.isPending}
+        isSubmitting={createPinMutation.isPending}
       />
     </div>
   );

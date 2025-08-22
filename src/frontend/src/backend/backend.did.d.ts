@@ -31,6 +31,7 @@ export interface Pin {
   'description' : string,
   'isPrivate' : boolean,
   'longitude' : string,
+  'musicLink' : string,
 }
 export type StreamingCallback = ActorMethod<
   [StreamingToken],
@@ -59,7 +60,7 @@ export type UserRole = { 'admin' : null } |
 export interface _SERVICE {
   'assignRole' : ActorMethod<[Principal, UserRole], undefined>,
   'createPin' : ActorMethod<
-    [string, string, string, string, boolean],
+    [string, string, string, string, string, boolean],
     undefined
   >,
   'deletePin' : ActorMethod<[bigint], undefined>,
@@ -88,7 +89,7 @@ export interface _SERVICE {
   'saveUserProfile' : ActorMethod<[UserProfile], undefined>,
   'setApproval' : ActorMethod<[Principal, ApprovalStatus], undefined>,
   'updatePin' : ActorMethod<
-    [bigint, string, string, string, string, boolean],
+    [bigint, string, string, string, string, string, boolean],
     undefined
   >,
 }
