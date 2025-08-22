@@ -53,6 +53,8 @@ const InteractiveMap: React.FC<Props> = (props) => {
   const [newPinLocation, setNewPinLocation] = React.useState<{ lat: number; lng: number } | null>(
     null
   );
+  // Flag to prevent user location centering after pin creation
+  const [justCreatedPin, setJustCreatedPin] = React.useState(false);
   const { identity } = useInternetIdentity();
   const isMobile = useIsMobile();
   const currentUser = identity?.getPrincipal().toString();
@@ -102,6 +104,7 @@ const InteractiveMap: React.FC<Props> = (props) => {
   // Center map based on location / defaults
   useEffect(() => {
     if (!mapInstance || selectedPin) return;
+    if (justCreatedPin) return; // Skip centering after pin creation
     if (status === 'granted' && userLocation) {
       mapInstance.setView([userLocation.lat, userLocation.lng], 15);
       setTimeout(() => onMapCentered?.(), 500);
@@ -216,7 +219,11 @@ const InteractiveMap: React.FC<Props> = (props) => {
       <PinCreateModal
         isOpen={pinCreateModalOpen}
         location={newPinLocation}
-        onSubmit={handleCreateSubmit}
+        onSubmit={async (...args) => {
+          setJustCreatedPin(true);
+          await handleCreateSubmit(...args);
+          setTimeout(() => setJustCreatedPin(false), 1000); // Reset flag after 1s
+        }}
         onCancel={() => {
           setPinCreateModalOpen(false);
           setPopupOpen(false);

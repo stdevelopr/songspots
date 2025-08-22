@@ -207,16 +207,39 @@ export const usePins = ({
     location?: { lat: number; lng: number } | null
   ) => {
     try {
+      if (!location) {
+        // If no location is provided, do not fly the map
+        await createPinMutation.mutateAsync({
+          name: pinData.name ?? '',
+          description: pinData.description ?? '',
+          musicLink: pinData.musicLink ?? '',
+          latitude: '',
+          longitude: '',
+          isPrivate: !!pinData.isPrivate,
+        });
+        setPinCreateModalOpen(false);
+        setPinToEdit(null);
+        return;
+      }
+      // Always use the modal's location for the pin
+      const lat = location.lat;
+      const lng = location.lng;
       await createPinMutation.mutateAsync({
         name: pinData.name ?? '',
         description: pinData.description ?? '',
         musicLink: pinData.musicLink ?? '',
-        latitude: location ? String(location.lat) : userLocation ? String(userLocation.lat) : '',
-        longitude: location ? String(location.lng) : userLocation ? String(userLocation.lng) : '',
+        latitude: String(lat),
+        longitude: String(lng),
         isPrivate: !!pinData.isPrivate,
       });
       setPinCreateModalOpen(false);
       setPinToEdit(null); // Clear edit state after creating
+      // Fly to the new pin location using the coordinates from the modal, not from state
+      if (mapInstance) {
+        setTimeout(() => {
+          mapInstance.flyTo([lat, lng], 16, { animate: true });
+        }, 300); // Delay to ensure map doesn't fly to old pin
+      }
     } catch (error) {
       console.error('Failed to create pin:', error);
       alert('Failed to create pin. Please try again.');
