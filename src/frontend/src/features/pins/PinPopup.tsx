@@ -1,4 +1,5 @@
 import React from 'react';
+import MusicEmbed from '../common/MusicEmbed';
 import { Pin } from '../map/types/map';
 
 interface Props {
@@ -80,70 +81,11 @@ const PinPopup: React.FC<Props> = ({ pin, onViewProfile, onEdit, onDelete, onClo
           </p>
         </div>
       )}
-      {pin.musicLink &&
-        (pin.musicLink.includes('spotify.com') ? (
-          <div
-            className="px-5 py-3 border-b border-zinc-100 dark:border-zinc-800 flex flex-col items-center gap-2"
-            style={{ minHeight: 220, maxHeight: '500px', height: '30vh' }}
-          >
-            <span className="text-base">🎵</span>
-            <div
-              style={{
-                flex: 1,
-                width: '100%',
-                display: 'flex',
-                alignItems: 'stretch',
-                justifyContent: 'center',
-              }}
-            >
-              <iframe
-                data-testid="embed-iframe"
-                style={{
-                  borderRadius: '12px',
-                  width: '100%',
-                  minHeight: 200,
-                  maxHeight: '100%',
-                  height: '100%',
-                }}
-                src={(() => {
-                  // Parse track or album ID from any valid Spotify URL
-                  const trackMatch = pin.musicLink.match(/spotify\.com\/track\/([\w\d]+)/);
-                  if (trackMatch && trackMatch[1]) {
-                    return `https://open.spotify.com/embed/track/${trackMatch[1]}?utm_source=generator`;
-                  }
-                  const albumMatch = pin.musicLink.match(/spotify\.com\/album\/([\w\d]+)/);
-                  if (albumMatch && albumMatch[1]) {
-                    return `https://open.spotify.com/embed/album/${albumMatch[1]}?utm_source=generator`;
-                  }
-                  return '';
-                })()}
-                frameBorder="0"
-                allowFullScreen
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy"
-              ></iframe>
-            </div>
-          </div>
-        ) : (
-          <div className="px-5 py-3 border-b border-zinc-100 dark:border-zinc-800 flex flex-col items-center gap-2">
-            <span className="text-base">🎵</span>
-            <div className="w-full flex justify-center">
-              <iframe
-                src={
-                  pin.musicLink.includes('youtube.com') || pin.musicLink.includes('youtu.be')
-                    ? getYouTubeEmbedUrl(pin.musicLink)
-                    : pin.musicLink
-                }
-                title="Music player"
-                className="rounded-lg border w-full max-w-[320px] aspect-video bg-black"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-                frameBorder="0"
-              ></iframe>
-            </div>
-          </div>
-        ))}
+      {pin.musicLink && (
+        <div className="px-5 py-3 border-b border-zinc-100 dark:border-zinc-800">
+          <MusicEmbed musicLink={pin.musicLink} />
+        </div>
+      )}
       <div className="px-5 py-3 flex flex-col gap-2">
         <button
           type="button"

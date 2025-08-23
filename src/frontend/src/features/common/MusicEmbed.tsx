@@ -1,0 +1,77 @@
+import React from 'react';
+
+interface MusicEmbedProps {
+  musicLink: string;
+}
+
+// Helper functions for parsing
+function getYouTubeEmbedUrl(url: string): string {
+  const youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/);
+  if (youtubeMatch && youtubeMatch[1]) {
+    return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+  }
+  const vParam = url.match(/[?&]v=([\w-]{11})/);
+  if (vParam && vParam[1]) {
+    return `https://www.youtube.com/embed/${vParam[1]}`;
+  }
+  return url;
+}
+
+function getSpotifyEmbedUrl(url: string): string {
+  const trackMatch = url.match(/spotify\.com\/track\/([\w\d]+)/);
+  if (trackMatch && trackMatch[1]) {
+    return `https://open.spotify.com/embed/track/${trackMatch[1]}?utm_source=generator`;
+  }
+  const albumMatch = url.match(/spotify\.com\/album\/([\w\d]+)/);
+  if (albumMatch && albumMatch[1]) {
+    return `https://open.spotify.com/embed/album/${albumMatch[1]}?utm_source=generator`;
+  }
+  return '';
+}
+
+const MusicEmbed: React.FC<MusicEmbedProps> = ({ musicLink }) => {
+  if (!musicLink) return null;
+  const isSpotify = musicLink.includes('spotify.com');
+  const isYouTube = musicLink.includes('youtube.com') || musicLink.includes('youtu.be');
+
+  let embedSrc = '';
+  if (isSpotify) embedSrc = getSpotifyEmbedUrl(musicLink);
+  else if (isYouTube) embedSrc = getYouTubeEmbedUrl(musicLink);
+  else embedSrc = musicLink;
+
+  return (
+    <div
+      className="w-full flex flex-col items-center gap-2"
+      style={{ minHeight: 220, maxHeight: '60vh', height: '100%' }}
+    >
+      <div
+        style={{
+          flex: 1,
+          width: '100%',
+          display: 'flex',
+          alignItems: 'stretch',
+          justifyContent: 'center',
+        }}
+      >
+        <iframe
+          data-testid="embed-iframe"
+          style={{
+            borderRadius: '12px',
+            width: '100%',
+            minHeight: 200,
+            maxHeight: '100%',
+            height: '100%',
+          }}
+          src={embedSrc}
+          frameBorder="0"
+          allowFullScreen
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+          title="Music player"
+        ></iframe>
+      </div>
+    </div>
+  );
+};
+
+export default MusicEmbed;
