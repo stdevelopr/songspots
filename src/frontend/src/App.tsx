@@ -207,21 +207,13 @@ function App() {
             {/* Account area */}
             <div className="flex items-center">
               <div className="flex items-center gap-2 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-md px-2.5 py-1.5 shadow-md">
-                {isAuthenticated && (
-                  <>
-                    <ProfileButton
-                      onProfileClick={handleProfileClick}
-                      onLogout={handleLogout}
-                      currentView={currentView}
-                    />
-                    <button
-                      className="inline-flex items-center justify-center rounded-full px-4 py-1.5 text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 shadow hover:shadow-lg hover:brightness-110 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 transition-all"
-                      onClick={handleLogout}
-                    >
-                      Logout
-                    </button>
-                  </>
-                )}
+                <ProfileButton onProfileClick={handleProfileClick} currentView={currentView} />
+                <button
+                  className="inline-flex items-center justify-center rounded-full px-4 py-1.5 text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 shadow hover:shadow-lg hover:brightness-110 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 transition-all"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
               </div>
             </div>
           </div>
