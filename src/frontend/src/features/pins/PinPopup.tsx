@@ -1,5 +1,6 @@
 import React from 'react';
 import MusicEmbed from '../common/MusicEmbed';
+import PinActionButton from './PinActionButton';
 import { Pin } from '../map/types/map';
 
 interface Props {
@@ -96,20 +97,12 @@ const PinPopup: React.FC<Props> = ({ pin, onViewProfile, onEdit, onDelete, onClo
         </button>
         {pin.isOwner && (
           <div className="flex gap-2">
-            <button
-              type="button"
-              className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 font-medium py-2 px-3 hover:bg-blue-200 dark:hover:bg-blue-800 transition"
-              onClick={() => onEdit(pin)}
-            >
+            <PinActionButton color="edit" onClick={() => onEdit(pin)}>
               <span className="text-base">✏️</span> Edit
-            </button>
-            <button
-              type="button"
-              className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-rose-100 dark:bg-rose-900 text-rose-800 dark:text-rose-200 font-medium py-2 px-3 hover:bg-rose-200 dark:hover:bg-rose-800 transition"
-              onClick={() => onDelete(pin)}
-            >
+            </PinActionButton>
+            <PinActionButton color="delete" onClick={() => onDelete(pin)}>
               <span className="text-base">🗑️</span> Delete
-            </button>
+            </PinActionButton>
           </div>
         )}
       </div>

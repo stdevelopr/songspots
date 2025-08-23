@@ -1,5 +1,7 @@
 import React from 'react';
-import type { Pin } from '../types/map';
+import MusicEmbed from '../common/MusicEmbed';
+import PinActionButton from './PinActionButton';
+import { Pin } from '../map';
 
 interface Props {
   pin: Pin | null;
@@ -10,18 +12,21 @@ interface Props {
   onDelete: (pin: Pin) => void;
 }
 
-const PinDetailModal: React.FC<Props> = ({ pin, isOpen, onClose, onViewProfile, onEdit, onDelete }) => {
+const PinDetailModal: React.FC<Props> = ({
+  pin,
+  isOpen,
+  onClose,
+  onViewProfile,
+  onEdit,
+  onDelete,
+}) => {
   if (!isOpen || !pin) return null;
 
   const privacy = pin.isPrivate ? (
     <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-red-100 text-red-700 text-xs font-semibold">
       🔒 Private
     </span>
-  ) : (
-    <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-semibold">
-      🌍 Public
-    </span>
-  );
+  ) : null;
 
   const musicText = pin.musicLink
     ? pin.musicLink.includes('youtu')
@@ -33,51 +38,71 @@ const PinDetailModal: React.FC<Props> = ({ pin, isOpen, onClose, onViewProfile, 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 z-[2000] flex items-center justify-center">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-2 max-h-[90vh] overflow-y-auto p-4 animate-fade-in">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-gray-900">Pin Details</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
-            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+      <div className="w-[340px] max-w-[92vw] rounded-2xl bg-white/80 dark:bg-zinc-900/80 shadow-xl backdrop-blur-md border border-zinc-200 dark:border-zinc-700 flex flex-col animate-fade-in max-h-[90vh] overflow-y-auto">
+        <div className="h-14 w-full relative rounded-t-2xl flex items-center justify-between px-5 py-3 bg-gradient-to-r from-white/60 via-zinc-100/60 to-white/40 dark:from-zinc-900/60 dark:via-zinc-800/60 dark:to-zinc-900/40 border-b border-zinc-200 dark:border-zinc-700">
+          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 truncate">
+            {pin.name || 'Unnamed Pin'}
+          </h3>
+          <button
+            className="cursor-pointer bg-zinc-200/70 hover:bg-zinc-300 dark:bg-zinc-800/70 dark:hover:bg-zinc-700 transition-colors rounded-full w-8 h-8 flex items-center justify-center shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 dark:focus-visible:ring-zinc-600"
+            onClick={onClose}
+            aria-label="Close"
+            title="Close"
+          >
+            <svg
+              className="h-5 w-5 text-zinc-600 dark:text-zinc-300"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                fill="currentColor"
+                d="M6 6L18 18M6 18L18 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
         </div>
-        <div className="mb-4">
-          <h3 className="text-xl font-semibold text-gray-800 mb-1">{pin.name || 'Unnamed Pin'}</h3>
-          {privacy}
-        </div>
+        {privacy && (
+          <div className="px-5 py-3 border-b border-zinc-100 dark:border-zinc-800">{privacy}</div>
+        )}
         {pin.description && (
-          <div className="mb-4">
-            <p className="text-gray-700 text-base whitespace-pre-line">{pin.description}</p>
+          <div className="px-5 py-3 border-b border-zinc-100 dark:border-zinc-800">
+            <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
+              {pin.description}
+            </p>
           </div>
         )}
-        <div className="mb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-gray-500 text-sm">👤 Created by:</span>
-            <button type="button" className="underline text-blue-600 text-sm font-medium" onClick={() => onViewProfile(pin.owner.toString())}>
-              View Profile
-            </button>
+        {pin.musicLink && (
+          <div className="px-5 py-3 border-b border-zinc-100 dark:border-zinc-800">
+            <MusicEmbed musicLink={pin.musicLink} />
           </div>
-        </div>
-        <div className="mb-4 flex gap-2 flex-wrap">
-          {pin.musicLink && musicText && (
-            <a href={pin.musicLink} target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition">
-              🎵 {musicText}
-            </a>
-          )}
+        )}
+        <div className="px-5 py-3 flex flex-col gap-2">
+          <button
+            type="button"
+            className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium py-2 px-3 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition"
+            onClick={() => onViewProfile(pin.owner.toString())}
+          >
+            <span className="text-base">👤</span> View Profile
+          </button>
           {pin.isOwner && (
-            <>
-              <button type="button" className="bg-yellow-400 text-yellow-900 px-4 py-2 rounded-lg font-semibold shadow hover:bg-yellow-500 transition" onClick={() => onEdit(pin)}>
-                ✏️ Edit
-              </button>
-              <button type="button" className="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-red-600 transition" onClick={() => onDelete(pin)}>
-                🗑️ Delete
-              </button>
-            </>
+            <div className="flex gap-2">
+              <PinActionButton color="edit" onClick={() => onEdit(pin)}>
+                <span className="text-base">✏️</span> Edit
+              </PinActionButton>
+              <PinActionButton color="delete" onClick={() => onDelete(pin)}>
+                <span className="text-base">🗑️</span> Delete
+              </PinActionButton>
+            </div>
           )}
         </div>
-        <div className="mt-2 text-right">
-          <span className="timestamp text-xs text-gray-400">Added: {new Date(pin.timestamp).toLocaleString()}</span>
+        <div className="px-5 py-2 text-right">
+          <span className="timestamp text-xs text-gray-400">
+            Added: {new Date(pin.timestamp).toLocaleString()}
+          </span>
         </div>
       </div>
     </div>
