@@ -99,17 +99,21 @@ export const usePins = ({
   useEffect(() => {
     if (!backendPins?.length) return;
     setPins(
-      backendPins.map((p) => ({
-        id: p.id.toString(),
-        lat: parseFloat(p.latitude),
-        lng: parseFloat(p.longitude),
-        timestamp: Date.now(),
-        name: p.name || undefined,
-        description: p.description || undefined,
-        isPrivate: p.isPrivate,
-        isOwner: currentUser ? p.owner.toString() === currentUser : false,
-        owner: p.owner,
-      }))
+      backendPins.map((p) => {
+        const pinObj = {
+          id: p.id.toString(),
+          lat: parseFloat(p.latitude),
+          lng: parseFloat(p.longitude),
+          timestamp: Date.now(),
+          name: p.name || undefined,
+          description: p.description || undefined,
+          musicLink: p.musicLink || undefined,
+          isPrivate: p.isPrivate,
+          isOwner: currentUser ? p.owner.toString() === currentUser : false,
+          owner: p.owner,
+        };
+        return pinObj;
+      })
     );
   }, [backendPins, currentUser]);
 

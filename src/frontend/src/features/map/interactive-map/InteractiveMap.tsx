@@ -50,6 +50,7 @@ const InteractiveMap: React.FC<Props> = (props) => {
     fromProfile = false,
     setSelectedPin,
   } = props;
+
   const [newPinLocation, setNewPinLocation] = React.useState<{ lat: number; lng: number } | null>(
     null
   );
