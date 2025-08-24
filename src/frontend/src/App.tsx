@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import LoginButton from './features/common/LoginButton';
-import ProfileButton from './features/profile/ProfileButton';
+import AppHeader from './features/common/AppHeader';
 import ProfilePage from './features/profile/ProfilePage';
 import { useInternetIdentity } from 'ic-use-internet-identity';
 import { useGetAllPins } from './features/common/useQueries';
@@ -164,61 +164,12 @@ function App() {
     <div className="h-screen w-screen flex flex-col">
       {/* Initial loading overlay - covers entire app until all conditions are met */}
 
-      <header className="sticky top-0 z-20 bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500/90 backdrop-blur-sm border-b border-white/10 shadow-lg">
-        <div className="mx-auto max-w-[1400px] px-4 sm:px-6">
-          <div className="flex h-14 items-center justify-between">
-            {/* Brand */}
-            <div className="flex items-center gap-4">
-              <button
-                className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 border border-white/20 backdrop-blur-md shadow-sm hover:bg-white/20 active:scale-[0.98] transition-all"
-                aria-label="Home"
-              >
-                <span className="relative flex items-center justify-center h-5 w-5">
-                  {/* Music note */}
-                  <svg className="h-4 w-4 text-white/90" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 17V5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v12a4 4 0 1 1-2-3.465V7h-4v10a4 4 0 1 1-2-3.465z" />
-                  </svg>
-                  {/* Pin */}
-                  <svg
-                    className="absolute -right-0.5 -bottom-0.5 h-2.5 w-2.5 text-sky-200"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 2a6 6 0 016 6c0 4.418-6 10-6 10S4 12.418 4 8a6 6 0 016-6zm0 8a2 2 0 100-4 2 2 0 000 4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </span>
-              </button>
-
-              <div className="hidden md:flex items-center gap-3">
-                <div className="h-6 w-px bg-white/25" />
-                <h1 className="text-xl tracking-tight">
-                  <span className="text-white/95 font-medium">Music </span>
-                  <span className="font-extrabold bg-gradient-to-r from-white to-pink-200 bg-clip-text text-transparent">
-                    Memories
-                  </span>
-                </h1>
-              </div>
-            </div>
-
-            {/* Account area */}
-            <div className="flex items-center">
-              <div className="flex items-center gap-2 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-md px-2.5 py-1.5 shadow-md">
-                <ProfileButton onProfileClick={handleProfileClick} currentView={currentView} />
-                <button
-                  className="inline-flex items-center justify-center rounded-full px-4 py-1.5 text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 shadow hover:shadow-lg hover:brightness-110 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 transition-all"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <AppHeader
+        onProfileClick={handleProfileClick}
+        onLogout={handleLogout}
+        currentView={currentView}
+        isAuthenticated={isAuthenticated}
+      />
 
       <main className="flex-1 relative">
         {/* Loading overlay for map transitions - only show when transitioning to map */}
