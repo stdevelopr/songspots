@@ -33,7 +33,7 @@ export default function AppHeader({
               <div className="h-6 w-px bg-white/25" />
               <h1 className="text-xl tracking-tight">
                 <span className="text-white/95 font-medium">Song </span>
-                <span className="font-extrabold bg-gradient-to-r from-white to-pink-200 bg-clip-text text-transparent">
+                <span className="font-extrabold bg-gradient-to-r from-yellow-50 to-yellow-50 bg-clip-text text-transparent">
                   Spots
                 </span>
               </h1>
@@ -50,17 +50,20 @@ export default function AppHeader({
                   aria-label="Profile"
                 >
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 via-blue-500 to-indigo-500 border border-blue-100 shadow">
+                    {/* Musical note icon only */}
                     <svg
-                      className="h-4 w-4 text-white block group-hover:hidden"
+                      className="h-5 w-5 text-white"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth={2}
                     >
-                      <path d="M12 3v10.15A4 4 0 1 0 14 17V7h4V3h-6z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 18V5l12-2v13" />
+                      <circle cx="6" cy="18" r="3" />
+                      <circle cx="18" cy="16" r="3" />
                     </svg>
                   </span>
-                  <span className="font-bold text-white text-sm drop-shadow-sm">Profile</span>
+                  <span className="font-bold text-white text-sm drop-shadow-sm">My Profile</span>
                 </button>
 
                 {/* Logout button — same pill style as Profile */}
