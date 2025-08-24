@@ -194,6 +194,18 @@ export const usePins = ({
         longitude: String(pinToEdit.lng), // text
         isPrivate: !!pinData.isPrivate, // bool
       });
+      // Update selectedPinDetail so popup refreshes
+      setSelectedPinDetail((prev) =>
+        prev && prev.id === pinToEdit.id
+          ? {
+              ...prev,
+              name: pinData.name,
+              description: pinData.description,
+              musicLink: pinData.musicLink,
+              isPrivate: pinData.isPrivate,
+            }
+          : prev
+      );
       setPinToEdit(null);
     } catch (error) {
       console.error('Failed to update pin:', error);

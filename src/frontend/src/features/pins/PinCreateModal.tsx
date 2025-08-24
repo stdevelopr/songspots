@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PinModal from './PinModal';
 
 interface Pin {
   id: string;
@@ -15,7 +16,7 @@ interface PinData {
   isPrivate: boolean;
 }
 
-interface PinEditModalProps {
+interface PinCreateModalProps {
   isOpen: boolean;
   location?: { lat: number; lng: number } | null;
   onSubmit: (pinData: PinData, location?: { lat: number; lng: number } | null) => void;
@@ -23,7 +24,7 @@ interface PinEditModalProps {
   isSubmitting?: boolean;
 }
 
-const PinCreateModal: React.FC<PinEditModalProps> = ({
+const PinCreateModal: React.FC<PinCreateModalProps> = ({
   isOpen,
   location,
   onSubmit,
@@ -83,169 +84,24 @@ const PinCreateModal: React.FC<PinEditModalProps> = ({
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex items-center justify-center">
-      <div
-        className="bg-white rounded-lg shadow-xl w-full max-w-md sm:max-w-lg mx-2 sm:mx-4 max-h-[90vh] overflow-y-auto p-2 sm:p-6"
-        style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-        }}
-      >
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">Create Pin</h2>
-            <button
-              onClick={onCancel}
-              disabled={isSubmitting}
-              className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="editPinName" className="block text-sm font-medium text-gray-700 mb-2">
-                Pin Name (Optional)
-              </label>
-              <input
-                type="text"
-                id="editPinName"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter a name for this pin"
-                disabled={isSubmitting}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50"
-                maxLength={100}
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="editPinDescription"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Description (Optional)
-              </label>
-              <textarea
-                id="editPinDescription"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Add a description for this pin"
-                rows={3}
-                disabled={isSubmitting}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none disabled:opacity-50 disabled:bg-gray-50"
-                maxLength={500}
-              />
-              <div className="text-xs text-gray-500 mt-1">{description.length}/500 characters</div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="editMusicLink"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Music Link (Optional)
-              </label>
-              <input
-                type="url"
-                id="editMusicLink"
-                value={musicLink}
-                onChange={handleMusicLinkChange}
-                placeholder="https://youtube.com/... or https://spotify.com/..."
-                disabled={isSubmitting}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50 ${
-                  error ? 'border-red-300' : 'border-gray-300'
-                }`}
-              />
-              {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-              <p className="mt-1 text-xs text-gray-500">Supported: YouTube and Spotify links</p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Privacy Setting
-              </label>
-              <div className="space-y-2">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="editPrivacy"
-                    value="public"
-                    checked={!isPrivate}
-                    onChange={() => setIsPrivate(false)}
-                    disabled={isSubmitting}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 disabled:opacity-50"
-                  />
-                  <span className="ml-3 text-sm text-gray-700">
-                    <span className="font-medium">🌐 Public</span> - Visible to everyone
-                  </span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="editPrivacy"
-                    value="private"
-                    checked={isPrivate}
-                    onChange={() => setIsPrivate(true)}
-                    disabled={isSubmitting}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 disabled:opacity-50"
-                  />
-                  <span className="ml-3 text-sm text-gray-700">
-                    <span className="font-medium">🔒 Private</span> - Only visible to you
-                  </span>
-                </label>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-3 pt-2">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Saving...
-                  </>
-                ) : (
-                  'Save Changes'
-                )}
-              </button>
-              <button
-                type="button"
-                onClick={onCancel}
-                disabled={isSubmitting}
-                className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors disabled:opacity-50"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-
-          <div className="mt-4 p-3 bg-gray-50 rounded-md">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Examples:</h3>
-            <div className="text-xs text-gray-600 space-y-1">
-              <div>YouTube: https://youtube.com/watch?v=...</div>
-              <div>Spotify: https://open.spotify.com/track/...</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <PinModal
+      isOpen={isOpen}
+  title="Create Spot"
+      name={name}
+      setName={setName}
+      description={description}
+      setDescription={setDescription}
+      musicLink={musicLink}
+      setMusicLink={setMusicLink}
+      isPrivate={isPrivate}
+      setIsPrivate={setIsPrivate}
+      error={error}
+      isSubmitting={isSubmitting}
+      onCancel={onCancel}
+      onSubmit={handleSubmit}
+  submitText={isSubmitting ? 'Creating...' : 'Create Spot'}
+    />
   );
 };
 

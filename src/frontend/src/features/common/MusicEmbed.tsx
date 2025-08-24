@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface MusicEmbedProps {
   musicLink: string;
@@ -30,6 +30,7 @@ function getSpotifyEmbedUrl(url: string): string {
 }
 
 const MusicEmbed: React.FC<MusicEmbedProps> = ({ musicLink }) => {
+  const [loading, setLoading] = useState(true);
   if (!musicLink) return null;
   const isSpotify = musicLink.includes('spotify.com');
   const isYouTube = musicLink.includes('youtube.com') || musicLink.includes('youtu.be');
@@ -41,9 +42,14 @@ const MusicEmbed: React.FC<MusicEmbedProps> = ({ musicLink }) => {
 
   return (
     <div
-      className="w-full flex flex-col items-center gap-2"
+      className="w-full flex flex-col items-center gap-2 relative"
       style={{ minHeight: 220, maxHeight: '60vh', height: '100%' }}
     >
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center z-10">
+          <div className="animate-spin-slow h-10 w-10 rounded-full border-4 border-blue-400 border-t-transparent"></div>
+        </div>
+      )}
       <div
         style={{
           flex: 1,
@@ -68,6 +74,7 @@ const MusicEmbed: React.FC<MusicEmbedProps> = ({ musicLink }) => {
           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
           loading="lazy"
           title="Music player"
+          onLoad={() => setLoading(false)}
         ></iframe>
       </div>
     </div>
