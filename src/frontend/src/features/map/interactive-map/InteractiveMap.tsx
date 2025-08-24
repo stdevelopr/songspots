@@ -172,7 +172,7 @@ const InteractiveMap: React.FC<Props> = (props) => {
         isLoadingTransition={isLoadingTransition!}
         isInitialLoading={isInitialLoading!}
       />
-      <div ref={mapRef} className="w-full h-full" />
+      <div ref={mapRef} className="w-full h-full z-0" />
 
       {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal

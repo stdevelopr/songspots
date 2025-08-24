@@ -87,7 +87,7 @@ const PinCreateModal: React.FC<PinCreateModalProps> = ({
   return (
     <PinModal
       isOpen={isOpen}
-  title="Create Spot"
+      title="Create Spot"
       name={name}
       setName={setName}
       description={description}
@@ -100,7 +100,7 @@ const PinCreateModal: React.FC<PinCreateModalProps> = ({
       isSubmitting={isSubmitting}
       onCancel={onCancel}
       onSubmit={handleSubmit}
-  submitText={isSubmitting ? 'Creating...' : 'Create Spot'}
+      submitText={isSubmitting ? 'Creating...' : 'Create Spot'}
     />
   );
 };

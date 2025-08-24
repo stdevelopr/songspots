@@ -93,7 +93,7 @@ const PinEditModal: React.FC<PinEditModalProps> = ({
   return (
     <PinModal
       isOpen={isOpen}
-  title="Edit Spot"
+      title="Edit Spot"
       name={name}
       setName={setName}
       description={description}

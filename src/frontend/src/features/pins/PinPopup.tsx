@@ -20,7 +20,6 @@ const PinPopup: React.FC<Props> = ({ pin, onViewProfile, onEdit, onDelete, onClo
       onClose={onClose}
       showPrivacy={true}
       showTimestamp={true}
-      label="Memory"
     />
   );
 };

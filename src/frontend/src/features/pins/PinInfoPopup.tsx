@@ -27,9 +27,7 @@ const PinInfoPopup: React.FC<PinInfoPopupProps> = ({
       <span className="privacy-icon">🔒</span> Private
     </span>
   ) : (
-    <span className="privacy-badge public">
-      Public
-    </span>
+    <span className="privacy-badge public">Public</span>
   );
 
   return (
@@ -62,7 +60,7 @@ const PinInfoPopup: React.FC<PinInfoPopupProps> = ({
           </button>
         )}
       </div>
-  {/* Privacy info removed as requested */}
+      {/* Privacy info removed as requested */}
       {pin.description && (
         <div className="px-5 py-3 border-b border-zinc-100 dark:border-zinc-800 max-h-40 overflow-y-auto">
           <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed break-words">

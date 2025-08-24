@@ -208,18 +208,6 @@ function App() {
           />
         )}
       </main>
-
-      <footer className="bg-white border-t border-gray-200 px-6 py-3 text-center text-sm text-gray-600">
-        © 2025. Built with <span className="text-red-500">♥</span> using{' '}
-        <a
-          href="https://caffeine.ai"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          caffeine.ai
-        </a>
-      </footer>
     </div>
   );
 }
