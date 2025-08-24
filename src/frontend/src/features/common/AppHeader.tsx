@@ -61,10 +61,10 @@ export default function AppHeader({
                 {/* Profile button */}
                 <button
                   onClick={onProfileClick}
-                  className="flex items-center gap-2 px-3 h-9 rounded-full bg-white/30 backdrop-blur-md border border-white/30 shadow-md hover:bg-white/40 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition-all cursor-pointer group"
+                  className="flex items-center gap-2 px-3 h-9 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg hover:bg-white/20 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition-all cursor-pointer group"
                   aria-label="Profile"
                 >
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 via-purple-400 to-pink-300 border border-indigo-100 shadow">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 via-blue-500 to-indigo-500 border border-blue-100 shadow">
                     <svg
                       className="h-4 w-4 text-white block group-hover:hidden"
                       viewBox="0 0 24 24"
@@ -97,12 +97,12 @@ export default function AppHeader({
                 {/* Logout button — same pill style as Profile */}
                 <button
                   onClick={onLogout}
-                  className="flex items-center gap-2 px-3 h-9 rounded-full bg-white/30 backdrop-blur-md border border-white/30 shadow-md hover:bg-white/40 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 transition-all cursor-pointer"
+                  className="flex items-center gap-2 px-3 h-9 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg hover:bg-white/20 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 transition-all cursor-pointer"
                   aria-label="Logout"
                 >
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-pink-400 to-rose-300 border border-pink-100 shadow">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-rose-400 to-pink-400 border border-rose-100 shadow">
                     <svg
-                      className="h-4 w-4 text-white"
+                      className="h-4 w-4 text-white "
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2"
