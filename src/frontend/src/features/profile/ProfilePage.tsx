@@ -207,6 +207,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
         id: pinToEdit.id,
         name: pinData.name || '',
         description: pinData.description || '',
+        musicLink: pinData.musicLink || '',
         latitude: pinToEdit.latitude,
         longitude: pinToEdit.longitude,
         isPrivate: pinData.isPrivate,
