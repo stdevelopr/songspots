@@ -39,7 +39,7 @@ const getFileUrl = async (path: string): Promise<string> => {
 
   const baseUrl =
     network === 'local'
-      ? `http://${backendCanisterId}.raw.localhost:8081`
+      ? `http://${backendCanisterId}.raw.localhost:4943`
       : `https://${backendCanisterId}.raw.icp0.io`;
 
   return `${baseUrl}/${sanitizedPath}`;
