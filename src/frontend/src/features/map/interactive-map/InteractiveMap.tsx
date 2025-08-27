@@ -19,7 +19,7 @@ const DEFAULT_CENTER: [number, number] = [40.7128, -74.006];
 const DEFAULT_ZOOM = 10;
 
 interface Props {
-  onViewUserProfile: (userId: string) => void;
+  onViewUserProfile: (userId: string | null) => void;
   selectedPin?: SelectedPin | null;
   onPinSelected?: (pin: Pin) => void;
   onMapReady?: () => void;

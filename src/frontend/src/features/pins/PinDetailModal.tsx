@@ -6,7 +6,7 @@ interface Props {
   pin: Pin | null;
   isOpen: boolean;
   onClose: () => void;
-  onViewProfile: (userId: string) => void;
+  onViewProfile: (userId: string | null) => void;
   onEdit: (pin: Pin) => void;
   onDelete: (pin: Pin) => void;
 }

@@ -91,10 +91,9 @@ function App() {
     setIsLoadingMapTransition(false);
   };
 
-  const handleViewUserProfile = (userId: string) => {
+  const handleViewUserProfile = (userId: string | null) => {
     setProfileUserId(userId);
     setCurrentView('profile');
-    // Always dismiss loading indicator when switching to profile
     setIsLoadingMapTransition(false);
   };
 

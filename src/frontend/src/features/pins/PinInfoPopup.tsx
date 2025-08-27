@@ -5,7 +5,7 @@ import { Pin } from '../map/types/map';
 
 interface PinInfoPopupProps {
   pin: Pin;
-  onViewProfile: (userId: string) => void;
+  onViewProfile: (userId: string | null) => void;
   onEdit?: (pin: Pin) => void;
   onDelete?: (pin: Pin) => void;
   onClose?: () => void;
@@ -77,7 +77,13 @@ const PinInfoPopup: React.FC<PinInfoPopupProps> = ({
         <button
           type="button"
           className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-medium py-2 px-3 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition"
-          onClick={() => onViewProfile(pin.owner.toString())}
+          onClick={() => {
+            if (pin.isOwner) {
+              onViewProfile(null);
+            } else {
+              onViewProfile(pin.owner.toString());
+            }
+          }}
         >
           <span className="text-base flex items-center">
             View Profile
