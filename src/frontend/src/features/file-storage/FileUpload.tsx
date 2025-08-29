@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useActor } from '../../hooks/useActor';
+import { useActor } from '../common/useActor';
 import { sanitizeUrl, useInvalidateQueries } from './FileList';
 
 const CHUNK_SIZE = 2_000_000;

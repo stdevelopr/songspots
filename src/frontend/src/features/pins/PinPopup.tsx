@@ -4,7 +4,7 @@ import { Pin } from '../map/types/map';
 
 interface Props {
   pin: Pin;
-  onViewProfile: (userId: string) => void;
+  onViewProfile: (userId: string | null) => void;
   onEdit: (pin: Pin) => void;
   onDelete: (pin: Pin) => void;
   onClose?: () => void;

@@ -6,6 +6,7 @@ interface AppHeaderProps {
   onLogout: () => void;
   currentView: 'map' | 'profile';
   isAuthenticated: boolean;
+  onBackToMap?: () => void;
 }
 
 export default function AppHeader({
@@ -13,13 +14,58 @@ export default function AppHeader({
   onLogout,
   currentView,
   isAuthenticated,
+  onBackToMap,
 }: AppHeaderProps) {
   return (
-    <header className="sticky top-0 z-20 bg-gradient-to-r from-black via-zinc-800 to-zinc-900 shadow-lg border-b border-zinc-800">
+    <header
+      className="sticky top-0 z-20 bg-gradient-to-r from-black via-zinc-800 to-zinc-900 shadow-lg border-b border-zinc-800"
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+    >
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 relative">
         <div className="flex h-14 items-center justify-between">
           {/* Brand */}
           <div className="flex items-center gap-4">
+            {/* Back/Map in header, consistent position for all breakpoints */}
+            {currentView === 'profile' && onBackToMap && (
+              <>
+                {/* Mobile icon button */}
+                <button
+                  onClick={onBackToMap}
+                  className="md:hidden flex items-center justify-center w-9 h-9 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg hover:bg-white/20 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition-all cursor-pointer"
+                  aria-label="Map"
+                >
+                  <svg
+                    className="h-5 w-5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                </button>
+                {/* Desktop pill button */}
+                <button
+                  onClick={onBackToMap}
+                  className="hidden md:flex items-center gap-2 mr-1 px-3 h-9 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg hover:bg-white/20 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition-all cursor-pointer"
+                  aria-label="Map"
+                >
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-blue-500 border border-blue-100 shadow">
+                    <svg
+                      className="h-4 w-4 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                  </span>
+                  <span className="font-bold text-white text-sm drop-shadow-sm">Map</span>
+                </button>
+              </>
+            )}
+
             <span className="relative flex items-center justify-center h-12 w-12">
               <img
                 src="/song_spot.png"
@@ -38,6 +84,8 @@ export default function AppHeader({
                 </span>
               </h1>
             </div>
+
+            {/* Desktop Map pill moved to the far left (above) for consistency */}
           </div>
           {/* Auth area: show login if not authenticated, else profile + logout */}
           <div className="flex items-center gap-3">

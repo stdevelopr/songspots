@@ -168,9 +168,10 @@ function App() {
         onLogout={handleLogout}
         currentView={currentView}
         isAuthenticated={isAuthenticated}
+        onBackToMap={handleBackToMap}
       />
 
-      <main className="flex-1 relative">
+      <main className="flex-1 relative overflow-hidden min-h-0">
         {/* Loading overlay for map transitions - only show when transitioning to map */}
         {isLoadingMapTransition && currentView === 'map' && !isInitialLoading && (
           <div className="absolute inset-0 bg-white bg-opacity-95 flex items-center justify-center z-40 pointer-events-none">

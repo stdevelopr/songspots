@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   useGetUserProfile,
   useSaveUserProfile,
@@ -13,6 +13,8 @@ import { useFileUrl, sanitizeUrl } from '../file-storage/FileList';
 import { Principal } from '@dfinity/principal';
 import DeleteConfirmationModal from '../common/DeleteConfirmationModal';
 import PinEditModal from '../pins/PinEditModal';
+import ProfileHero from './ProfileHero';
+import ProfileCard from './ProfileCard';
 
 interface ProfilePageProps {
   onBackToMap: () => void;
@@ -47,10 +49,18 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
   const [error, setError] = useState('');
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
   const [profilePicturePreview, setProfilePicturePreview] = useState<string | null>(null);
+  const [removeProfilePicture, setRemoveProfilePicture] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [pinToDelete, setPinToDelete] = useState<any>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [pinToEdit, setPinToEdit] = useState<any>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const [isCondensed, setIsCondensed] = useState(false);
+  const [bio, setBio] = useState('');
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   // Get current profile picture URL
   const profilePicturePath = userProfile?.profilePicture;
@@ -81,7 +91,31 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
     setError('');
     setProfilePictureFile(null);
     setProfilePicturePreview(null);
+    // Load bio from localStorage for own profile
+    try {
+      const principalId = identity?.getPrincipal().toString();
+      if (principalId && isViewingOwnProfile) {
+        const stored = localStorage.getItem(`profile-bio-${principalId}`) || '';
+        setBio(stored);
+      } else if (!isViewingOwnProfile) {
+        setBio('');
+      }
+    } catch {}
   }, [userProfile, isViewingOwnProfile]);
+
+  // Condense header on scroll
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      setIsCondensed(el.scrollTop > 32);
+    };
+    el.addEventListener('scroll', onScroll);
+    onScroll();
+    return () => {
+      el.removeEventListener('scroll', onScroll);
+    };
+  }, []);
 
   const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -121,7 +155,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
     try {
       let finalProfilePictureForBackend: [string] | [] = [];
 
-      if (profilePictureFile) {
+      if (removeProfilePicture) {
+        finalProfilePictureForBackend = [];
+      } else if (profilePictureFile) {
         const data = new Uint8Array(await profilePictureFile.arrayBuffer());
         const fileName = `profile-pictures/${identity?.getPrincipal().toString()}-${Date.now()}.${profilePictureFile.name.split('.').pop()}`;
         const uploadedFilePath = sanitizeUrl(fileName);
@@ -146,10 +182,19 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
         profilePicture: finalProfilePictureForBackend,
       });
 
+      // Save bio locally for now (no backend field yet)
+      try {
+        const principalId = identity?.getPrincipal().toString();
+        if (principalId) {
+          localStorage.setItem(`profile-bio-${principalId}`, bio.trim());
+        }
+      } catch {}
+
       setIsEditing(false);
       setError('');
       setProfilePictureFile(null);
       setProfilePicturePreview(null);
+      setRemoveProfilePicture(false);
     } catch (error) {
       console.error('Failed to save profile:', error);
       setError('Failed to save profile. Please try again.');
@@ -164,6 +209,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
     setError('');
     setProfilePictureFile(null);
     setProfilePicturePreview(null);
+    setRemoveProfilePicture(false);
   };
 
   const handleDeletePin = (pin: any) => {
@@ -271,604 +317,210 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
     return identity?.getPrincipal().toString() || '';
   };
 
-  const getProfileHeaderGradient = () => {
-    if (isViewingOwnProfile) {
-      return 'from-purple-600 via-blue-600 to-indigo-700';
+  const handleCopyPrincipal = async () => {
+    try {
+      await navigator.clipboard.writeText(getUserPrincipalId());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+      setToastMessage('Copied ID to clipboard');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 1500);
+    } catch (e) {
+      console.error('Clipboard copy failed', e);
     }
-    return 'from-emerald-600 via-teal-600 to-cyan-700';
+  };
+
+  const getProfileHeaderGradient = () => {
+    // Harmonize with dark header: cool indigo/blue tones
+    if (isViewingOwnProfile) {
+      return 'from-indigo-600 via-violet-600 to-sky-600';
+    }
+    return 'from-blue-700 via-indigo-700 to-slate-800';
   };
 
   const getProfileAccentColor = () => {
-    if (isViewingOwnProfile) {
-      return 'blue';
-    }
-    return 'emerald';
+    // Use a single accent family to match the black header
+    return 'indigo';
   };
 
   return (
-    <div className="h-full bg-gray-50 overflow-y-auto">
-      <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        {/* Back to Map Button */}
-        <div className="mb-6">
-          <button
-            onClick={onBackToMap}
-            className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors group"
-          >
-            <svg
-              className="w-5 h-5 group-hover:-translate-x-1 transition-transform"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-            <span className="font-medium">Back to Map</span>
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Profile Card */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100">
-              <div
-                className={`bg-gradient-to-br ${getProfileHeaderGradient()} px-6 py-10 relative`}
-              >
-                {/* Decorative elements */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white bg-opacity-10 rounded-full -translate-y-16 translate-x-16"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white bg-opacity-5 rounded-full translate-y-12 -translate-x-12"></div>
-
-                <div className="text-center relative z-10">
-                  {/* Profile Picture */}
-                  <div className="mb-6">
-                    {profilePicturePreview ? (
-                      <img
-                        src={profilePicturePreview}
-                        alt="Profile preview"
-                        className="w-24 h-24 rounded-full mx-auto border-4 border-white shadow-xl object-cover ring-4 ring-white ring-opacity-20"
-                      />
-                    ) : profilePictureUrl ? (
-                      <img
-                        src={profilePictureUrl}
-                        alt="Profile"
-                        className="w-24 h-24 rounded-full mx-auto border-4 border-white shadow-xl object-cover ring-4 ring-white ring-opacity-20"
-                      />
-                    ) : (
-                      <div className="w-24 h-24 bg-white bg-opacity-20 rounded-full mx-auto border-4 border-white shadow-xl flex items-center justify-center backdrop-blur-sm ring-4 ring-white ring-opacity-20">
-                        <svg
-                          className="w-12 h-12 text-white"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                          />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-
-                  <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">
-                    {getDisplayName()}
-                  </h1>
-
-                  <div className="flex items-center justify-center space-x-4 text-white text-opacity-90">
-                    <div className="flex items-center space-x-2">
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                      </svg>
-                      <span className="font-medium">
-                        {visiblePins.length} pin{visiblePins.length !== 1 ? 's' : ''}
-                      </span>
-                    </div>
-
-                    {!isViewingOwnProfile && (
-                      <div className="flex items-center space-x-2">
-                        <svg
-                          className="w-5 h-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                          />
-                        </svg>
-                        <span className="text-sm">Public Profile</span>
-                      </div>
-                    )}
-                  </div>
+    <div className="h-full min-h-0 bg-gray-50 flex flex-col text-gray-800">
+      {/* Desktop layout (lg+): card + scrollable list (two-column flex) */}
+      <div className="hidden lg:flex h-full min-h-0 px-4 lg:px-8 py-6">
+        <div className="w-full max-w-6xl mx-auto h-full min-h-0 flex gap-8">
+          <div className="w-full lg:w-1/3 min-h-0 overflow-y-auto">
+            <ProfileCard
+              name={getDisplayName()}
+              principalId={getUserPrincipalId()}
+              photoUrl={profilePictureUrl || undefined}
+              headerGradient={getProfileHeaderGradient()}
+              totalCount={visiblePins?.length || 0}
+            />
+            {/* Profile extras (desktop) */}
+            <div className="mt-4 space-y-4">
+              {/* About */}
+              <div className="bg-white/95 rounded-xl border border-gray-100 shadow-sm p-4">
+                <h3 className="text-sm font-semibold text-gray-800 mb-2">About</h3>
+                {isViewingOwnProfile ? (
+                  bio?.trim() ? (
+                    <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{bio}</p>
+                  ) : (
+                    <p className="text-sm text-gray-500">Add a short bio to tell others about you.</p>
+                  )
+                ) : (
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+                    {/* For now, show nothing special for other users if no bio */}
+                    {''}
+                  </p>
+                )}
+              </div>
+              {/* Stats */}
+              <div className="bg-white/95 rounded-xl border border-gray-100 shadow-sm p-4">
+                <h3 className="text-sm font-semibold text-gray-800 mb-3">Stats</h3>
+                <div className="flex flex-wrap gap-2">
+                  {isViewingOwnProfile ? (
+                    <>
+                      <span className="text-[12px] px-2.5 py-1 rounded-full bg-gray-50 text-gray-800 border border-gray-200">Total: {visiblePins?.length || 0}</span>
+                      <span className="text-[12px] px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">Public: {(userPins || []).filter((p) => !p.isPrivate).length}</span>
+                      <span className="text-[12px] px-2.5 py-1 rounded-full bg-slate-50 text-slate-700 border border-slate-200">Private (only you): {(userPins || []).filter((p) => p.isPrivate).length}</span>
+                    </>
+                  ) : (
+                    <span className="text-[12px] px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">Spots: {visiblePins?.length || 0}</span>
+                  )}
                 </div>
               </div>
-
-              <div className="p-6">
-                {isLoading || isLoadingPins ? (
-                  <div className="flex items-center justify-center py-12">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    <span className="ml-3 text-gray-600">Loading profile...</span>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    {/* User Identity Info */}
-                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                      <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                        <svg
-                          className="w-4 h-4 mr-2"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V4a2 2 0 114 0v2m-4 0a2 2 0 104 0m-4 0v2m4-2v2"
-                          />
-                        </svg>
-                        Account Information
-                      </h3>
-                      <p className="text-xs text-gray-500 break-all font-mono bg-white rounded-lg p-3 border">
-                        {getUserPrincipalId()}
-                      </p>
-                    </div>
-
-                    {/* Profile Form - Only show for own profile */}
-                    {isViewingOwnProfile && (
-                      <form onSubmit={handleSave} className="space-y-6">
-                        <div>
-                          <label
-                            htmlFor="profileName"
-                            className="block text-sm font-medium text-gray-700 mb-2"
-                          >
-                            Name *
-                          </label>
-                          {isEditing ? (
-                            <input
-                              type="text"
-                              id="profileName"
-                              value={name}
-                              onChange={(e) => {
-                                setName(e.target.value);
-                                if (error) setError('');
-                              }}
-                              placeholder="Enter your name"
-                              disabled={saveProfileMutation.isPending || isUploading}
-                              className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50 transition-colors ${
-                                error ? 'border-red-300' : 'border-gray-300'
-                              }`}
-                              maxLength={100}
-                              required
-                            />
-                          ) : (
-                            <div className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-3 border border-gray-200">
-                              <p className="text-gray-900 font-medium">{name || 'Not set'}</p>
-                              <button
-                                type="button"
-                                onClick={() => setIsEditing(true)}
-                                className="text-blue-600 hover:text-blue-700 text-sm font-medium px-3 py-1 rounded-md hover:bg-blue-50 transition-colors"
-                              >
-                                Edit
-                              </button>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Profile Picture Upload */}
-                        {isEditing && (
-                          <div>
-                            <label
-                              htmlFor="profilePicture"
-                              className="block text-sm font-medium text-gray-700 mb-2"
-                            >
-                              Profile Picture
-                            </label>
-                            <input
-                              type="file"
-                              id="profilePicture"
-                              accept="image/*"
-                              onChange={handleProfilePictureChange}
-                              disabled={saveProfileMutation.isPending || isUploading}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                            />
-                            <p className="mt-1 text-xs text-gray-500">
-                              Supported formats: JPG, PNG, GIF. Max size: 5MB
-                            </p>
-                          </div>
-                        )}
-
-                        {error && (
-                          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                            <p className="text-sm text-red-600 flex items-center">
-                              <svg
-                                className="w-4 h-4 mr-2"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                />
-                              </svg>
-                              {error}
-                            </p>
-                          </div>
-                        )}
-
-                        {isEditing && (
-                          <div className="flex items-center space-x-4 pt-4">
-                            <button
-                              type="submit"
-                              disabled={saveProfileMutation.isPending || isUploading}
-                              className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center font-medium shadow-lg hover:shadow-xl"
-                            >
-                              {saveProfileMutation.isPending || isUploading ? (
-                                <>
-                                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                                  {isUploading ? 'Uploading...' : 'Saving...'}
-                                </>
-                              ) : (
-                                <>
-                                  <svg
-                                    className="w-5 h-5 mr-2"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M5 13l4 4L19 7"
-                                    />
-                                  </svg>
-                                  Save Profile
-                                </>
-                              )}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={handleCancel}
-                              disabled={saveProfileMutation.isPending || isUploading}
-                              className="flex-1 bg-gray-200 text-gray-800 py-3 px-6 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors disabled:opacity-50 font-medium"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        )}
-                      </form>
-                    )}
-
-                    {/* Profile Status - Only for own profile */}
-                    {isViewingOwnProfile && (
-                      <>
-                        {userProfile && !isEditing && (
-                          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                            <div className="flex items-center">
-                              <div className="w-5 h-5 text-green-600">✓</div>
-                              <span className="ml-3 text-sm text-green-700 font-medium">
-                                Profile is complete and saved
-                              </span>
-                            </div>
-                          </div>
-                        )}
-
-                        {!userProfile && !isEditing && (
-                          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                            <div className="flex items-center">
-                              <div className="w-5 h-5 text-yellow-600">⚠️</div>
-                              <span className="ml-3 text-sm text-yellow-700 font-medium">
-                                No profile found. Please create one to get started.
-                              </span>
-                            </div>
-                            <button
-                              onClick={() => setIsEditing(true)}
-                              className="mt-3 text-sm text-yellow-800 underline hover:text-yellow-900 font-medium"
-                            >
-                              Create Profile
-                            </button>
-                          </div>
-                        )}
-                      </>
-                    )}
-
-                    {/* Other user profile info */}
-                    {!isViewingOwnProfile && (
-                      <div
-                        className={`bg-${getProfileAccentColor()}-50 border border-${getProfileAccentColor()}-200 rounded-lg p-4`}
-                      >
-                        <div className="flex items-center">
-                          <div className={`w-5 h-5 text-${getProfileAccentColor()}-600`}>👤</div>
-                          <span
-                            className={`ml-3 text-sm text-${getProfileAccentColor()}-700 font-medium`}
-                          >
-                            Viewing {getDisplayName()}'s public profile
-                          </span>
-                        </div>
-                        <p className={`mt-2 text-xs text-${getProfileAccentColor()}-600`}>
-                          Only public pins and information are visible to other users.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
+              {/* Social links (visual only) */}
+              <div className="bg-white/95 rounded-xl border border-gray-100 shadow-sm p-4">
+                <h3 className="text-sm font-semibold text-gray-800 mb-3">Links</h3>
+                <div className="flex items-center gap-3 text-gray-500">
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 border border-gray-200">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.5 13a5.5 5.5 0 007.778 0l1.172-1.172a5.5 5.5 0 000-7.778v0a5.5 5.5 0 00-7.778 0L10.5 5.5"/></svg>
+                  </span>
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 border border-gray-200">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M22.46 6c-.77.35-1.6.58-2.46.69a4.3 4.3 0 001.89-2.38 8.6 8.6 0 01-2.73 1.04 4.28 4.28 0 00-7.29 3.9A12.15 12.15 0 013 4.8a4.28 4.28 0 001.32 5.71 4.23 4.23 0 01-1.94-.53v.05a4.28 4.28 0 003.44 4.19 4.3 4.3 0 01-1.93.07 4.28 4.28 0 004 2.97A8.6 8.6 0 012 19.54a12.14 12.14 0 006.57 1.92c7.88 0 12.2-6.53 12.2-12.2l-.01-.56A8.7 8.7 0 0022.46 6z"/></svg>
+                  </span>
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 border border-gray-200">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.2c3.18 0 3.56.01 4.82.07 1.17.05 1.95.24 2.41.4.61.24 1.05.53 1.51.99.46.46.75.9.99 1.51.16.46.35 1.24.4 2.41.06 1.26.07 1.64.07 4.82s-.01 3.56-.07 4.82c-.05 1.17-.24 1.95-.4 2.41a3.92 3.92 0 01-.99 1.51 3.92 3.92 0 01-1.51.99c-.46.16-1.24.35-2.41.4-1.26.06-1.64.07-4.82.07s-3.56-.01-4.82-.07c-1.17-.05-1.95-.24-2.41-.4a3.92 3.92 0 01-1.51-.99 3.92 3.92 0 01-.99-1.51c-.16-.46-.35-1.24-.4-2.41C2.21 15.56 2.2 15.18 2.2 12s.01-3.56.07-4.82c.05-1.17.24-1.95.4-2.41.24-.61.53-1.05.99-1.51.46-.46.9-.75 1.51-.99.46-.16 1.24-.35 2.41-.4C8.44 2.21 8.82 2.2 12 2.2zm0 1.8c-3.12 0-3.48.01-4.7.07-.98.04-1.5.21-1.85.34-.47.18-.8.39-1.15.74-.35.35-.56.68-.74 1.15-.13.34-.3.87-.34 1.85-.06 1.22-.07 1.58-.07 4.7s.01 3.48.07 4.7c.04.98.21 1.5.34 1.85.18.47.39.8.74 1.15.35.35.68.56 1.15.74.34.13.87.3 1.85.34 1.22.06 1.58.07 4.7.07s3.48-.01 4.7-.07c.98-.04 1.5-.21 1.85-.34.47-.18.8-.39 1.15-.74.35-.35.56-.68.74-1.15.13-.34.3-.87.34-1.85.06-1.22.07-1.58.07-4.7s-.01-3.48-.07-4.7c-.04-.98-.21-1.5-.34-1.85a2.32 2.32 0 00-.74-1.15 2.32 2.32 0 00-1.15-.74c-.34-.13-.87-.3-1.85-.34-1.22-.06-1.58-.07-4.7-.07zm0 3.3a6.5 6.5 0 110 13 6.5 6.5 0 010-13z"/></svg>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-
-          {/* Pins List */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100">
-              <div
-                className={`bg-gradient-to-r ${getProfileHeaderGradient()} px-6 py-6 border-b border-gray-200`}
-              >
+          <div className="flex-1 min-h-0 overflow-y-auto pr-2">
+            <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-md bg-white/95 backdrop-blur-sm">
+              <div className={`bg-gradient-to-r ${getProfileHeaderGradient()} px-6 py-6 border-b border-gray-200`}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-2xl font-bold text-white">
-                      {isViewingOwnProfile ? 'Your Pins' : `${getDisplayName()}'s Public Pins`}
-                    </h2>
-                    <p className="text-white text-opacity-90 mt-1">
-                      {visiblePins.length} pin{visiblePins.length !== 1 ? 's' : ''}{' '}
-                      {isViewingOwnProfile ? 'created' : 'visible'}
-                    </p>
+                    <h2 className="text-2xl font-extrabold text-white drop-shadow-sm">{isViewingOwnProfile ? 'Your Spots' : `${getDisplayName()}'s Spots`}</h2>
+                    <p className="text-white/90 mt-1 drop-shadow-sm">{isViewingOwnProfile ? 'Manage your spots' : 'Explore spots'}</p>
                   </div>
-                  <div className="bg-white bg-opacity-20 rounded-full p-3 backdrop-blur-sm">
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
+                  <div className="bg-white/20 rounded-full p-3 backdrop-blur-sm">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </div>
                 </div>
               </div>
-
-              <div className="p-6">
-                {visiblePins.length === 0 ? (
+              <div className="p-6 lg:p-7">
+                {isLoading || isLoadingPins ? (
+                  <div className="grid gap-4">
+                    {[0, 1, 2].map((i) => (
+                      <div key={i} className="animate-pulse rounded-2xl p-5 border border-gray-100 bg-white/80">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex-1">
+                            <div className="h-5 w-40 bg-gray-200 rounded mb-3" />
+                            <div className="h-4 w-full bg-gray-100 rounded mb-2" />
+                            <div className="h-4 w-5/6 bg-gray-100 rounded" />
+                          </div>
+                          <div className="h-6 w-20 bg-gray-200 rounded-full" />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="h-14 bg-gray-100 rounded" />
+                          <div className="h-14 bg-gray-100 rounded" />
+                        </div>
+                        <div className="mt-4 h-8 w-32 bg-gray-100 rounded" />
+                      </div>
+                    ))}
+                  </div>
+                ) : visiblePins.length === 0 ? (
                   <div className="text-center py-16">
                     <div className="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-6 flex items-center justify-center">
-                      <svg
-                        className="w-10 h-10 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
+                      <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                      {isViewingOwnProfile ? 'No pins yet' : 'No public pins'}
-                    </h3>
-                    <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-3">{isViewingOwnProfile ? 'No spots yet' : 'No spots yet'}</h3>
+                    <p className="text-gray-700 mb-6 max-w-md mx-auto">
                       {isViewingOwnProfile
-                        ? 'Start creating pins by clicking on the map to mark your favorite places and memories!'
-                        : "This user hasn't created any public pins yet. Check back later to see their contributions!"}
+                        ? 'Start creating spots by clicking on the map to mark your favorite places and musical moments!'
+                        : "This user hasn't created any spots yet. Check back later to see their contributions!"}
                     </p>
-                    {isViewingOwnProfile && (
-                      <button
-                        onClick={onBackToMap}
-                        className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-lg hover:shadow-xl"
-                      >
-                        Go to Map
-                      </button>
-                    )}
                   </div>
                 ) : (
                   <div className="grid gap-6">
                     {visiblePins.map((pin) => (
-                      <div
-                        key={pin.id.toString()}
-                        className="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-200 bg-gradient-to-r from-white to-gray-50"
-                      >
+                      <div key={pin.id.toString()} className="rounded-2xl p-5 border border-gray-100 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
-                            <div className="flex items-center space-x-3 mb-2">
-                              <h3 className="text-xl font-semibold text-gray-900">
-                                {pin.name || 'Unnamed Pin'}
-                              </h3>
-                              <div
-                                className={`flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-semibold ${
-                                  pin.isPrivate
-                                    ? 'bg-gray-100 text-gray-700'
-                                    : 'bg-green-100 text-green-700'
-                                }`}
-                              >
-                                <span>{pin.isPrivate ? '🔒' : '🌐'}</span>
-                                <span>{pin.isPrivate ? 'Private' : 'Public'}</span>
-                              </div>
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="text-lg font-semibold text-gray-900 tracking-tight">{pin.name || 'Unnamed Memory'}</h3>
+                              {pin.isPrivate && (
+                                <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700 ring-1 ring-slate-200">
+                                  <span>🔒</span>
+                                  <span>Private</span>
+                                </div>
+                              )}
                             </div>
                             {pin.description && (
-                              <p className="text-gray-600 text-sm mb-3 leading-relaxed bg-white rounded-lg p-3 border border-gray-100">
-                                {pin.description}
-                              </p>
+                              <p className="text-gray-700 text-sm mb-3 leading-relaxed bg-white/60 rounded-lg p-3 border border-gray-100">{pin.description}</p>
                             )}
                           </div>
-                          {/* Action buttons for own pins */}
                           {isViewingOwnProfile && (
-                            <div className="ml-4 flex space-x-2">
-                              <button
-                                onClick={() => handleEditPin(pin)}
-                                disabled={updatePinMutation.isPending}
-                                className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 group"
-                                title="Edit pin"
-                              >
-                                <svg
-                                  className="w-5 h-5 group-hover:scale-110 transition-transform"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                  />
+                            <div className="ml-4 flex gap-2">
+                              <button onClick={() => handleEditPin(pin)} className="px-2.5 py-2 text-blue-700 bg-blue-50/60 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors" title="Edit memory">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
                               </button>
-                              <button
-                                onClick={() => handleDeletePin(pin)}
-                                disabled={deletePinMutation.isPending}
-                                className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 group"
-                                title="Delete pin"
-                              >
-                                <svg
-                                  className="w-5 h-5 group-hover:scale-110 transition-transform"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                  />
+                              <button onClick={() => handleDeletePin(pin)} className="px-2.5 py-2 text-red-700 bg-red-50/60 hover:bg-red-100 border border-red-200 rounded-lg transition-colors" title="Delete memory">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
                               </button>
                             </div>
                           )}
                         </div>
-
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                          <div className="bg-white rounded-lg p-3 border border-gray-100">
+                          <div className="bg-white rounded-lg p-3 border border-gray-100 shadow-[inset_0_1px_0_0_rgba(0,0,0,0.02)]">
                             <span className="font-semibold text-gray-700 flex items-center mb-1">
-                              <svg
-                                className="w-4 h-4 mr-2"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                />
+                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                               </svg>
                               Location
                             </span>
-                            <p className="font-mono text-xs text-gray-600">
-                              {formatCoordinates(pin.latitude, pin.longitude)}
-                            </p>
+                            <p className="font-mono text-[11px] text-gray-600">{formatCoordinates(pin.latitude, pin.longitude)}</p>
                           </div>
-                          <div className="bg-white rounded-lg p-3 border border-gray-100">
+                          <div className="bg-white rounded-lg p-3 border border-gray-100 shadow-[inset_0_1px_0_0_rgba(0,0,0,0.02)]">
                             <span className="font-semibold text-gray-700 flex items-center mb-1">
-                              <svg
-                                className="w-4 h-4 mr-2"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                />
+                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
                               Created
                             </span>
-                            <p className="text-xs text-gray-600">{formatDate(pin.id)}</p>
+                            <p className="text-[11px] text-gray-600">{formatDate(pin.id)}</p>
                           </div>
                         </div>
-
                         <div className="mt-4 pt-4 border-t border-gray-100">
-                          <button
-                            onClick={() => handleViewPinOnMap(pin)}
-                            className={`text-${getProfileAccentColor()}-600 hover:text-${getProfileAccentColor()}-700 text-sm font-medium flex items-center space-x-2 group bg-${getProfileAccentColor()}-50 hover:bg-${getProfileAccentColor()}-100 px-4 py-2 rounded-lg transition-all duration-200`}
-                          >
-                            <svg
-                              className="w-4 h-4 group-hover:scale-110 transition-transform"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                              />
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                              />
+                          <button onClick={() => handleViewPinOnMap(pin)} className={`text-${getProfileAccentColor()}-700 hover:text-${getProfileAccentColor()}-800 text-sm font-medium flex items-center gap-2 bg-${getProfileAccentColor()}-50/70 hover:bg-${getProfileAccentColor()}-100 px-4 py-2 rounded-lg border border-${getProfileAccentColor()}-100 transition-all`}>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                             <span>View on Map</span>
-                            <svg
-                              className="w-4 h-4 group-hover:translate-x-1 transition-transform"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M9 5l7 7-7 7"
-                              />
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                             </svg>
                           </button>
                         </div>
@@ -878,29 +530,134 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                 )}
               </div>
             </div>
+          </div>
+        </div>
+      </div>
 
-            {/* Additional Information */}
-            <div
-              className={`mt-6 bg-${getProfileAccentColor()}-50 border border-${getProfileAccentColor()}-200 rounded-xl p-6`}
-            >
-              <h3
-                className={`text-sm font-semibold text-${getProfileAccentColor()}-800 mb-3 flex items-center`}
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                About {isViewingOwnProfile ? 'Your' : "This User's"} Data
-              </h3>
-              <p className={`text-sm text-${getProfileAccentColor()}-700 leading-relaxed`}>
-                {isViewingOwnProfile
-                  ? 'Your profile and pin data are securely stored and associated with your Internet Identity. Private pins are only visible to you, while public pins can be seen by all users. You have full control over your data and can edit or delete your content at any time.'
-                  : "This user's public profile and pins are visible to all users. Private pins remain hidden and are only visible to the owner. All data is securely stored and managed through the Internet Computer blockchain."}
-              </p>
+      {/* Mobile + Tablet (base–lg-1): full profile section included in scroll */}
+      <div className="lg:hidden h-full min-h-0 overflow-y-auto">
+        <div className="w-full max-w-2xl mx-auto px-3 py-3">
+          <ProfileCard
+            name={getDisplayName()}
+            principalId={getUserPrincipalId()}
+            photoUrl={profilePictureUrl || undefined}
+            headerGradient={getProfileHeaderGradient()}
+            totalCount={visiblePins?.length || 0}
+          />
+
+          <div className="pt-3 pb-6">
+            {/* Profile extras (mobile) */}
+            <div className="space-y-3">
+              <div className="bg-white/95 rounded-xl border border-gray-100 shadow-sm p-4">
+                <h3 className="text-sm font-semibold text-gray-800 mb-2">About</h3>
+                {isViewingOwnProfile ? (
+                  bio?.trim() ? (
+                    <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{bio}</p>
+                  ) : (
+                    <p className="text-sm text-gray-500">Add a short bio to tell others about you.</p>
+                  )
+                ) : (
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{''}</p>
+                )}
+              </div>
+              <div className="bg-white/95 rounded-xl border border-gray-100 shadow-sm p-4">
+                <h3 className="text-sm font-semibold text-gray-800 mb-3">Stats</h3>
+                <div className="flex flex-wrap gap-2">
+                  {isViewingOwnProfile ? (
+                    <>
+                      <span className="text-[12px] px-2.5 py-1 rounded-full bg-gray-50 text-gray-800 border border-gray-200">Total: {visiblePins?.length || 0}</span>
+                      <span className="text-[12px] px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">Public: {(userPins || []).filter((p) => !p.isPrivate).length}</span>
+                      <span className="text-[12px] px-2.5 py-1 rounded-full bg-slate-50 text-slate-700 border border-slate-200">Private (only you): {(userPins || []).filter((p) => p.isPrivate).length}</span>
+                    </>
+                  ) : (
+                    <span className="text-[12px] px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">Spots: {visiblePins?.length || 0}</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Edit Profile Form */}
+            {isViewingOwnProfile && isEditing && (
+              <div className="px-1">
+                <form onSubmit={handleSave} className="bg-white rounded-lg shadow border border-gray-100 p-4 flex flex-col gap-3">
+                  <h3 className="text-base font-semibold text-gray-900">Edit Profile</h3>
+                  {error && <div className="text-sm text-red-600">{error}</div>}
+                  <label className="text-sm text-gray-700">
+                    Display name
+                    <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" className="mt-1 w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                  </label>
+                  <label className="text-sm text-gray-700">
+                    Bio
+                    <textarea value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Tell others a bit about you (local only for now)" className="mt-1 w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[72px]" />
+                  </label>
+                  <div className="flex gap-2 justify-end mt-2">
+                    <button type="button" onClick={handleCancel} className="text-sm px-4 py-2 rounded border border-gray-200 text-gray-700 hover:bg-gray-50">Cancel</button>
+                    <button type="submit" disabled={isUploading || saveProfileMutation.isPending} className="text-sm px-4 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50">
+                      {isUploading || saveProfileMutation.isPending ? 'Saving...' : 'Save'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {/* Spots List */}
+            <div className="w-full mt-4">
+              <h2 className="text-lg font-bold text-gray-900 mb-4">{isViewingOwnProfile ? 'Your Spots' : getDisplayName() + "'s Spots"}</h2>
+            {isLoading || isLoadingPins ? (
+              <div className="flex flex-col gap-4">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="animate-pulse bg-white/90 rounded-2xl border border-gray-100 p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="h-5 w-40 bg-gray-200 rounded" />
+                      <div className="h-6 w-16 bg-gray-200 rounded-full" />
+                    </div>
+                    <div className="h-4 w-full bg-gray-100 rounded mb-2" />
+                    <div className="h-4 w-2/3 bg-gray-100 rounded mb-4" />
+                    <div className="h-8 w-28 bg-gray-100 rounded" />
+                  </div>
+                ))}
+              </div>
+            ) : visiblePins.length === 0 ? (
+              <div className="text-center py-8">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">No spots yet</h3>
+                <p className="text-gray-700 mb-4">{isViewingOwnProfile ? 'Start creating spots by clicking on the map!' : 'No spots yet.'}</p>
+              </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {visiblePins
+                    .slice()
+                    .sort((a, b) => Number(b.id) - Number(a.id))
+                    .map((spot) => (
+                      <div key={spot.id.toString()} className="bg-white/95 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition border border-gray-100 p-4 flex flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-semibold text-gray-900">{spot.name || 'Unnamed Spot'}</h3>
+                          <div className="flex items-center gap-2">
+                          {spot.isPrivate && (
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 ring-1 ring-slate-200">Private</span>
+                          )}
+                            {isViewingOwnProfile && (
+                              <div className="flex gap-2">
+                                <button onClick={() => handleEditPin(spot)} className="text-indigo-700 bg-indigo-50/60 hover:bg-indigo-100 border border-indigo-200 text-sm px-2.5 py-1 rounded-md">Edit</button>
+                                <button onClick={() => handleDeletePin(spot)} className="text-red-700 bg-red-50/60 hover:bg-red-100 border border-red-200 text-sm px-2.5 py-1 rounded-md">Delete</button>
+                              </div>
+                          )}
+                          </div>
+                        </div>
+                        {spot.description && <p className="text-gray-700 text-sm leading-relaxed bg-white/60 rounded-lg p-3 border border-gray-100">{spot.description}</p>}
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <span>Location: {formatCoordinates(spot.latitude, spot.longitude)}</span>
+                        </div>
+                        <button onClick={() => handleViewPinOnMap(spot)} className="mt-2 inline-flex items-center gap-2 text-indigo-700 hover:text-indigo-800 text-sm font-medium bg-indigo-50/70 hover:bg-indigo-100 px-3 py-1.5 rounded-md border border-indigo-100 transition">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          View on Map
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -933,8 +690,14 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
         onCancel={handleEditCancel}
         isSubmitting={updatePinMutation.isPending}
       />
+      {/* Toast */}
+      {showToast && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-black/80 text-white text-sm px-3 py-2 rounded shadow">
+          {toastMessage}
+        </div>
+      )}
     </div>
-  );
+);
 };
 
 export default ProfilePage;

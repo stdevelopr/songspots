@@ -43,5 +43,5 @@ export interface InteractiveMapProps {
 }
 
 export interface IOnViewUserProfile {
-  (userId: string): void;
+  (userId: string | null): void;
 }

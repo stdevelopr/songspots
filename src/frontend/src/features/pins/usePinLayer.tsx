@@ -10,7 +10,7 @@ import { bindReactPopup } from '../common/utils/bindReactPopup';
 interface Options {
   map: L.Map | null;
   pins: Pin[];
-  onViewProfile: (userId: string) => void;
+  onViewProfile: (userId: string | null) => void;
   onEdit: (pin: Pin) => void;
   onDelete: (pin: Pin) => void;
   onPinClick?: (pin: Pin) => void;

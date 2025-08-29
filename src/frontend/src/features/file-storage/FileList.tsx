@@ -1,4 +1,4 @@
-import { useActor } from '../../hooks/useActor';
+import { useActor } from '../common/useActor';
 import { canisterId } from '../../backend';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
