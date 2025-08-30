@@ -35,7 +35,7 @@ persistent actor {
     MultiUserSystem.setApproval(multiUserState, caller, user, approval);
   };
 
-  public query ({ caller }) func getApprovalStatus(user : Principal) : async MultiUserSystem.ApprovalStatus {
+  public query ({ caller = _ }) func getApprovalStatus(user : Principal) : async MultiUserSystem.ApprovalStatus {
     MultiUserSystem.getApprovalStatus(multiUserState, user);
   };
 
@@ -51,7 +51,8 @@ persistent actor {
   // ** Application-specific user profile management **
   public type UserProfile = {
     name : Text;
-    profilePicture : ?Text;
+    profilePicture : ?Text; // Keep as optional Text for simplicity
+    bio : Text;
     // Other user's metadata if needed
   };
 
@@ -63,6 +64,9 @@ persistent actor {
   };
 
   public shared ({ caller }) func saveUserProfile(profile : UserProfile) : async () {
+    if (not (MultiUserSystem.hasPermission(multiUserState, caller, #user, false))) {
+      Debug.trap("Unauthorized: Only authenticated users can save profiles");
+    };
     userProfiles := principalMap.put(userProfiles, caller, profile);
   };
 

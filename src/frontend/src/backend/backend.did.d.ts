@@ -51,6 +51,7 @@ export interface UserInfo {
   'approval' : ApprovalStatus,
 }
 export interface UserProfile {
+  'bio' : string,
   'name' : string,
   'profilePicture' : [] | [string],
 }

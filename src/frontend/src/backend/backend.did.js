@@ -25,6 +25,7 @@ export const idlFactory = ({ IDL }) => {
     'rejected' : IDL.Null,
   });
   const UserProfile = IDL.Record({
+    'bio' : IDL.Text,
     'name' : IDL.Text,
     'profilePicture' : IDL.Opt(IDL.Text),
   });
