@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 
 const ACTOR_QUERY_KEY = 'actor';
 export function useActor() {
-  const { identity } = useInternetIdentity();
+  const { identity, clear } = useInternetIdentity();
   const queryClient = useQueryClient();
 
   const actorQuery = useQuery<ActorSubclass<_SERVICE>>({
@@ -37,9 +37,39 @@ export function useActor() {
         console.log('Actor created successfully, initializing auth...');
         await actor.initializeAuth();
         console.log('Auth initialized successfully');
+        
+        // Test authentication by calling a simple authenticated method
+        try {
+          await actor.getCurrentUserRole();
+          console.log('Authentication verification successful');
+        } catch (authError) {
+          console.error('Authentication verification failed:', authError);
+          // Clear identity and force re-login
+          throw new Error('Authentication failed - please log in again');
+        }
+        
         return actor;
       } catch (error) {
         console.error('Error creating authenticated actor:', error);
+        
+        // Check for signature verification failures or other auth errors
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const isAuthError = errorMessage.includes('Authentication failed') ||
+                           errorMessage.includes('Invalid signature') ||
+                           errorMessage.includes('verification failed') ||
+                           errorMessage.includes('EcdsaP256 signature could not be verified');
+        
+        if (isAuthError) {
+          console.log('Authentication/signature error detected - clearing invalid authentication state');
+          try {
+            await clear();
+            console.log('Authentication state cleared successfully');
+          } catch (clearError) {
+            console.error('Failed to clear authentication:', clearError);
+          }
+          // Throw a user-friendly error
+          throw new Error('Authentication expired - please log in again');
+        }
         throw error;
       }
     },
@@ -47,7 +77,15 @@ export function useActor() {
     staleTime: Infinity,
     // This will cause the actor to be recreated when the identity changes
     enabled: true,
-    retry: 3,
+    retry: (failureCount, error) => {
+      // Don't retry if authentication failed - user needs to re-login
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('Authentication expired') || 
+          errorMessage.includes('Authentication failed')) {
+        return false;
+      }
+      return failureCount < 2;
+    },
     retryDelay: 1000,
   });
 

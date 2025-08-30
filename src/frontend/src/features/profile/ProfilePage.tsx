@@ -15,6 +15,8 @@ import DeleteConfirmationModal from '../common/DeleteConfirmationModal';
 import PinEditModal from '../pins/PinEditModal';
 import ProfileHero from './ProfileHero';
 import ProfileCard from './ProfileCard';
+import MusicEmbed from '../common/MusicEmbed';
+import LocationDisplay from '../common/LocationDisplay';
 
 interface ProfilePageProps {
   onBackToMap: () => void;
@@ -317,15 +319,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
     }
   };
 
-  const formatCoordinates = (lat: string, lng: string) => {
-    try {
-      const latitude = parseFloat(lat);
-      const longitude = parseFloat(lng);
-      return `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-    } catch {
-      return `${lat}, ${lng}`;
-    }
-  };
 
   const getDisplayName = () => {
     if (userProfile?.name) {
@@ -358,11 +351,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
   };
 
   const getProfileHeaderGradient = () => {
-    // Harmonize with dark header: cool indigo/blue tones
-    if (isViewingOwnProfile) {
-      return 'from-indigo-600 via-violet-600 to-sky-600';
-    }
-    return 'from-blue-700 via-indigo-700 to-slate-800';
+    // Use darker tones that harmonize with black header
+    return 'from-slate-600 via-indigo-600 to-blue-600';
   };
 
   const getProfileAccentColor = () => {
@@ -940,6 +930,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                                 {pin.description}
                               </p>
                             )}
+                            {pin.musicLink && (
+                              <div className="mb-4 bg-white/60 rounded-lg p-3 border border-gray-100">
+                                <div className="w-full max-w-md mx-auto aspect-video">
+                                  <MusicEmbed musicLink={pin.musicLink} />
+                                </div>
+                              </div>
+                            )}
                           </div>
                           {isViewingOwnProfile && (
                             <div className="ml-4 flex gap-2">
@@ -987,24 +984,15 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                           <div className="bg-white rounded-lg p-3 border border-gray-100 shadow-[inset_0_1px_0_0_rgba(0,0,0,0.02)]">
                             <span className="font-semibold text-gray-700 flex items-center mb-1">
-                              <svg
-                                className="w-4 h-4 mr-2"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                />
-                              </svg>
                               Location
                             </span>
-                            <p className="font-mono text-[11px] text-gray-600">
-                              {formatCoordinates(pin.latitude, pin.longitude)}
-                            </p>
+                            <div className="text-[11px] text-gray-600">
+                              <LocationDisplay 
+                                latitude={pin.latitude} 
+                                longitude={pin.longitude}
+                                showIcon={false}
+                              />
+                            </div>
                           </div>
                           <div className="bg-white rounded-lg p-3 border border-gray-100 shadow-[inset_0_1px_0_0_rgba(0,0,0,0.02)]">
                             <span className="font-semibold text-gray-700 flex items-center mb-1">
@@ -1442,8 +1430,20 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                             {spot.description}
                           </p>
                         )}
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                          <span>Location: {formatCoordinates(spot.latitude, spot.longitude)}</span>
+                        {spot.musicLink && (
+                          <div className="mb-3 bg-white/60 rounded-lg p-3 border border-gray-100">
+                            <div className="w-full aspect-video">
+                              <MusicEmbed musicLink={spot.musicLink} />
+                            </div>
+                          </div>
+                        )}
+                        <div className="text-xs text-gray-500">
+                          <LocationDisplay 
+                            latitude={spot.latitude} 
+                            longitude={spot.longitude}
+                            showIcon={true}
+                            className="text-gray-500"
+                          />
                         </div>
                         <button
                           onClick={() => handleViewPinOnMap(spot)}
