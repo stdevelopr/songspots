@@ -319,7 +319,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
     }
   };
 
-
   const getDisplayName = () => {
     if (userProfile?.name) {
       return userProfile.name;
@@ -905,7 +904,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                     )}
                   </div>
                 ) : (
-                  <div className="grid gap-6">
+                  <div className="grid gap-6 justify-items-center">
                     {visiblePins.map((pin, index) => (
                       <div
                         key={pin.id.toString()}
@@ -918,25 +917,22 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                               <h3 className="text-lg font-semibold text-gray-900 tracking-tight">
                                 {pin.name || 'Unnamed Memory'}
                               </h3>
-                              {pin.isPrivate && (
-                                <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700 ring-1 ring-slate-200">
-                                  <span>🔒</span>
-                                  <span>Private</span>
-                                </div>
+                              {isViewingOwnProfile && (
+                                <>
+                                  {pin.isPrivate ? (
+                                    <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700 ring-1 ring-slate-200">
+                                      <span>🔒</span>
+                                      <span>Private</span>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200">
+                                      <span>🌍</span>
+                                      <span>Public</span>
+                                    </div>
+                                  )}
+                                </>
                               )}
                             </div>
-                            {pin.description && (
-                              <p className="text-gray-700 text-sm mb-3 leading-relaxed bg-white/60 rounded-lg p-3 border border-gray-100">
-                                {pin.description}
-                              </p>
-                            )}
-                            {pin.musicLink && (
-                              <div className="mb-4 bg-white/60 rounded-lg p-3 border border-gray-100">
-                                <div className="w-full max-w-md mx-auto aspect-video">
-                                  <MusicEmbed musicLink={pin.musicLink} />
-                                </div>
-                              </div>
-                            )}
                           </div>
                           {isViewingOwnProfile && (
                             <div className="ml-4 flex gap-2">
@@ -981,14 +977,28 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                             </div>
                           )}
                         </div>
+                        {pin.description && (
+                          <div className="mb-4">
+                            <p className="text-gray-700 text-sm leading-relaxed bg-white/60 rounded-lg p-3 border border-gray-100">
+                              {pin.description}
+                            </p>
+                          </div>
+                        )}
+                        {pin.musicLink && (
+                          <div className="mb-4 bg-white/60 rounded-lg p-3 border border-gray-100 flex justify-center">
+                            <div className="w-full max-w-md aspect-video">
+                              <MusicEmbed musicLink={pin.musicLink} />
+                            </div>
+                          </div>
+                        )}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                           <div className="bg-white rounded-lg p-3 border border-gray-100 shadow-[inset_0_1px_0_0_rgba(0,0,0,0.02)]">
                             <span className="font-semibold text-gray-700 flex items-center mb-1">
                               Location
                             </span>
                             <div className="text-[11px] text-gray-600">
-                              <LocationDisplay 
-                                latitude={pin.latitude} 
+                              <LocationDisplay
+                                latitude={pin.latitude}
                                 longitude={pin.longitude}
                                 showIcon={false}
                               />
@@ -1388,42 +1398,55 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                   </p>
                 </div>
               ) : (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-4 items-center">
                   {visiblePins
                     .slice()
                     .sort((a, b) => Number(b.id) - Number(a.id))
                     .map((spot) => (
                       <div
                         key={spot.id.toString()}
-                        className="bg-white/95 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition border border-gray-100 p-4 flex flex-col gap-2"
+                        className="w-full bg-white/95 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition border border-gray-100 p-4 flex flex-col gap-2"
                       >
                         <div className="flex items-center justify-between">
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            {spot.name || 'Unnamed Spot'}
-                          </h3>
                           <div className="flex items-center gap-2">
-                            {spot.isPrivate && (
-                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 ring-1 ring-slate-200">
-                                Private
-                              </span>
-                            )}
-                            {isViewingOwnProfile && (
-                              <div className="flex gap-2">
-                                <button
-                                  onClick={() => handleEditPin(spot)}
-                                  className="text-indigo-700 bg-indigo-50/60 hover:bg-indigo-100 border border-indigo-200 text-sm px-2.5 py-1 rounded-md"
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  onClick={() => handleDeletePin(spot)}
-                                  className="text-red-700 bg-red-50/60 hover:bg-red-100 border border-red-200 text-sm px-2.5 py-1 rounded-md"
-                                >
-                                  Delete
-                                </button>
-                              </div>
-                            )}
+                            <div className="flex items-center min-w-0 gap-2 flex-1">
+                              <h3
+                                className="text-lg font-semibold text-gray-900 truncate overflow-hidden whitespace-nowrap min-w-0 flex-1 max-w-[45vw]"
+                                title={spot.name || 'Unnamed Spot'}
+                              >
+                                {spot.name || 'Unnamed Spot'}
+                              </h3>
+                              {isViewingOwnProfile && (
+                                <>
+                                  {spot.isPrivate ? (
+                                    <span className="flex-shrink-0 text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 ring-1 ring-slate-200 mr-2">
+                                      🔒 Private
+                                    </span>
+                                  ) : (
+                                    <span className="flex-shrink-0 text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200 ring-1 ring-emerald-200 mr-2">
+                                      🌍 Public
+                                    </span>
+                                  )}
+                                </>
+                              )}
+                            </div>
                           </div>
+                          {isViewingOwnProfile && (
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleEditPin(spot)}
+                                className="text-indigo-700 bg-indigo-50/60 hover:bg-indigo-100 border border-indigo-200 text-sm px-2.5 py-1 rounded-md"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDeletePin(spot)}
+                                className="text-red-700 bg-red-50/60 hover:bg-red-100 border border-red-200 text-sm px-2.5 py-1 rounded-md"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          )}
                         </div>
                         {spot.description && (
                           <p className="text-gray-700 text-sm leading-relaxed bg-white/60 rounded-lg p-3 border border-gray-100">
@@ -1431,15 +1454,15 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                           </p>
                         )}
                         {spot.musicLink && (
-                          <div className="mb-3 bg-white/60 rounded-lg p-3 border border-gray-100">
+                          <div className="mb-3 bg-white/60 rounded-lg p-3 border border-gray-100 flex justify-center">
                             <div className="w-full aspect-video">
                               <MusicEmbed musicLink={spot.musicLink} />
                             </div>
                           </div>
                         )}
                         <div className="text-xs text-gray-500">
-                          <LocationDisplay 
-                            latitude={spot.latitude} 
+                          <LocationDisplay
+                            latitude={spot.latitude}
                             longitude={spot.longitude}
                             showIcon={true}
                             className="text-gray-500"
@@ -1497,7 +1520,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                 id: pinToEdit.id.toString(),
                 name: pinToEdit.name,
                 description: pinToEdit.description,
-                musicLink: undefined, // Music links are not stored in backend
+                musicLink: pinToEdit.musicLink,
                 isPrivate: pinToEdit.isPrivate,
               }
             : null
