@@ -17,6 +17,8 @@ import ProfileHero from './ProfileHero';
 import ProfileCard from './ProfileCard';
 import MusicEmbed from '../common/MusicEmbed';
 import LocationDisplay from '../common/LocationDisplay';
+import InteractiveMap from '../map/interactive-map';
+import ProfileEditForm from './ProfileEditForm';
 
 interface ProfilePageProps {
   onBackToMap: () => void;
@@ -79,6 +81,19 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
   // Only show public pins if viewing another user's profile
   const visiblePins = isViewingOwnProfile ? userPins : userPins.filter((pin) => !pin.isPrivate);
 
+  // For map display, convert pins to backend format if needed
+  // InteractiveMap expects backendPins: BackendPin[]
+  // userPins are already from backend, but may need type assertion
+  const backendPinsForMap = visiblePins.map((pin) => ({
+    id: pin.id,
+    latitude: pin.latitude,
+    longitude: pin.longitude,
+    name: pin.name,
+    description: pin.description,
+    musicLink: pin.musicLink,
+    isPrivate: pin.isPrivate,
+    owner: pin.owner,
+  }));
   // Initialize form when profile data loads or component mounts
   useEffect(() => {
     if (isViewingOwnProfile) {
@@ -376,225 +391,23 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
             {/* Edit Profile Form (Desktop) */}
             {isViewingOwnProfile && isEditing && (
               <div className="mt-4">
-                <form
-                  onSubmit={handleSave}
-                  className="bg-white/95 rounded-xl border border-gray-100 shadow-sm p-6 space-y-4"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Edit Profile</h3>
-                    <button
-                      type="button"
-                      onClick={handleCancel}
-                      className="text-gray-400 hover:text-gray-600 p-1"
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-
-                  {error && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-800">
-                      {error}
-                    </div>
-                  )}
-
-                  {/* Profile Picture Upload */}
-                  <div className="space-y-3">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Profile Picture
-                    </label>
-                    <div className="flex items-start gap-4">
-                      <div className="relative">
-                        <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-200 group">
-                          {profilePicturePreview ? (
-                            <img
-                              src={profilePicturePreview}
-                              alt="Preview"
-                              className="w-full h-full object-cover"
-                            />
-                          ) : profilePictureUrl ? (
-                            <img
-                              src={profilePictureUrl}
-                              alt="Current"
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <svg
-                                className="w-8 h-8 text-gray-400"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                />
-                              </svg>
-                            </div>
-                          )}
-                        </div>
-                        {isUploading && (
-                          <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
-                            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex-1">
-                        <div
-                          className={`relative border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
-                            isDragOver
-                              ? 'border-indigo-400 bg-indigo-50'
-                              : 'border-gray-300 hover:border-gray-400'
-                          }`}
-                          onDragOver={handleDragOver}
-                          onDragLeave={handleDragLeave}
-                          onDrop={handleDrop}
-                        >
-                          <svg
-                            className="w-8 h-8 text-gray-400 mx-auto mb-2"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                            />
-                          </svg>
-                          <p className="text-sm text-gray-600 mb-2">
-                            Drag & drop an image here, or{' '}
-                            <button
-                              type="button"
-                              onClick={() => fileInputRef.current?.click()}
-                              className="text-indigo-600 hover:text-indigo-800 font-medium underline"
-                            >
-                              browse
-                            </button>
-                          </p>
-                          <p className="text-xs text-gray-400">PNG, JPG up to 5MB</p>
-                        </div>
-
-                        <div className="flex gap-2 mt-3">
-                          <button
-                            type="button"
-                            onClick={() => fileInputRef.current?.click()}
-                            className="text-sm px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition-colors flex items-center gap-2"
-                          >
-                            <svg
-                              className="w-4 h-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                              />
-                            </svg>
-                            Choose Photo
-                          </button>
-                          {(profilePictureUrl || profilePicturePreview) && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setRemoveProfilePicture(true);
-                                setProfilePicturePreview(null);
-                                setProfilePictureFile(null);
-                                setToastMessage('Profile picture will be removed');
-                                setShowToast(true);
-                                setTimeout(() => setShowToast(false), 2000);
-                              }}
-                              className="text-sm px-3 py-1.5 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 transition-colors flex items-center gap-2"
-                            >
-                              <svg
-                                className="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                />
-                              </svg>
-                              Remove
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleProfilePictureChange}
-                      className="hidden"
-                    />
-                  </div>
-
-                  {/* Name Field */}
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">Display Name</label>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Your name"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  {/* Bio Field */}
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">Bio</label>
-                    <textarea
-                      value={bio}
-                      onChange={(e) => setBio(e.target.value)}
-                      placeholder="Tell others a bit about yourself..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-                      rows={3}
-                    />
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-3 pt-4 border-t border-gray-100">
-                    <button
-                      type="button"
-                      onClick={handleCancel}
-                      className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-300 rounded-lg transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={isUploading || saveProfileMutation.isPending}
-                      className="flex-1 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
-                    >
-                      {isUploading || saveProfileMutation.isPending ? 'Saving...' : 'Save Changes'}
-                    </button>
-                  </div>
-                </form>
+                <ProfileEditForm
+                  name={name}
+                  bio={bio}
+                  error={error}
+                  profilePicturePreview={profilePicturePreview}
+                  profilePictureUrl={profilePictureUrl || undefined}
+                  isUploading={isUploading}
+                  isDragOver={isDragOver}
+                  onNameChange={(e) => setName(e.target.value)}
+                  onBioChange={(e) => setBio(e.target.value)}
+                  onProfilePictureChange={handleProfilePictureChange}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onCancel={handleCancel}
+                  onSave={handleSave}
+                />
               </div>
             )}
 
@@ -783,6 +596,43 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
             </div>
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto pr-2">
+            {/* Map showing all user's pins */}
+            <div className="mb-8">
+              <h3 className="text-lg font-bold text-gray-900 mb-2">
+                {isViewingOwnProfile ? 'Your Pins on Map' : `${getDisplayName()}'s Pins on Map`}
+              </h3>
+              <div
+                style={{
+                  height: '400px',
+                  width: '100%',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                }}
+              >
+                {/* Only render if there are pins */}
+                {backendPinsForMap.length > 0 ? (
+                  <React.Suspense
+                    fallback={
+                      <div className="flex items-center justify-center h-full">Loading map...</div>
+                    }
+                  >
+                    {/* @ts-ignore: dynamic import for code splitting if needed */}
+                    <InteractiveMap
+                      backendPins={backendPinsForMap}
+                      fromProfile={true}
+                      profileMode={true}
+                      onViewUserProfile={() => {}}
+                      setSelectedPin={() => {}}
+                    />
+                  </React.Suspense>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-400">
+                    No pins to show on map
+                  </div>
+                )}
+              </div>
+            </div>
             <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-md bg-white/95 backdrop-blur-sm">
               <div
                 className={`bg-gradient-to-r ${getProfileHeaderGradient()} px-6 py-6 border-b border-gray-200`}
@@ -904,11 +754,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                     )}
                   </div>
                 ) : (
-                  <div className="grid gap-6 justify-items-center">
+                  <div className="grid gap-6">
                     {visiblePins.map((pin, index) => (
                       <div
                         key={pin.id.toString()}
-                        className="rounded-2xl p-5 border border-gray-100 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform hover:scale-[1.02] group"
+                        className="w-full rounded-2xl p-5 border border-gray-100 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform hover:scale-[1.02] group min-h-[320px]"
                         style={{ animationDelay: `${index * 100}ms` }}
                       >
                         <div className="flex items-start justify-between mb-4">
@@ -986,11 +836,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                         )}
                         {pin.musicLink && (
                           <div className="mb-4 bg-white/60 rounded-lg p-3 border border-gray-100 flex justify-center">
-                            <div className="w-full max-w-md aspect-video">
+                            <div className="w-full aspect-video">
                               <MusicEmbed musicLink={pin.musicLink} />
                             </div>
                           </div>
                         )}
+                        {/* No video placeholder rendered when there is no musicLink */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                           <div className="bg-white rounded-lg p-3 border border-gray-100 shadow-[inset_0_1px_0_0_rgba(0,0,0,0.02)]">
                             <span className="font-semibold text-gray-700 flex items-center mb-1">
@@ -1084,6 +935,42 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
             headerGradient={getProfileHeaderGradient()}
             totalCount={visiblePins?.length || 0}
           />
+
+          {/* Map showing all user's pins (mobile) */}
+          <div className="mb-6">
+            <h3 className="text-base font-bold text-gray-900 mb-2">
+              {isViewingOwnProfile ? 'Your Pins on Map' : `${getDisplayName()}'s Pins on Map`}
+            </h3>
+            <div
+              style={{
+                height: '300px',
+                width: '100%',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              }}
+            >
+              {backendPinsForMap.length > 0 ? (
+                <React.Suspense
+                  fallback={
+                    <div className="flex items-center justify-center h-full">Loading map...</div>
+                  }
+                >
+                  <InteractiveMap
+                    backendPins={backendPinsForMap}
+                    fromProfile={true}
+                    profileMode={true}
+                    onViewUserProfile={() => {}}
+                    setSelectedPin={() => {}}
+                  />
+                </React.Suspense>
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-400">
+                  No pins to show on map
+                </div>
+              )}
+            </div>
+          </div>
 
           <div className="pt-3 pb-6">
             {/* Profile extras (mobile) */}

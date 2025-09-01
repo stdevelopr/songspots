@@ -31,6 +31,7 @@ interface Props {
   backendPins: BackendPin[];
   fromProfile?: boolean;
   setSelectedPin: React.Dispatch<React.SetStateAction<SelectedPin | null>>;
+  profileMode?: boolean;
 }
 
 const InteractiveMap: React.FC<Props> = (props) => {
@@ -49,6 +50,7 @@ const InteractiveMap: React.FC<Props> = (props) => {
     isInitialLoading = false,
     fromProfile = false,
     setSelectedPin,
+    profileMode,
   } = props;
 
   const [newPinLocation, setNewPinLocation] = React.useState<{ lat: number; lng: number } | null>(
@@ -102,8 +104,19 @@ const InteractiveMap: React.FC<Props> = (props) => {
     onLocationProcessed?.();
   }, []);
 
-  // Center map based on location / defaults
+  // Fit bounds to all pins for profile mode
   useEffect(() => {
+    if (profileMode && mapInstance && backendPins.length > 0) {
+      const bounds = L.latLngBounds(
+        backendPins.map((p) => [parseFloat(p.latitude), parseFloat(p.longitude)])
+      );
+      mapInstance.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+    }
+  }, [profileMode, mapInstance, backendPins]);
+
+  // Center map based on location / defaults (skip in profile mode)
+  useEffect(() => {
+    if (profileMode) return;
     if (!mapInstance || selectedPin) return;
     if (justCreatedPin) return; // Skip centering after pin creation
     if (status === 'granted' && userLocation) {
@@ -113,10 +126,11 @@ const InteractiveMap: React.FC<Props> = (props) => {
       mapInstance.setView(DEFAULT_CENTER, DEFAULT_ZOOM);
       onMapCentered?.();
     }
-  }, [mapInstance, status, userLocation, selectedPin, onMapCentered]);
+  }, [profileMode, mapInstance, status, userLocation, selectedPin, onMapCentered]);
 
-  // Map click to add pin (UI wiring for modal kept outside for brevity)
+  // Disable pin creation in profile mode
   useEffect(() => {
+    if (profileMode) return;
     if (!mapInstance) return;
     const onClick = (e: L.LeafletMouseEvent) => {
       mapInstance.closePopup();
@@ -131,7 +145,12 @@ const InteractiveMap: React.FC<Props> = (props) => {
     return () => {
       mapInstance.off('click', onClick);
     };
-  }, [mapInstance, identity, popupOpen, onMapInitialized, setPinToEdit]);
+  }, [profileMode, mapInstance, identity, popupOpen, onMapInitialized, setPinToEdit]);
+
+  if (profileMode) {
+    // Profile mode: just show the map with pins, no HUD, no modals, no location, no editing
+    return <div ref={mapRef} className="w-full h-full z-0" />;
+  }
 
   const publicCount = useMemo(() => pins.filter((p) => !p.isPrivate).length, [pins]);
   const privateCount = useMemo(() => pins.filter((p) => p.isPrivate && p.isOwner).length, [pins]);
