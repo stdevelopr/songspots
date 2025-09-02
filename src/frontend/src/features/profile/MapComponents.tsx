@@ -18,22 +18,27 @@ interface CollapseButtonProps {
 }
 
 export const CollapseButton: React.FC<CollapseButtonProps> = ({ onClick, isCollapsed }) => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent event bubbling
+    onClick();
+  };
+
   if (isCollapsed) {
     return (
       <button
-        onClick={onClick}
+        onClick={handleClick}
         className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors border border-white/20"
         title="Expand map"
         style={{ marginLeft: '0.5rem' }}
       >
-        <ChevronUpIcon />
+        <ChevronDownIcon />
       </button>
     );
   }
 
   return (
     <button
-      onClick={onClick}
+      onClick={handleClick}
       className="absolute top-3 right-3 p-2 rounded-lg bg-white/95 hover:bg-white shadow-lg border border-gray-200 transition-all duration-200"
       title="Collapse map"
       style={{ 
@@ -58,6 +63,22 @@ const ChevronUpIcon: React.FC = () => (
       strokeLinejoin="round"
       strokeWidth={2}
       d="M5 15l7-7 7 7"
+    />
+  </svg>
+);
+
+const ChevronDownIcon: React.FC = () => (
+  <svg
+    className="w-5 h-5 transition-transform duration-300"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M19 9l-7 7-7-7"
     />
   </svg>
 );

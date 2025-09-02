@@ -12,6 +12,7 @@ interface ProfileMapProps {
   className?: string;
   style?: React.CSSProperties;
   expandedHeight?: string;
+  onPinClick?: (pinId: string) => void;
 }
 
 export const ProfileMap: React.FC<ProfileMapProps> = ({
@@ -19,6 +20,7 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
   className = '',
   style,
   expandedHeight = UI_CONFIG.DEFAULT_EXPANDED_HEIGHT,
+  onPinClick,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
@@ -130,7 +132,16 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
         validPins.push({ ...coords, pin });
 
         const marker = L.marker([coords.lat, coords.lng]).addTo(mapInstance);
-        marker.bindPopup(createPopupContent(pin));
+        
+        // Add click handler for pin selection (no popup since list shows details)
+        if (onPinClick) {
+          marker.on('click', (e) => {
+            // Prevent default popup behavior
+            e.originalEvent?.preventDefault();
+            e.originalEvent?.stopPropagation();
+            onPinClick(pin.id.toString());
+          });
+        }
       } catch (error) {
         console.warn('Error adding marker for pin:', pin, error);
       }

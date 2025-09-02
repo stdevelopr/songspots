@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import MusicEmbed from '../common/MusicEmbed';
 import LocationDisplay from '../common/LocationDisplay';
 
@@ -19,6 +19,7 @@ interface ProfileSpotListProps {
   onEdit: (spot: Spot) => void;
   onDelete: (spot: Spot) => void;
   onViewOnMap: (spot: Spot) => void;
+  selectedPinId?: string | null;
 }
 
 const ProfileSpotList: React.FC<ProfileSpotListProps> = ({
@@ -28,7 +29,37 @@ const ProfileSpotList: React.FC<ProfileSpotListProps> = ({
   onEdit,
   onDelete,
   onViewOnMap,
+  selectedPinId,
 }) => {
+  const spotRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+  // Scroll to selected pin when selectedPinId changes
+  useEffect(() => {
+    if (selectedPinId && spotRefs.current[selectedPinId]) {
+      const element = spotRefs.current[selectedPinId];
+      if (element) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+        
+        // Add temporary highlight effect
+        element.style.transform = 'scale(1.02)';
+        element.style.boxShadow = '0 8px 32px rgba(59, 130, 246, 0.3)';
+        element.style.borderColor = 'rgb(59, 130, 246)';
+        
+        // Remove highlight after animation
+        setTimeout(() => {
+          if (element) {
+            element.style.transform = '';
+            element.style.boxShadow = '';
+            element.style.borderColor = '';
+          }
+        }, 2000);
+      }
+    }
+  }, [selectedPinId]);
   if (isLoading) {
     return (
       <div className="flex flex-col gap-4">
@@ -64,7 +95,9 @@ const ProfileSpotList: React.FC<ProfileSpotListProps> = ({
         .map((spot) => (
           <div
             key={spot.id.toString()}
-            className="w-full bg-white/95 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition border border-gray-100 p-4 flex flex-col gap-2"
+            ref={(el) => (spotRefs.current[spot.id.toString()] = el)}
+            data-pin-id={spot.id.toString()}
+            className="w-full bg-white/95 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 border border-gray-100 p-4 flex flex-col gap-2"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">

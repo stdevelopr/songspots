@@ -12,22 +12,19 @@ import {
 import { useInternetIdentity } from 'ic-use-internet-identity';
 import { useFileUpload } from '../file-storage/FileUpload';
 import { useFileUrl, sanitizeUrl } from '../file-storage/FileList';
-import { Principal } from '@dfinity/principal';
 import DeleteConfirmationModal from '../common/DeleteConfirmationModal';
 import PinEditModal from '../pins/PinEditModal';
-import ProfileHero from './ProfileHero';
 import ProfileCard from './ProfileCard';
 import MusicEmbed from '../common/MusicEmbed';
 import LocationDisplay from '../common/LocationDisplay';
 import ProfileEditForm from './ProfileEditForm';
 
 interface ProfilePageProps {
-  onBackToMap: () => void;
   userId?: string | null; // If provided, view another user's profile
   onViewPinOnMap: (pinId: string, lat: number, lng: number, fromProfile?: boolean) => void;
 }
 
-const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPinOnMap }) => {
+const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap }) => {
   const { identity } = useInternetIdentity();
   const isViewingOwnProfile = !userId;
 
@@ -61,11 +58,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
   const [showEditModal, setShowEditModal] = useState(false);
   const [pinToEdit, setPinToEdit] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const contentRef = useRef<HTMLDivElement | null>(null);
-  const [isCondensed, setIsCondensed] = useState(false);
+  const spotRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const [bio, setBio] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
+  const [isScrolling, setIsScrolling] = useState(false);
 
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -120,19 +118,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
     setProfilePicturePreview(null);
   }, [userProfile, isViewingOwnProfile]);
 
-  // Condense header on scroll
-  useEffect(() => {
-    const el = contentRef.current;
-    if (!el) return;
-    const onScroll = () => {
-      setIsCondensed(el.scrollTop > 32);
-    };
-    el.addEventListener('scroll', onScroll);
-    onScroll();
-    return () => {
-      el.removeEventListener('scroll', onScroll);
-    };
-  }, []);
 
   const validateAndSetProfilePicture = (file: File) => {
     // Validate file type
@@ -324,16 +309,150 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
     onViewPinOnMap(pin.id.toString(), lat, lng, true); // Pass fromProfile=true
   };
 
-  const formatDate = (pinId: bigint) => {
+  const handlePinClick = (pinId: string) => {
+    console.log('Pin clicked, scrolling to:', pinId);
+    
+    // Always update selected pin and scroll immediately
+    setSelectedPinId(pinId);
+    
+    // Clear any existing highlights first
+    Object.values(spotRefs.current).forEach(element => {
+      if (element) {
+        element.style.transform = '';
+        element.style.boxShadow = '';
+        element.style.borderColor = '';
+        element.style.transition = '';
+        // Remove any existing loading indicators
+        const indicator = element.querySelector('.animate-spin');
+        if (indicator) {
+          indicator.remove();
+        }
+      }
+    });
+    
+    // Scroll to the corresponding spot in the list immediately
+    const element = spotRefs.current[pinId];
+    if (element) {
+      console.log('Found element, scrolling to:', element);
+      
+      // Mobile-optimized scroll behavior
+      const isMobile = window.innerWidth < 768;
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: isMobile ? 'start' : 'center',
+        inline: 'nearest'
+      });
+      
+      // Add enhanced highlight effect
+      element.style.transform = 'scale(1.02)';
+      element.style.boxShadow = '0 12px 40px rgba(59, 130, 246, 0.4), 0 4px 20px rgba(59, 130, 246, 0.2)';
+      element.style.borderColor = 'rgb(59, 130, 246)';
+      element.style.borderWidth = '2px';
+      element.style.background = 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 197, 253, 0.1) 100%)';
+      element.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+      element.style.position = 'relative';
+      
+      // Add pulse animation
+      element.classList.add('animate-pulse-highlight');
+      
+      // Add temporary "selected" indicator
+      const selectedIndicator = document.createElement('div');
+      selectedIndicator.className = 'selected-pin-indicator absolute top-2 left-2 flex items-center gap-1 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-medium shadow-lg';
+      selectedIndicator.innerHTML = `
+        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+        </svg>
+        Selected
+      `;
+      selectedIndicator.style.zIndex = '1001';
+      element.appendChild(selectedIndicator);
+      
+      // Remove highlight and indicator after animation
+      setTimeout(() => {
+        if (element) {
+          element.style.transform = '';
+          element.style.boxShadow = '';
+          element.style.borderColor = '';
+          element.style.borderWidth = '';
+          element.style.background = '';
+          element.style.transition = '';
+          element.classList.remove('animate-pulse-highlight');
+          
+          // Remove selected indicator
+          const indicator = element.querySelector('.selected-pin-indicator');
+          if (indicator) {
+            indicator.remove();
+          }
+        }
+      }, 2500);
+    } else {
+      console.warn('No element ref found for pinId:', pinId);
+      // Fallback: try to find element by data attribute
+      const fallbackElement = document.querySelector(`[data-pin-id="${pinId}"]`) as HTMLElement;
+      if (fallbackElement) {
+        console.log('Found fallback element, scrolling');
+        fallbackElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+      } else {
+        console.error('Pin element not found in DOM for pinId:', pinId);
+      }
+    }
+  };
+
+  const formatDate = () => {
     try {
-      // Since we don't have a timestamp field, we'll use the pin ID as a rough indicator
-      // This is not ideal but works for display purposes
       const date = new Date();
       return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
     } catch {
       return 'Unknown date';
     }
   };
+
+  // Keyboard navigation for pins
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!visiblePins.length) return;
+      
+      const currentIndex = selectedPinId ? 
+        visiblePins.findIndex(pin => pin.id.toString() === selectedPinId) : -1;
+      
+      let nextIndex = currentIndex;
+      
+      switch (e.key) {
+        case 'ArrowUp':
+          e.preventDefault();
+          nextIndex = currentIndex > 0 ? currentIndex - 1 : visiblePins.length - 1;
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          nextIndex = currentIndex < visiblePins.length - 1 ? currentIndex + 1 : 0;
+          break;
+        case 'Home':
+          e.preventDefault();
+          nextIndex = 0;
+          break;
+        case 'End':
+          e.preventDefault();
+          nextIndex = visiblePins.length - 1;
+          break;
+        default:
+          return;
+      }
+      
+      if (nextIndex !== currentIndex && nextIndex >= 0) {
+        handlePinClick(visiblePins[nextIndex].id.toString());
+      }
+    };
+
+    // Only add keyboard listeners when pins are visible
+    if (visiblePins.length > 0) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [selectedPinId, visiblePins]);
 
   const getDisplayName = () => {
     if (userProfile?.name) {
@@ -377,6 +496,50 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
 
   return (
     <div className="h-full min-h-0 bg-gray-50 flex flex-col text-gray-800">
+      <style>{`
+        .animate-pulse-highlight {
+          animation: pulseHighlight 0.6s ease-in-out;
+        }
+        
+        @keyframes pulseHighlight {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.03); }
+          100% { transform: scale(1.02); }
+        }
+        
+        @media (max-width: 768px) {
+          .selected-pin-indicator {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+          }
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+          .animate-pulse-highlight {
+            animation: none;
+          }
+        }
+        
+        .keyboard-hint {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background: rgba(0, 0, 0, 0.8);
+          color: white;
+          padding: 8px 12px;
+          border-radius: 8px;
+          font-size: 0.75rem;
+          opacity: 0;
+          transform: translateY(10px);
+          transition: all 0.3s ease;
+          z-index: 1000;
+        }
+        
+        .keyboard-hint.show {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      `}</style>
       {/* Desktop layout (lg+): card + scrollable list (two-column flex) */}
       <div className="hidden lg:flex h-full min-h-0 px-4 lg:px-8 py-6">
         <div className="w-full max-w-6xl mx-auto h-full min-h-0 flex gap-8">
@@ -598,7 +761,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
           </div>
           <div className="flex-1 min-h-0 flex flex-col">
             {/* Sticky ProfileMap above the scrollable list */}
-            <ProfileMap backendPins={backendPinsForMap} className="mb-4" expandedHeight="270px" />
+            <ProfileMap 
+              backendPins={backendPinsForMap} 
+              className="mb-4" 
+              expandedHeight="270px"
+              onPinClick={handlePinClick}
+            />
 
             {/* Scrollable container for the spots list */}
             <div className="flex-1 min-h-0 overflow-y-auto">
@@ -694,6 +862,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                       {visiblePins.map((pin, index) => (
                         <div
                           key={pin.id.toString()}
+                          ref={(el) => (spotRefs.current[pin.id.toString()] = el)}
+                          data-pin-id={pin.id.toString()}
                           className="w-full rounded-2xl p-5 border border-gray-100 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform hover:scale-[1.02] group min-h-[220px]"
                           style={{ animationDelay: `${index * 100}ms` }}
                         >
@@ -810,7 +980,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                                 </svg>
                                 Created
                               </span>
-                              <p className="text-[11px] text-gray-600">{formatDate(pin.id)}</p>
+                              <p className="text-[11px] text-gray-600">{formatDate()}</p>
                             </div>
                           </div>
                           <div className="mt-4 pt-4 border-t border-gray-100">
@@ -1161,6 +1331,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
               backendPins={backendPinsForMap}
               className="mt-4 mb-6"
               expandedHeight="200px"
+              onPinClick={handlePinClick}
             />
 
             {/* Spots List */}
@@ -1175,6 +1346,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                 onEdit={handleEditPin}
                 onDelete={handleDeletePin}
                 onViewOnMap={handleViewPinOnMap}
+                selectedPinId={selectedPinId}
               />
             </div>
           </div>
@@ -1212,6 +1384,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
       {showToast && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-black/80 text-white text-sm px-3 py-2 rounded shadow">
           {toastMessage}
+        </div>
+      )}
+      
+      {/* Keyboard navigation hint */}
+      {visiblePins.length > 0 && (
+        <div className="keyboard-hint" id="keyboard-hint">
+          ↑↓ Navigate pins • Home/End Jump • Click pin to scroll
         </div>
       )}
     </div>
