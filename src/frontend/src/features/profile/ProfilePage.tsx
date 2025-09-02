@@ -1,3 +1,5 @@
+import ProfileSpotList from './ProfileSpotList';
+import { ProfileMap } from './ProfileMap';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   useGetUserProfile,
@@ -17,7 +19,6 @@ import ProfileHero from './ProfileHero';
 import ProfileCard from './ProfileCard';
 import MusicEmbed from '../common/MusicEmbed';
 import LocationDisplay from '../common/LocationDisplay';
-import InteractiveMap from '../map/interactive-map';
 import ProfileEditForm from './ProfileEditForm';
 
 interface ProfilePageProps {
@@ -595,270 +596,230 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
               </div>
             </div>
           </div>
-          <div className="flex-1 min-h-0 overflow-y-auto pr-2">
-            {/* Map showing all user's pins */}
-            <div className="mb-8">
-              <h3 className="text-lg font-bold text-gray-900 mb-2">
-                {isViewingOwnProfile ? 'Your Pins on Map' : `${getDisplayName()}'s Pins on Map`}
-              </h3>
-              <div
-                style={{
-                  height: '400px',
-                  width: '100%',
-                  borderRadius: '16px',
-                  overflow: 'hidden',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                }}
-              >
-                {/* Only render if there are pins */}
-                {backendPinsForMap.length > 0 ? (
-                  <React.Suspense
-                    fallback={
-                      <div className="flex items-center justify-center h-full">Loading map...</div>
-                    }
-                  >
-                    {/* @ts-ignore: dynamic import for code splitting if needed */}
-                    <InteractiveMap
-                      backendPins={backendPinsForMap}
-                      fromProfile={true}
-                      profileMode={true}
-                      onViewUserProfile={() => {}}
-                      setSelectedPin={() => {}}
-                    />
-                  </React.Suspense>
-                ) : (
-                  <div className="flex items-center justify-center h-full text-gray-400">
-                    No pins to show on map
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-md bg-white/95 backdrop-blur-sm">
-              <div
-                className={`bg-gradient-to-r ${getProfileHeaderGradient()} px-6 py-6 border-b border-gray-200`}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-2xl font-extrabold text-white drop-shadow-sm">
-                      {isViewingOwnProfile ? 'Your Spots' : `${getDisplayName()}'s Spots`}
-                    </h2>
-                    <p className="text-white/90 mt-1 drop-shadow-sm">
-                      {isViewingOwnProfile ? 'Manage your spots' : 'Explore spots'}
-                    </p>
-                  </div>
-                  <div className="bg-white/20 rounded-full p-3 backdrop-blur-sm">
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-              <div className="p-6 lg:p-7">
-                {isLoading || isLoadingPins ? (
-                  <div className="space-y-6">
-                    <div className="text-center py-8">
-                      <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full mb-4">
-                        <div className="w-8 h-8 border-3 border-indigo-300 border-t-indigo-600 rounded-full animate-spin" />
-                      </div>
-                      <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                        Loading memories...
-                      </h3>
-                      <p className="text-gray-500">Gathering your special moments</p>
-                    </div>
-                    <div className="grid gap-6">
-                      {[0, 1, 2].map((i) => (
-                        <div
-                          key={i}
-                          className="animate-pulse rounded-2xl p-6 border border-gray-100 bg-white/90 shadow-sm"
-                        >
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-3">
-                                <div className="h-6 w-32 bg-gradient-to-r from-gray-200 to-gray-100 rounded-lg" />
-                                <div className="h-5 w-16 bg-gray-100 rounded-full" />
-                              </div>
-                              <div className="space-y-2">
-                                <div className="h-4 w-full bg-gray-100 rounded" />
-                                <div className="h-4 w-4/5 bg-gray-100 rounded" />
-                                <div className="h-4 w-3/5 bg-gray-100 rounded" />
-                              </div>
-                            </div>
-                            <div className="flex gap-2">
-                              <div className="h-8 w-8 bg-gray-100 rounded-lg" />
-                              <div className="h-8 w-8 bg-gray-100 rounded-lg" />
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                            <div className="h-16 bg-gradient-to-r from-gray-100 to-gray-50 rounded-lg border border-gray-100" />
-                            <div className="h-16 bg-gradient-to-r from-gray-100 to-gray-50 rounded-lg border border-gray-100" />
-                          </div>
-                          <div className="h-10 w-36 bg-gray-100 rounded-lg" />
+          <div className="flex-1 min-h-0 flex flex-col">
+            {/* Sticky ProfileMap above the scrollable list */}
+            <ProfileMap backendPins={backendPinsForMap} className="mb-4" expandedHeight="270px" />
+
+            {/* Scrollable container for the spots list */}
+            <div className="flex-1 min-h-0 overflow-y-auto">
+              <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-md bg-white/95 backdrop-blur-sm">
+                <div className="p-6 lg:p-7">
+                  {isLoading || isLoadingPins ? (
+                    <div className="space-y-6">
+                      <div className="text-center py-8">
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full mb-4">
+                          <div className="w-8 h-8 border-3 border-indigo-300 border-t-indigo-600 rounded-full animate-spin" />
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : visiblePins.length === 0 ? (
-                  <div className="text-center py-16">
-                    <div className="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-6 flex items-center justify-center">
-                      <svg
-                        className="w-10 h-10 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                      </svg>
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                      {isViewingOwnProfile ? 'Your journey starts here' : 'No memories yet'}
-                    </h3>
-                    <p className="text-gray-600 mb-8 leading-relaxed max-w-lg mx-auto">
-                      {isViewingOwnProfile
-                        ? 'Create your first memory by clicking on the map to mark special places and musical moments that matter to you.'
-                        : "This user hasn't shared any memories yet. Check back later to discover their musical journey!"}
-                    </p>
-                    {isViewingOwnProfile && (
-                      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-100 max-w-md mx-auto">
-                        <h4 className="text-lg font-semibold text-indigo-900 mb-2">Get started</h4>
-                        <p className="text-indigo-700 text-sm">
-                          Navigate to the map and click anywhere to create your first memory spot!
-                        </p>
+                        <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                          Loading memories...
+                        </h3>
+                        <p className="text-gray-500">Gathering your special moments</p>
                       </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="grid gap-6">
-                    {visiblePins.map((pin, index) => (
-                      <div
-                        key={pin.id.toString()}
-                        className="w-full rounded-2xl p-5 border border-gray-100 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform hover:scale-[1.02] group min-h-[320px]"
-                        style={{ animationDelay: `${index * 100}ms` }}
-                      >
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="text-lg font-semibold text-gray-900 tracking-tight">
-                                {pin.name || 'Unnamed Memory'}
-                              </h3>
-                              {isViewingOwnProfile && (
-                                <>
-                                  {pin.isPrivate ? (
-                                    <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700 ring-1 ring-slate-200">
-                                      <span>🔒</span>
-                                      <span>Private</span>
-                                    </div>
-                                  ) : (
-                                    <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200">
-                                      <span>🌍</span>
-                                      <span>Public</span>
-                                    </div>
-                                  )}
-                                </>
-                              )}
+                      <div className="grid gap-6">
+                        {[0, 1, 2].map((i) => (
+                          <div
+                            key={i}
+                            className="animate-pulse rounded-2xl p-6 border border-gray-100 bg-white/90 shadow-sm"
+                          >
+                            <div className="flex items-start justify-between mb-4">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-3">
+                                  <div className="h-6 w-32 bg-gradient-to-r from-gray-200 to-gray-100 rounded-lg" />
+                                  <div className="h-5 w-16 bg-gray-100 rounded-full" />
+                                </div>
+                                <div className="space-y-2">
+                                  <div className="h-4 w-full bg-gray-100 rounded" />
+                                  <div className="h-4 w-4/5 bg-gray-100 rounded" />
+                                  <div className="h-4 w-3/5 bg-gray-100 rounded" />
+                                </div>
+                              </div>
+                              <div className="flex gap-2">
+                                <div className="h-8 w-8 bg-gray-100 rounded-lg" />
+                                <div className="h-8 w-8 bg-gray-100 rounded-lg" />
+                              </div>
                             </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                              <div className="h-16 bg-gradient-to-r from-gray-100 to-gray-50 rounded-lg border border-gray-100" />
+                              <div className="h-16 bg-gradient-to-r from-gray-100 to-gray-50 rounded-lg border border-gray-100" />
+                            </div>
+                            <div className="h-10 w-36 bg-gray-100 rounded-lg" />
                           </div>
-                          {isViewingOwnProfile && (
-                            <div className="ml-4 flex gap-2">
-                              <button
-                                onClick={() => handleEditPin(pin)}
-                                className="px-2.5 py-2 text-blue-700 bg-blue-50/60 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors"
-                                title="Edit memory"
-                              >
-                                <svg
-                                  className="w-5 h-5"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                  />
-                                </svg>
-                              </button>
-                              <button
-                                onClick={() => handleDeletePin(pin)}
-                                className="px-2.5 py-2 text-red-700 bg-red-50/60 hover:bg-red-100 border border-red-200 rounded-lg transition-colors"
-                                title="Delete memory"
-                              >
-                                <svg
-                                  className="w-5 h-5"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                  />
-                                </svg>
-                              </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : visiblePins.length === 0 ? (
+                    <div className="text-center py-16">
+                      <div className="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-6 flex items-center justify-center">
+                        <svg
+                          className="w-10 h-10 text-gray-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                        </svg>
+                      </div>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                        {isViewingOwnProfile ? 'Your journey starts here' : 'No memories yet'}
+                      </h3>
+                      <p className="text-gray-600 mb-8 leading-relaxed max-w-lg mx-auto">
+                        {isViewingOwnProfile
+                          ? 'Create your first memory by clicking on the map to mark special places and musical moments that matter to you.'
+                          : "This user hasn't shared any memories yet. Check back later to discover their musical journey!"}
+                      </p>
+                      {isViewingOwnProfile && (
+                        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-100 max-w-md mx-auto">
+                          <h4 className="text-lg font-semibold text-indigo-900 mb-2">
+                            Get started
+                          </h4>
+                          <p className="text-indigo-700 text-sm">
+                            Navigate to the map and click anywhere to create your first memory spot!
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="grid gap-6">
+                      {visiblePins.map((pin, index) => (
+                        <div
+                          key={pin.id.toString()}
+                          className="w-full rounded-2xl p-5 border border-gray-100 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform hover:scale-[1.02] group min-h-[220px]"
+                          style={{ animationDelay: `${index * 100}ms` }}
+                        >
+                          {/* Video first */}
+                          {pin.musicLink && (
+                            <div className="mb-4">
+                              <div className="w-full aspect-video">
+                                <MusicEmbed musicLink={pin.musicLink} />
+                              </div>
                             </div>
                           )}
-                        </div>
-                        {pin.description && (
-                          <div className="mb-4">
-                            <p className="text-gray-700 text-sm leading-relaxed bg-white/60 rounded-lg p-3 border border-gray-100">
-                              {pin.description}
-                            </p>
+                          {/* Title and description after video */}
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <h3 className="text-lg font-semibold text-gray-900 tracking-tight">
+                                  {pin.name || 'Unnamed Memory'}
+                                </h3>
+                                {isViewingOwnProfile && (
+                                  <>
+                                    {pin.isPrivate ? (
+                                      <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700 ring-1 ring-slate-200">
+                                        <span>🔒</span>
+                                        <span>Private</span>
+                                      </div>
+                                    ) : (
+                                      <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200">
+                                        <span>🌍</span>
+                                        <span>Public</span>
+                                      </div>
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                            {isViewingOwnProfile && (
+                              <div className="ml-4 flex gap-2">
+                                <button
+                                  onClick={() => handleEditPin(pin)}
+                                  className="px-2.5 py-2 text-blue-700 bg-blue-50/60 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors"
+                                  title="Edit memory"
+                                >
+                                  <svg
+                                    className="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                    />
+                                  </svg>
+                                </button>
+                                <button
+                                  onClick={() => handleDeletePin(pin)}
+                                  className="px-2.5 py-2 text-red-700 bg-red-50/60 hover:bg-red-100 border border-red-200 rounded-lg transition-colors"
+                                  title="Delete memory"
+                                >
+                                  <svg
+                                    className="w-5 h-5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                    />
+                                  </svg>
+                                </button>
+                              </div>
+                            )}
                           </div>
-                        )}
-                        {pin.musicLink && (
-                          <div className="mb-4 bg-white/60 rounded-lg p-3 border border-gray-100 flex justify-center">
-                            <div className="w-full aspect-video">
-                              <MusicEmbed musicLink={pin.musicLink} />
+                          {pin.description && (
+                            <div className="mb-4">
+                              <p className="text-gray-700 text-sm leading-relaxed bg-white/60 rounded-lg p-3 border border-gray-100">
+                                {pin.description}
+                              </p>
+                            </div>
+                          )}
+                          {/* No video placeholder rendered when there is no musicLink */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                            <div className="bg-white rounded-lg p-3 border border-gray-100 shadow-[inset_0_1px_0_0_rgba(0,0,0,0.02)]">
+                              <span className="font-semibold text-gray-700 flex items-center mb-1">
+                                Location
+                              </span>
+                              <div className="text-[11px] text-gray-600">
+                                <LocationDisplay
+                                  latitude={pin.latitude}
+                                  longitude={pin.longitude}
+                                  showIcon={false}
+                                />
+                              </div>
+                            </div>
+                            <div className="bg-white rounded-lg p-3 border border-gray-100 shadow-[inset_0_1px_0_0_rgba(0,0,0,0.02)]">
+                              <span className="font-semibold text-gray-700 flex items-center mb-1">
+                                <svg
+                                  className="w-4 h-4 mr-2"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                  />
+                                </svg>
+                                Created
+                              </span>
+                              <p className="text-[11px] text-gray-600">{formatDate(pin.id)}</p>
                             </div>
                           </div>
-                        )}
-                        {/* No video placeholder rendered when there is no musicLink */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                          <div className="bg-white rounded-lg p-3 border border-gray-100 shadow-[inset_0_1px_0_0_rgba(0,0,0,0.02)]">
-                            <span className="font-semibold text-gray-700 flex items-center mb-1">
-                              Location
-                            </span>
-                            <div className="text-[11px] text-gray-600">
-                              <LocationDisplay
-                                latitude={pin.latitude}
-                                longitude={pin.longitude}
-                                showIcon={false}
-                              />
-                            </div>
-                          </div>
-                          <div className="bg-white rounded-lg p-3 border border-gray-100 shadow-[inset_0_1px_0_0_rgba(0,0,0,0.02)]">
-                            <span className="font-semibold text-gray-700 flex items-center mb-1">
+                          <div className="mt-4 pt-4 border-t border-gray-100">
+                            <button
+                              onClick={() => handleViewPinOnMap(pin)}
+                              className={`text-${getProfileAccentColor()}-700 hover:text-${getProfileAccentColor()}-800 text-sm font-medium flex items-center gap-2 bg-${getProfileAccentColor()}-50/70 hover:bg-${getProfileAccentColor()}-100 px-4 py-2 rounded-lg border border-${getProfileAccentColor()}-100 transition-all`}
+                            >
                               <svg
-                                className="w-4 h-4 mr-2"
+                                className="w-4 h-4"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -867,58 +828,36 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
                                   strokeWidth={2}
-                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                />
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                                 />
                               </svg>
-                              Created
-                            </span>
-                            <p className="text-[11px] text-gray-600">{formatDate(pin.id)}</p>
+                              <span>View on Map</span>
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 5l7 7-7 7"
+                                />
+                              </svg>
+                            </button>
                           </div>
                         </div>
-                        <div className="mt-4 pt-4 border-t border-gray-100">
-                          <button
-                            onClick={() => handleViewPinOnMap(pin)}
-                            className={`text-${getProfileAccentColor()}-700 hover:text-${getProfileAccentColor()}-800 text-sm font-medium flex items-center gap-2 bg-${getProfileAccentColor()}-50/70 hover:bg-${getProfileAccentColor()}-100 px-4 py-2 rounded-lg border border-${getProfileAccentColor()}-100 transition-all`}
-                          >
-                            <svg
-                              className="w-4 h-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                              />
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                              />
-                            </svg>
-                            <span>View on Map</span>
-                            <svg
-                              className="w-4 h-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M9 5l7 7-7 7"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -935,42 +874,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
             headerGradient={getProfileHeaderGradient()}
             totalCount={visiblePins?.length || 0}
           />
-
-          {/* Map showing all user's pins (mobile) */}
-          <div className="mb-6">
-            <h3 className="text-base font-bold text-gray-900 mb-2">
-              {isViewingOwnProfile ? 'Your Pins on Map' : `${getDisplayName()}'s Pins on Map`}
-            </h3>
-            <div
-              style={{
-                height: '300px',
-                width: '100%',
-                borderRadius: '12px',
-                overflow: 'hidden',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-              }}
-            >
-              {backendPinsForMap.length > 0 ? (
-                <React.Suspense
-                  fallback={
-                    <div className="flex items-center justify-center h-full">Loading map...</div>
-                  }
-                >
-                  <InteractiveMap
-                    backendPins={backendPinsForMap}
-                    fromProfile={true}
-                    profileMode={true}
-                    onViewUserProfile={() => {}}
-                    setSelectedPin={() => {}}
-                  />
-                </React.Suspense>
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-400">
-                  No pins to show on map
-                </div>
-              )}
-            </div>
-          </div>
 
           <div className="pt-3 pb-6">
             {/* Profile extras (mobile) */}
@@ -1253,137 +1156,26 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ onBackToMap, userId, onViewPi
               </div>
             )}
 
+            {/* ProfileMap for mobile - positioned after all profile info */}
+            <ProfileMap
+              backendPins={backendPinsForMap}
+              className="mt-4 mb-6"
+              expandedHeight="200px"
+            />
+
             {/* Spots List */}
-            <div className="w-full mt-4">
+            <div className="w-full">
               <h2 className="text-lg font-bold text-gray-900 mb-4">
                 {isViewingOwnProfile ? 'Your Spots' : getDisplayName() + "'s Spots"}
               </h2>
-              {isLoading || isLoadingPins ? (
-                <div className="flex flex-col gap-4">
-                  {[0, 1, 2].map((i) => (
-                    <div
-                      key={i}
-                      className="animate-pulse bg-white/90 rounded-2xl border border-gray-100 p-4"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="h-5 w-40 bg-gray-200 rounded" />
-                        <div className="h-6 w-16 bg-gray-200 rounded-full" />
-                      </div>
-                      <div className="h-4 w-full bg-gray-100 rounded mb-2" />
-                      <div className="h-4 w-2/3 bg-gray-100 rounded mb-4" />
-                      <div className="h-8 w-28 bg-gray-100 rounded" />
-                    </div>
-                  ))}
-                </div>
-              ) : visiblePins.length === 0 ? (
-                <div className="text-center py-8">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No spots yet</h3>
-                  <p className="text-gray-700 mb-4">
-                    {isViewingOwnProfile
-                      ? 'Start creating spots by clicking on the map!'
-                      : 'No spots yet.'}
-                  </p>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-4 items-center">
-                  {visiblePins
-                    .slice()
-                    .sort((a, b) => Number(b.id) - Number(a.id))
-                    .map((spot) => (
-                      <div
-                        key={spot.id.toString()}
-                        className="w-full bg-white/95 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition border border-gray-100 p-4 flex flex-col gap-2"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="flex items-center min-w-0 gap-2 flex-1">
-                              <h3
-                                className="text-lg font-semibold text-gray-900 truncate overflow-hidden whitespace-nowrap min-w-0 flex-1 max-w-[45vw]"
-                                title={spot.name || 'Unnamed Spot'}
-                              >
-                                {spot.name || 'Unnamed Spot'}
-                              </h3>
-                              {isViewingOwnProfile && (
-                                <>
-                                  {spot.isPrivate ? (
-                                    <span className="flex-shrink-0 text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 ring-1 ring-slate-200 mr-2">
-                                      🔒 Private
-                                    </span>
-                                  ) : (
-                                    <span className="flex-shrink-0 text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200 ring-1 ring-emerald-200 mr-2">
-                                      🌍 Public
-                                    </span>
-                                  )}
-                                </>
-                              )}
-                            </div>
-                          </div>
-                          {isViewingOwnProfile && (
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => handleEditPin(spot)}
-                                className="text-indigo-700 bg-indigo-50/60 hover:bg-indigo-100 border border-indigo-200 text-sm px-2.5 py-1 rounded-md"
-                              >
-                                Edit
-                              </button>
-                              <button
-                                onClick={() => handleDeletePin(spot)}
-                                className="text-red-700 bg-red-50/60 hover:bg-red-100 border border-red-200 text-sm px-2.5 py-1 rounded-md"
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                        {spot.description && (
-                          <p className="text-gray-700 text-sm leading-relaxed bg-white/60 rounded-lg p-3 border border-gray-100">
-                            {spot.description}
-                          </p>
-                        )}
-                        {spot.musicLink && (
-                          <div className="mb-3 bg-white/60 rounded-lg p-3 border border-gray-100 flex justify-center">
-                            <div className="w-full aspect-video">
-                              <MusicEmbed musicLink={spot.musicLink} />
-                            </div>
-                          </div>
-                        )}
-                        <div className="text-xs text-gray-500">
-                          <LocationDisplay
-                            latitude={spot.latitude}
-                            longitude={spot.longitude}
-                            showIcon={true}
-                            className="text-gray-500"
-                          />
-                        </div>
-                        <button
-                          onClick={() => handleViewPinOnMap(spot)}
-                          className="mt-2 inline-flex items-center gap-2 text-indigo-700 hover:text-indigo-800 text-sm font-medium bg-indigo-50/70 hover:bg-indigo-100 px-3 py-1.5 rounded-md border border-indigo-100 transition"
-                        >
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                            />
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                            />
-                          </svg>
-                          View on Map
-                        </button>
-                      </div>
-                    ))}
-                </div>
-              )}
+              <ProfileSpotList
+                spots={visiblePins}
+                isViewingOwnProfile={isViewingOwnProfile}
+                isLoading={isLoading || isLoadingPins}
+                onEdit={handleEditPin}
+                onDelete={handleDeletePin}
+                onViewOnMap={handleViewPinOnMap}
+              />
             </div>
           </div>
         </div>

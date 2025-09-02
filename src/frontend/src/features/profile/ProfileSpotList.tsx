@@ -1,0 +1,156 @@
+import React from 'react';
+import MusicEmbed from '../common/MusicEmbed';
+import LocationDisplay from '../common/LocationDisplay';
+
+interface Spot {
+  id: bigint;
+  name: string;
+  description?: string;
+  musicLink?: string;
+  isPrivate: boolean;
+  latitude: string;
+  longitude: string;
+}
+
+interface ProfileSpotListProps {
+  spots: Spot[];
+  isViewingOwnProfile: boolean;
+  isLoading: boolean;
+  onEdit: (spot: Spot) => void;
+  onDelete: (spot: Spot) => void;
+  onViewOnMap: (spot: Spot) => void;
+}
+
+const ProfileSpotList: React.FC<ProfileSpotListProps> = ({
+  spots,
+  isViewingOwnProfile,
+  isLoading,
+  onEdit,
+  onDelete,
+  onViewOnMap,
+}) => {
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-4">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="animate-pulse bg-white/90 rounded-2xl border border-gray-100 p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="h-5 w-40 bg-gray-200 rounded" />
+              <div className="h-6 w-16 bg-gray-200 rounded-full" />
+            </div>
+            <div className="h-4 w-full bg-gray-100 rounded mb-2" />
+            <div className="h-4 w-2/3 bg-gray-100 rounded mb-4" />
+            <div className="h-8 w-28 bg-gray-100 rounded" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (spots.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">No spots yet</h3>
+        <p className="text-gray-700 mb-4">
+          {isViewingOwnProfile ? 'Start creating spots by clicking on the map!' : 'No spots yet.'}
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div className="flex flex-col gap-4 items-center">
+      {spots
+        .slice()
+        .sort((a, b) => Number(b.id) - Number(a.id))
+        .map((spot) => (
+          <div
+            key={spot.id.toString()}
+            className="w-full bg-white/95 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition border border-gray-100 p-4 flex flex-col gap-2"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center min-w-0 gap-2 flex-1">
+                  <h3
+                    className="text-lg font-semibold text-gray-900 truncate overflow-hidden whitespace-nowrap min-w-0 flex-1 max-w-[45vw]"
+                    title={spot.name || 'Unnamed Spot'}
+                  >
+                    {spot.name || 'Unnamed Spot'}
+                  </h3>
+                  {isViewingOwnProfile && (
+                    <>
+                      {spot.isPrivate ? (
+                        <span className="flex-shrink-0 text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 ring-1 ring-slate-200 mr-2">
+                          🔒 Private
+                        </span>
+                      ) : (
+                        <span className="flex-shrink-0 text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200 ring-1 ring-emerald-200 mr-2">
+                          🌍 Public
+                        </span>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+              {isViewingOwnProfile && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => onEdit(spot)}
+                    className="text-indigo-700 bg-indigo-50/60 hover:bg-indigo-100 border border-indigo-200 text-sm px-2.5 py-1 rounded-md"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => onDelete(spot)}
+                    className="text-red-700 bg-red-50/60 hover:bg-red-100 border border-red-200 text-sm px-2.5 py-1 rounded-md"
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
+            </div>
+            {spot.description && (
+              <p className="text-gray-700 text-sm leading-relaxed bg-white/60 rounded-lg p-3 border border-gray-100">
+                {spot.description}
+              </p>
+            )}
+            {spot.musicLink && (
+              <div className="mb-3 bg-white/60 rounded-lg p-3 border border-gray-100 flex justify-center">
+                <div className="w-full aspect-video">
+                  <MusicEmbed musicLink={spot.musicLink} />
+                </div>
+              </div>
+            )}
+            <div className="text-xs text-gray-500">
+              <LocationDisplay
+                latitude={spot.latitude}
+                longitude={spot.longitude}
+                showIcon={true}
+                className="text-gray-500"
+              />
+            </div>
+            <button
+              onClick={() => onViewOnMap(spot)}
+              className="mt-2 inline-flex items-center gap-2 text-indigo-700 hover:text-indigo-800 text-sm font-medium bg-indigo-50/70 hover:bg-indigo-100 px-3 py-1.5 rounded-md border border-indigo-100 transition"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              View on Map
+            </button>
+          </div>
+        ))}
+    </div>
+  );
+};
+
+export default ProfileSpotList;
