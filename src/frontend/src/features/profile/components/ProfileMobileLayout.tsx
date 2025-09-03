@@ -36,8 +36,11 @@ interface ProfileMobileLayoutProps {
   // Edit form component
   editFormComponent?: React.ReactNode;
   
-  // Map focus
+  // Map focus and hover
   focusedMapPinId?: string | null;
+  hoveredMapPinId?: string | null;
+  onPinHover?: (pin: any) => void;
+  onPinHoverEnd?: () => void;
 }
 
 const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
@@ -62,6 +65,9 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
   onViewPinOnMap,
   editFormComponent,
   focusedMapPinId,
+  hoveredMapPinId,
+  onPinHover,
+  onPinHoverEnd,
 }) => {
   return (
     <div className="lg:hidden h-full min-h-0 overflow-y-auto">
@@ -102,6 +108,7 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
             expandedHeight="200px"
             onPinClick={onPinClick}
             focusedPinId={focusedMapPinId}
+            hoveredPinId={hoveredMapPinId}
           />
 
           {/* Spots List */}
@@ -116,6 +123,8 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
               onEdit={onEditPin}
               onDelete={onDeletePin}
               onViewOnMap={onViewPinOnMap}
+              onMouseEnter={onPinHover}
+              onMouseLeave={onPinHoverEnd}
               selectedPinId={selectedPinId}
             />
           </div>

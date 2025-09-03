@@ -19,6 +19,8 @@ interface ProfileSpotListProps {
   onEdit: (spot: Spot) => void;
   onDelete: (spot: Spot) => void;
   onViewOnMap: (spot: Spot) => void;
+  onMouseEnter?: (spot: Spot) => void;
+  onMouseLeave?: () => void;
   selectedPinId?: string | null;
 }
 
@@ -29,6 +31,8 @@ const ProfileSpotList: React.FC<ProfileSpotListProps> = ({
   onEdit,
   onDelete,
   onViewOnMap,
+  onMouseEnter,
+  onMouseLeave,
   selectedPinId,
 }) => {
   const spotRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -98,6 +102,8 @@ const ProfileSpotList: React.FC<ProfileSpotListProps> = ({
             ref={(el) => (spotRefs.current[spot.id.toString()] = el)}
             data-pin-id={spot.id.toString()}
             className="w-full bg-white/95 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 border border-gray-100 p-4 flex flex-col gap-2"
+            onMouseEnter={() => onMouseEnter?.(spot)}
+            onMouseLeave={() => onMouseLeave?.()}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">

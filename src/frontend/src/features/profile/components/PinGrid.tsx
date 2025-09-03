@@ -9,6 +9,8 @@ interface PinGridProps {
   onEdit: (pin: any) => void;
   onDelete: (pin: any) => void;
   onViewOnMap: (pin: any) => void;
+  onMouseEnter?: (pin: any) => void;
+  onMouseLeave?: () => void;
   formatDate: () => string;
   getProfileAccentColor: () => string;
   spotRef: (el: HTMLDivElement | null) => void;
@@ -21,6 +23,8 @@ const PinGrid: React.FC<PinGridProps> = ({
   onEdit,
   onDelete,
   onViewOnMap,
+  onMouseEnter,
+  onMouseLeave,
   formatDate,
   getProfileAccentColor,
   spotRef,
@@ -32,6 +36,8 @@ const PinGrid: React.FC<PinGridProps> = ({
       data-pin-id={pin.id.toString()}
       className="w-full rounded-xl p-3 border border-gray-100 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform hover:scale-[1.01] group min-h-[140px]"
       style={{ animationDelay: `${index * 100}ms` }}
+      onMouseEnter={() => onMouseEnter?.(pin)}
+      onMouseLeave={() => onMouseLeave?.()}
     >
       {/* Video first */}
       {pin.musicLink && (

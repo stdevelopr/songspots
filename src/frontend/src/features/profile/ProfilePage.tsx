@@ -16,8 +16,9 @@ interface ProfilePageProps {
 }
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap }) => {
-  // State for focused pin in profile map
+  // State for focused and hovered pins in profile map
   const [focusedMapPinId, setFocusedMapPinId] = useState<string | null>(null);
+  const [hoveredMapPinId, setHoveredMapPinId] = useState<string | null>(null);
 
   // Initialize all hooks
   const profileState = useProfileState({ userId });
@@ -118,6 +119,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap }) => 
         formatDate={profileActions.formatDate}
         getProfileAccentColor={profileActions.getProfileAccentColor}
         focusedMapPinId={focusedMapPinId}
+        hoveredMapPinId={hoveredMapPinId}
+        onPinHover={(pin) => setHoveredMapPinId(pin.id.toString())}
+        onPinHoverEnd={() => setHoveredMapPinId(null)}
       />
       
       {/* Mobile Layout */}
@@ -143,6 +147,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap }) => 
         onViewPinOnMap={pinOperations.handleViewPinOnMap}
         editFormComponent={mobileEditForm}
         focusedMapPinId={focusedMapPinId}
+        hoveredMapPinId={hoveredMapPinId}
+        onPinHover={(pin) => setHoveredMapPinId(pin.id.toString())}
+        onPinHoverEnd={() => setHoveredMapPinId(null)}
       />
 
 
