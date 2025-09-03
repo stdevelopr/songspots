@@ -28,18 +28,19 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
   const mapRef = useRef<HTMLDivElement>(null);
   const markersRef = useRef<Map<string, L.Marker>>(new Map());
   const focusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const expandTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Create custom icons for focused and normal pins
   const normalIcon = L.divIcon({
     className: 'custom-pin-icon',
-    html: `<div class="w-6 h-6 bg-blue-500 rounded-full border-2 border-white shadow-lg"></div>`,
+    html: `<div class="w-6 h-6 bg-blue-500 rounded-full border-2 border-white shadow-lg" style="z-index: 100;"></div>`,
     iconSize: [24, 24],
     iconAnchor: [12, 12],
   });
   
   const focusedIcon = L.divIcon({
     className: 'custom-pin-icon focused',
-    html: `<div class="w-8 h-8 bg-red-500 rounded-full border-3 border-white shadow-xl animate-pulse"></div>`,
+    html: `<div class="w-8 h-8 bg-red-500 rounded-full border-3 border-white shadow-xl animate-pulse" style="z-index: 1000; position: relative;"></div>`,
     iconSize: [32, 32],
     iconAnchor: [16, 16],
   });
@@ -127,7 +128,7 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
 
   // Add markers and fit bounds when pins change
   useEffect(() => {
-    if (!mapInstance) return;
+    if (!mapInstance || isCollapsed) return;
 
     // Clear existing markers
     markersRef.current.forEach((marker) => {
@@ -151,10 +152,10 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
         validPins.push({ ...coords, pin });
 
         const pinId = pin.id.toString();
-        const isFocused = focusedPinId === pinId;
-        const icon = isFocused ? focusedIcon : normalIcon;
-        
-        const marker = L.marker([coords.lat, coords.lng], { icon }).addTo(mapInstance);
+        const marker = L.marker([coords.lat, coords.lng], { 
+          icon: normalIcon,
+          zIndexOffset: 0 
+        }).addTo(mapInstance);
         
         // Store marker reference
         markersRef.current.set(pinId, marker);
@@ -180,28 +181,60 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
         maxZoom: UI_CONFIG.MAX_ZOOM_ON_FIT 
       });
     }
-  }, [mapInstance, backendPins, focusedPinId, normalIcon, focusedIcon, onPinClick]);
+  }, [mapInstance, backendPins, normalIcon, focusedIcon, onPinClick, isCollapsed]);
+
+  // Update marker icons when focusedPinId changes (without recreating all markers)
+  useEffect(() => {
+    if (!mapInstance || isCollapsed) return;
+
+    markersRef.current.forEach((marker, pinId) => {
+      const isFocused = focusedPinId === pinId;
+      const icon = isFocused ? focusedIcon : normalIcon;
+      
+      marker.setIcon(icon);
+      marker.setZIndexOffset(isFocused ? 1000 : 0);
+    });
+  }, [focusedPinId, normalIcon, focusedIcon, mapInstance, isCollapsed]);
 
   // Handle focusing on a specific pin with two-stage animation
   useEffect(() => {
-    // Clear any existing timeout when focusedPinId changes
+    // Clear any existing timeouts when focusedPinId changes
     if (focusTimeoutRef.current) {
       clearTimeout(focusTimeoutRef.current);
       focusTimeoutRef.current = null;
     }
+    if (expandTimeoutRef.current) {
+      clearTimeout(expandTimeoutRef.current);
+      expandTimeoutRef.current = null;
+    }
 
     if (!mapInstance || !focusedPinId) return;
 
+    // Find the focused marker
     const focusedMarker = markersRef.current.get(focusedPinId);
-    if (focusedMarker) {
-      // Ensure map is expanded when focusing on a pin
-      if (isCollapsed) {
-        setIsCollapsed(false);
-      }
+    if (!focusedMarker) {
+      console.warn('Focused marker not found:', focusedPinId);
+      return;
+    }
+
+    // Ensure map is expanded when focusing on a pin
+    if (isCollapsed) {
+      setIsCollapsed(false);
+      // Wait for map to expand before trying to animate
+      expandTimeoutRef.current = setTimeout(() => {
+        performFocusAnimation();
+      }, 400); // Wait for collapse animation to complete
+      return;
+    }
+
+    performFocusAnimation();
+
+    function performFocusAnimation() {
+      if (!mapInstance || !focusedMarker) return;
 
       const markerLatLng = focusedMarker.getLatLng();
       
-      // Stage 1: Show full map view with all pins for context (1 second)
+      // Stage 1: Show full map view with all pins for context
       if (backendPins.length > 1) {
         const bounds = L.latLngBounds(
           backendPins
@@ -211,6 +244,7 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
             })
             .filter(Boolean) as [number, number][]
         );
+        
         mapInstance.fitBounds(bounds, { 
           padding: UI_CONFIG.FIT_BOUNDS_PADDING, 
           maxZoom: UI_CONFIG.MAX_ZOOM_ON_FIT,
@@ -218,13 +252,12 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
           duration: 0.5
         });
         
-        // Stage 2: Zoom to focused pin after 1.5 seconds - store timeout ref
+        // Stage 2: Zoom to focused pin after 1.5 seconds
         focusTimeoutRef.current = setTimeout(() => {
-          // Only zoom if this timeout hasn't been cancelled
-          if (focusTimeoutRef.current) {
+          if (mapInstance && focusedMarker) {
             mapInstance.setView(markerLatLng, 15, { animate: true, duration: 0.8 });
-            focusTimeoutRef.current = null;
           }
+          focusTimeoutRef.current = null;
         }, 1500);
       } else {
         // If only one pin, just zoom to it directly
@@ -232,26 +265,40 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
       }
     }
 
-    // Cleanup function to clear timeout when component unmounts or dependencies change
+    // Cleanup function to clear timeouts when component unmounts or dependencies change
     return () => {
       if (focusTimeoutRef.current) {
         clearTimeout(focusTimeoutRef.current);
         focusTimeoutRef.current = null;
       }
+      if (expandTimeoutRef.current) {
+        clearTimeout(expandTimeoutRef.current);
+        expandTimeoutRef.current = null;
+      }
     };
   }, [focusedPinId, mapInstance, isCollapsed, backendPins]);
 
   return (
-    <div
-      className={`profile-map bg-white/95 backdrop-blur-sm border border-gray-100 shadow-sm rounded-2xl overflow-hidden transition-all duration-300 ease-in-out ${className}`}
-      style={{
-        ...style,
-        height: isCollapsed ? UI_CONFIG.COLLAPSED_HEIGHT : expandedHeight,
-        position: 'sticky',
-        top: '0',
-        zIndex: 10,
-      }}
-    >
+    <>
+      {/* CSS for pin z-index management */}
+      <style>{`
+        .custom-pin-icon.focused {
+          z-index: 1000 !important;
+        }
+        .custom-pin-icon {
+          z-index: 100;
+        }
+      `}</style>
+      <div
+        className={`profile-map bg-white/95 backdrop-blur-sm border border-gray-100 shadow-sm rounded-2xl overflow-hidden transition-all duration-300 ease-in-out ${className}`}
+        style={{
+          ...style,
+          height: isCollapsed ? UI_CONFIG.COLLAPSED_HEIGHT : expandedHeight,
+          position: 'sticky',
+          top: '0',
+          zIndex: 10,
+        }}
+      >
       {isCollapsed ? (
         <div
           className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-600 text-white rounded-2xl shadow cursor-pointer border border-blue-400"
@@ -277,6 +324,7 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
           <CollapseButton onClick={toggleCollapse} isCollapsed={isCollapsed} />
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
