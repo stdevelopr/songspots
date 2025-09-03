@@ -176,7 +176,7 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
                 ) : visiblePins.length === 0 ? (
                   <EmptyState isViewingOwnProfile={isViewingOwnProfile} />
                 ) : (
-                  <div className="grid gap-6">
+                  <div className="grid grid-cols-2 gap-6">
                     {visiblePins.map((pin, index) => (
                       <PinGrid
                         key={pin.id.toString()}
