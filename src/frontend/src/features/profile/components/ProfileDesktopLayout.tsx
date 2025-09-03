@@ -58,6 +58,9 @@ interface ProfileDesktopLayoutProps {
   // Utility functions
   formatDate: () => string;
   getProfileAccentColor: () => string;
+  
+  // Map focus
+  focusedMapPinId?: string | null;
 }
 
 const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
@@ -98,6 +101,7 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
   spotRefs,
   formatDate,
   getProfileAccentColor,
+  focusedMapPinId,
 }) => {
   return (
     <div className="hidden lg:flex h-full min-h-0 px-4 lg:px-8 py-6">
@@ -165,6 +169,7 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
             className="mb-4" 
             expandedHeight="270px"
             onPinClick={onPinClick}
+            focusedPinId={focusedMapPinId}
           />
 
           {/* Scrollable container for the spots list */}

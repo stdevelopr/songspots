@@ -4,9 +4,10 @@ import { useDeletePin, useUpdatePin } from '../../common/useQueries';
 interface UsePinOperationsProps {
   visiblePins: any[];
   onViewPinOnMap: (pinId: string, lat: number, lng: number, fromProfile?: boolean) => void;
+  onFocusMapPin?: (pinId: string) => void;
 }
 
-export const usePinOperations = ({ visiblePins, onViewPinOnMap }: UsePinOperationsProps) => {
+export const usePinOperations = ({ visiblePins, onViewPinOnMap, onFocusMapPin }: UsePinOperationsProps) => {
   const deletePinMutation = useDeletePin();
   const updatePinMutation = useUpdatePin();
   
@@ -85,9 +86,15 @@ export const usePinOperations = ({ visiblePins, onViewPinOnMap }: UsePinOperatio
 
   // View on map
   const handleViewPinOnMap = (pin: any) => {
-    const lat = parseFloat(pin.latitude);
-    const lng = parseFloat(pin.longitude);
-    onViewPinOnMap(pin.id.toString(), lat, lng, true);
+    if (onFocusMapPin) {
+      // Focus on pin in profile map instead of navigating to main map
+      onFocusMapPin(pin.id.toString());
+    } else {
+      // Fallback to original behavior if onFocusMapPin is not provided
+      const lat = parseFloat(pin.latitude);
+      const lng = parseFloat(pin.longitude);
+      onViewPinOnMap(pin.id.toString(), lat, lng, true);
+    }
   };
 
   // Pin click and scroll functionality

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useProfileState } from './hooks/useProfileState';
 import { useProfilePicture } from './hooks/useProfilePicture';
 import { usePinOperations } from './hooks/usePinOperations';
@@ -16,6 +16,9 @@ interface ProfilePageProps {
 }
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap }) => {
+  // State for focused pin in profile map
+  const [focusedMapPinId, setFocusedMapPinId] = useState<string | null>(null);
+
   // Initialize all hooks
   const profileState = useProfileState({ userId });
   const profilePicture = useProfilePicture({
@@ -25,6 +28,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap }) => 
   const pinOperations = usePinOperations({
     visiblePins: profileState.visiblePins,
     onViewPinOnMap,
+    onFocusMapPin: setFocusedMapPinId,
   });
   const profileActions = useProfileActions({
     userProfile: profileState.userProfile,
@@ -38,6 +42,16 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap }) => 
     getProfilePictureForSave: profilePicture.getProfilePictureForSave,
     resetProfilePicture: profilePicture.resetProfilePicture,
   });
+
+  // Clear focused pin after 5 seconds
+  useEffect(() => {
+    if (focusedMapPinId) {
+      const timer = setTimeout(() => {
+        setFocusedMapPinId(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [focusedMapPinId]);
   // Mobile edit form component
   const mobileEditForm = profileState.isViewingOwnProfile && profileState.isEditing ? (
     <ProfileMobileEditForm
@@ -103,6 +117,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap }) => 
         spotRefs={pinOperations.spotRefs}
         formatDate={profileActions.formatDate}
         getProfileAccentColor={profileActions.getProfileAccentColor}
+        focusedMapPinId={focusedMapPinId}
       />
       
       {/* Mobile Layout */}
@@ -127,6 +142,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap }) => 
         onDeletePin={pinOperations.handleDeletePin}
         onViewPinOnMap={pinOperations.handleViewPinOnMap}
         editFormComponent={mobileEditForm}
+        focusedMapPinId={focusedMapPinId}
       />
 
 
