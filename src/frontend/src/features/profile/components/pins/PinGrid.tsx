@@ -1,6 +1,6 @@
 import React from 'react';
-import MusicEmbed from '../../common/MusicEmbed';
-import LocationDisplay from '../../common/LocationDisplay';
+import MusicEmbed from '../../../common/MusicEmbed';
+import LocationDisplay from '../../../common/LocationDisplay';
 
 interface PinGridProps {
   pin: any;

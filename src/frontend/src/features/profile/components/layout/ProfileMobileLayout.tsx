@@ -1,9 +1,9 @@
 import React from 'react';
-import ProfileCard from '../ProfileCard';
-import ProfileAbout from './ProfileAbout';
-import ProfileStats from './ProfileStats';
-import { ProfileMap } from '../ProfileMap';
-import ProfileSpotList from '../ProfileSpotList';
+import ProfileCard from '../shared/ProfileCard';
+import ProfileAbout from '../shared/ProfileAbout';
+import ProfileStats from '../shared/ProfileStats';
+import { ProfileMap } from '../../map/components/ProfileMap';
+import ProfileSpotList from '../pins/ProfileSpotList';
 
 interface ProfileMobileLayoutProps {
   // Profile data

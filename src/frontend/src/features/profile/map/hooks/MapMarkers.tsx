@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
-import type { Pin as BackendPin } from '../../backend/backend.did';
-import { parseCoordinates, type ValidPin } from './map-utils';
-import { UI_CONFIG } from './map-constants';
-import type { MapIcons } from './MapIcons';
+import type { Pin as BackendPin } from '../../../../backend/backend.did';
+import { parseCoordinates, type ValidPin } from '../utils/map-utils';
+import { UI_CONFIG } from '../utils/map-constants';
+import type { MapIcons } from '../components/MapIcons';
 
 interface UseMapMarkersProps {
   mapInstance: L.Map | null;

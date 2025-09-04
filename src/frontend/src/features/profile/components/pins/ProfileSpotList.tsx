@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import MusicEmbed from '../common/MusicEmbed';
-import LocationDisplay from '../common/LocationDisplay';
+import MusicEmbed from '../../../common/MusicEmbed';
+import LocationDisplay from '../../../common/LocationDisplay';
 
 interface Spot {
   id: bigint;

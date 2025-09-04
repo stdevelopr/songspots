@@ -3,9 +3,9 @@ import { useProfileState } from './hooks/useProfileState';
 import { useProfilePicture } from './hooks/useProfilePicture';
 import { usePinOperations } from './hooks/usePinOperations';
 import { useProfileActions } from './hooks/useProfileActions';
-import ProfileDesktopLayout from './components/ProfileDesktopLayout';
-import ProfileMobileLayout from './components/ProfileMobileLayout';
-import ProfileMobileEditForm from './components/ProfileMobileEditForm';
+import ProfileDesktopLayout from './components/layout/ProfileDesktopLayout';
+import ProfileMobileLayout from './components/layout/ProfileMobileLayout';
+import ProfileMobileEditForm from './components/forms/ProfileMobileEditForm';
 import DeleteConfirmationModal from '../common/DeleteConfirmationModal';
 import PinEditModal from '../pins/PinEditModal';
 import { PIN_HIGHLIGHT_STYLES } from './styles/profileStyles';
@@ -13,9 +13,10 @@ import { PIN_HIGHLIGHT_STYLES } from './styles/profileStyles';
 interface ProfilePageProps {
   userId?: string | null;
   onViewPinOnMap: (pinId: string, lat: number, lng: number, fromProfile?: boolean) => void;
+  onBackToMap?: () => void;
 }
 
-const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap }) => {
+const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap, onBackToMap }) => {
   // State for focused and hovered pins in profile map
   const [focusedMapPinId, setFocusedMapPinId] = useState<string | null>(null);
 

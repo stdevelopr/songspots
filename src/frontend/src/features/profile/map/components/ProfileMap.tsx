@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import type { Pin as BackendPin } from '../../backend/backend.did';
-import { useMapInstance } from './useMapInstance';
+import type { Pin as BackendPin } from '../../../../backend/backend.did';
+import { useMapInstance } from '../hooks/useMapInstance';
 import { MapLoadingOverlay, CollapseButton, MapCollapsedView } from './MapComponents';
 import { useMapIcons, MapIconStyles } from './MapIcons';
-import { useMapMarkers } from './MapMarkers';
-import { useMapContainerMonitor } from './MapContainerMonitor';
-import { useMapFocusHandler } from './MapFocusHandler';
-import { MAP_CONFIG, UI_CONFIG } from './map-constants';
+import { useMapMarkers } from '../hooks/MapMarkers';
+import { useMapContainerMonitor } from '../hooks/MapContainerMonitor';
+import { useMapFocusHandler } from '../hooks/MapFocusHandler';
+import { MAP_CONFIG, UI_CONFIG } from '../utils/map-constants';
 
 interface ProfileMapProps {
   backendPins: BackendPin[];
@@ -62,15 +62,15 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
     setContainerReady,
   });
 
-  // useMapFocusHandler({
-  //   mapInstance,
-  //   focusedPinId,
-  //   backendPins,
-  //   markersRef,
-  //   isCollapsed,
-  //   setIsCollapsed,
-  //   isFocusAnimatingRef,
-  // });
+  useMapFocusHandler({
+    mapInstance,
+    focusedPinId,
+    backendPins,
+    markersRef,
+    isCollapsed,
+    setIsCollapsed,
+    isFocusAnimatingRef,
+  });
 
   const toggleCollapse = useCallback(() => {
     setIsCollapsed((prev) => !prev);

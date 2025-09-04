@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import L from 'leaflet';
-import type { Pin as BackendPin } from '../../backend/backend.did';
-import { calculateMapCenter } from './map-utils';
+import type { Pin as BackendPin } from '../../../../backend/backend.did';
+import { calculateMapCenter } from '../utils/map-utils';
 
 interface UseMapInstanceConfig {
   defaultCenter: [number, number];

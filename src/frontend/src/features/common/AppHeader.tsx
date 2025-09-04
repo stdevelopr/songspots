@@ -1,4 +1,4 @@
-import ProfileButton from '../profile/ProfileButton';
+import ProfileButton from '../profile/components/shared/ProfileButton';
 import LoginButton from './LoginButton';
 
 interface AppHeaderProps {

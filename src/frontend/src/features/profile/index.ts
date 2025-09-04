@@ -1,3 +1,3 @@
-export { default as ProfileButton } from './ProfileButton';
+export { default as ProfileButton } from './components/shared/ProfileButton';
 export { default as ProfilePage } from './ProfilePage';
-export * from './useAuth';
+export * from './hooks/useAuth';

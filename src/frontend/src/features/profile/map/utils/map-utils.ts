@@ -1,4 +1,4 @@
-import type { Pin as BackendPin } from '../../backend/backend.did';
+import type { Pin as BackendPin } from '../../../../backend/backend.did';
 
 export interface ValidPin {
   lat: number;

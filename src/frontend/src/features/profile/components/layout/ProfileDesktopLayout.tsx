@@ -1,13 +1,13 @@
 import React from 'react';
-import ProfileCard from '../ProfileCard';
-import ProfileEditForm from '../ProfileEditForm';
-import ProfileAbout from './ProfileAbout';
-import ProfileStats from './ProfileStats';
-import ProfileQuickActions from './ProfileQuickActions';
-import { ProfileMap } from '../ProfileMap';
-import LoadingState from './LoadingState';
-import EmptyState from './EmptyState';
-import PinGrid from './PinGrid';
+import ProfileCard from '../shared/ProfileCard';
+import ProfileEditForm from '../forms/ProfileEditForm';
+import ProfileAbout from '../shared/ProfileAbout';
+import ProfileStats from '../shared/ProfileStats';
+import ProfileQuickActions from '../shared/ProfileQuickActions';
+import { ProfileMap } from '../../map/components/ProfileMap';
+import LoadingState from '../shared/LoadingState';
+import EmptyState from '../shared/EmptyState';
+import PinGrid from '../pins/PinGrid';
 
 interface ProfileDesktopLayoutProps {
   // Profile data

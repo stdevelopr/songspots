@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
-import type { Pin as BackendPin } from '../../backend/backend.did';
-import { parseCoordinates } from './map-utils';
-import { UI_CONFIG } from './map-constants';
+import type { Pin as BackendPin } from '../../../../backend/backend.did';
+import { parseCoordinates } from '../utils/map-utils';
+import { UI_CONFIG } from '../utils/map-constants';
 
 interface UseMapFocusHandlerProps {
   mapInstance: L.Map | null;

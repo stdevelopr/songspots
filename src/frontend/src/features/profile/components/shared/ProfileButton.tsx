@@ -1,3 +1,5 @@
+import React from 'react';
+
 interface ProfileButtonProps {
   onProfileClick: () => void;
   currentView: 'map' | 'profile';
