@@ -14,7 +14,6 @@ interface ProfileMapProps {
   expandedHeight?: string;
   onPinClick?: (pinId: string) => void;
   focusedPinId?: string;
-  hoveredPinId?: string;
 }
 
 export const ProfileMap: React.FC<ProfileMapProps> = ({
@@ -24,7 +23,6 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
   expandedHeight = UI_CONFIG.DEFAULT_EXPANDED_HEIGHT,
   onPinClick,
   focusedPinId,
-  hoveredPinId,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
@@ -40,12 +38,6 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
     iconAnchor: [12, 12],
   });
   
-  const hoveredIcon = L.divIcon({
-    className: 'custom-pin-icon hovered',
-    html: `<div class="w-7 h-7 bg-yellow-500 rounded-full border-2 border-white shadow-lg transition-all duration-200" style="z-index: 500; position: relative;"></div>`,
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
-  });
   
   const focusedIcon = L.divIcon({
     className: 'custom-pin-icon focused',
@@ -192,13 +184,12 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
     }
   }, [mapInstance, backendPins, normalIcon, focusedIcon, onPinClick, isCollapsed]);
 
-  // Update marker icons when focusedPinId or hoveredPinId changes (without recreating all markers)
+  // Update marker icons when focusedPinId changes (without recreating all markers)
   useEffect(() => {
     if (!mapInstance || isCollapsed) return;
 
     markersRef.current.forEach((marker, pinId) => {
       const isFocused = focusedPinId === pinId;
-      const isHovered = hoveredPinId === pinId && !isFocused; // Don't show hover if already focused
       
       let icon = normalIcon;
       let zIndex = 100;
@@ -206,15 +197,12 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
       if (isFocused) {
         icon = focusedIcon;
         zIndex = 1000;
-      } else if (isHovered) {
-        icon = hoveredIcon;
-        zIndex = 500;
       }
       
       marker.setIcon(icon);
       marker.setZIndexOffset(zIndex);
     });
-  }, [focusedPinId, hoveredPinId, normalIcon, hoveredIcon, focusedIcon, mapInstance, isCollapsed]);
+  }, [focusedPinId, normalIcon, focusedIcon, mapInstance, isCollapsed]);
 
   // Handle focusing on a specific pin with two-stage animation
   useEffect(() => {
@@ -304,9 +292,6 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
       <style>{`
         .custom-pin-icon.focused {
           z-index: 1000 !important;
-        }
-        .custom-pin-icon.hovered {
-          z-index: 500 !important;
         }
         .custom-pin-icon {
           z-index: 100;
