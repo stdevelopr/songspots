@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Pin as BackendPin } from '../../backend/backend.did';
@@ -29,42 +29,44 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
   const markersRef = useRef<Map<string, L.Marker>>(new Map());
   const focusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const expandTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
-  // Create custom icons for different pin states
-  const normalIcon = L.divIcon({
-    className: 'custom-pin-icon',
-    html: `<div class="w-6 h-6 bg-blue-500 rounded-full border-2 border-white shadow-lg" style="z-index: 100;"></div>`,
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-  });
-  
-  
-  const focusedIcon = L.divIcon({
-    className: 'custom-pin-icon focused',
-    html: `<div class="w-8 h-8 bg-red-500 rounded-full border-3 border-white shadow-xl animate-pulse" style="z-index: 1000; position: relative;"></div>`,
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
-  });
-  
-  const {
-    mapInstance,
-    isMapReady,
-    containerReady,
-    setContainerReady,
-    cleanupMap,
-    initializeMap
-  } = useMapInstance(mapRef, isCollapsed, backendPins, {
-    defaultCenter: MAP_CONFIG.DEFAULT_CENTER,
-    defaultZoom: MAP_CONFIG.DEFAULT_ZOOM,
-    singlePinZoom: MAP_CONFIG.SINGLE_PIN_ZOOM,
-    multiPinZoom: MAP_CONFIG.MULTI_PIN_ZOOM,
-    tileLayerUrl: MAP_CONFIG.TILE_LAYER_URL,
-    maxZoom: MAP_CONFIG.MAX_ZOOM,
-    attribution: MAP_CONFIG.ATTRIBUTION
-  });
+  const isFocusAnimatingRef = useRef<boolean>(false);
+
+  // Create custom icons for different pin states using useMemo to prevent recreation
+  const normalIcon = useMemo(
+    () =>
+      L.divIcon({
+        className: 'custom-pin-icon',
+        html: `<div class="w-6 h-6 bg-blue-500 rounded-full border-2 border-white shadow-lg" style="z-index: 100;"></div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+      }),
+    []
+  );
+
+  const focusedIcon = useMemo(
+    () =>
+      L.divIcon({
+        className: 'custom-pin-icon focused',
+        html: `<div class="w-8 h-8 bg-red-500 rounded-full border-3 border-white shadow-xl animate-pulse" style="z-index: 1000; position: relative;"></div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+      }),
+    []
+  );
+
+  const { mapInstance, isMapReady, containerReady, setContainerReady, cleanupMap, initializeMap } =
+    useMapInstance(mapRef, isCollapsed, backendPins, {
+      defaultCenter: MAP_CONFIG.DEFAULT_CENTER,
+      defaultZoom: MAP_CONFIG.DEFAULT_ZOOM,
+      singlePinZoom: MAP_CONFIG.SINGLE_PIN_ZOOM,
+      multiPinZoom: MAP_CONFIG.MULTI_PIN_ZOOM,
+      tileLayerUrl: MAP_CONFIG.TILE_LAYER_URL,
+      maxZoom: MAP_CONFIG.MAX_ZOOM,
+      attribution: MAP_CONFIG.ATTRIBUTION,
+    });
 
   const toggleCollapse = useCallback(() => {
-    setIsCollapsed(prev => !prev);
+    setIsCollapsed((prev) => !prev);
   }, []);
 
   // Handle map lifecycle
@@ -73,7 +75,7 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
       cleanupMap();
       return;
     }
-    
+
     const cleanup = initializeMap();
     return cleanup;
   }, [isCollapsed, cleanupMap, initializeMap]);
@@ -97,7 +99,7 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
 
     const frameId = requestAnimationFrame(() => {
       if (checkContainer()) return;
-      
+
       const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting && entry.boundingClientRect.width > 0) {
@@ -140,11 +142,11 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
     if (backendPins.length === 0) return;
 
     const validPins: ValidPin[] = [];
-    
+
     backendPins.forEach((pin) => {
       try {
         const coords = parseCoordinates(pin.latitude, pin.longitude);
-        
+
         if (!coords) {
           console.warn('Invalid coordinates for pin:', pin);
           return;
@@ -153,14 +155,14 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
         validPins.push({ ...coords, pin });
 
         const pinId = pin.id.toString();
-        const marker = L.marker([coords.lat, coords.lng], { 
+        const marker = L.marker([coords.lat, coords.lng], {
           icon: normalIcon,
-          zIndexOffset: 0 
+          zIndexOffset: 0,
         }).addTo(mapInstance);
-        
+
         // Store marker reference
         markersRef.current.set(pinId, marker);
-        
+
         // Add click handler for pin selection (no popup since list shows details)
         if (onPinClick) {
           marker.on('click', (e) => {
@@ -175,14 +177,14 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
       }
     });
 
-    if (validPins.length > 0) {
-      const bounds = L.latLngBounds(validPins.map(p => [p.lat, p.lng]));
-      mapInstance.fitBounds(bounds, { 
-        padding: UI_CONFIG.FIT_BOUNDS_PADDING, 
-        maxZoom: UI_CONFIG.MAX_ZOOM_ON_FIT 
+    if (validPins.length > 0 && !isFocusAnimatingRef.current) {
+      const bounds = L.latLngBounds(validPins.map((p) => [p.lat, p.lng]));
+      mapInstance.fitBounds(bounds, {
+        padding: UI_CONFIG.FIT_BOUNDS_PADDING,
+        maxZoom: UI_CONFIG.MAX_ZOOM_ON_FIT,
       });
     }
-  }, [mapInstance, backendPins, normalIcon, focusedIcon, onPinClick, isCollapsed]);
+  }, [mapInstance, backendPins, normalIcon, onPinClick, isCollapsed]);
 
   // Update marker icons when focusedPinId changes (without recreating all markers)
   useEffect(() => {
@@ -190,15 +192,15 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
 
     markersRef.current.forEach((marker, pinId) => {
       const isFocused = focusedPinId === pinId;
-      
+
       let icon = normalIcon;
       let zIndex = 100;
-      
+
       if (isFocused) {
         icon = focusedIcon;
         zIndex = 1000;
       }
-      
+
       marker.setIcon(icon);
       marker.setZIndexOffset(zIndex);
     });
@@ -216,7 +218,13 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
       expandTimeoutRef.current = null;
     }
 
-    if (!mapInstance || !focusedPinId) return;
+    if (!mapInstance || !focusedPinId) {
+      isFocusAnimatingRef.current = false;
+      return;
+    }
+
+    // Set animation flag to prevent fitBounds interference
+    isFocusAnimatingRef.current = true;
 
     // Find the focused marker
     const focusedMarker = markersRef.current.get(focusedPinId);
@@ -241,35 +249,37 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
       if (!mapInstance || !focusedMarker) return;
 
       const markerLatLng = focusedMarker.getLatLng();
-      
+
       // Stage 1: Show full map view with all pins for context
       if (backendPins.length > 1) {
         const bounds = L.latLngBounds(
           backendPins
-            .map(pin => {
+            .map((pin) => {
               const coords = parseCoordinates(pin.latitude, pin.longitude);
               return coords ? [coords.lat, coords.lng] : null;
             })
             .filter(Boolean) as [number, number][]
         );
-        
-        mapInstance.fitBounds(bounds, { 
-          padding: UI_CONFIG.FIT_BOUNDS_PADDING, 
+
+        mapInstance.fitBounds(bounds, {
+          padding: UI_CONFIG.FIT_BOUNDS_PADDING,
           maxZoom: UI_CONFIG.MAX_ZOOM_ON_FIT,
           animate: true,
-          duration: 0.5
+          duration: 0.5,
         });
-        
+
         // Stage 2: Zoom to focused pin after 1.5 seconds
         focusTimeoutRef.current = setTimeout(() => {
           if (mapInstance && focusedMarker) {
             mapInstance.setView(markerLatLng, 15, { animate: true, duration: 0.8 });
+            // Keep animation flag true to preserve focus - don't clear it
           }
           focusTimeoutRef.current = null;
         }, 1500);
       } else {
         // If only one pin, just zoom to it directly
         mapInstance.setView(markerLatLng, 15, { animate: true, duration: 0.5 });
+        // Keep animation flag true to preserve focus - don't clear it
       }
     }
 
@@ -307,31 +317,31 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
           zIndex: 10,
         }}
       >
-      {isCollapsed ? (
-        <div
-          className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-600 text-white rounded-2xl shadow cursor-pointer border border-blue-400"
-          style={{ borderRadius: '1rem' }}
-          onClick={toggleCollapse}
-        >
-          <span className="font-semibold text-base pl-2">Show Map</span>
-          <CollapseButton onClick={toggleCollapse} isCollapsed={isCollapsed} />
-        </div>
-      ) : (
-        <div className="relative w-full h-full">
-          <div 
-            key={`map-${isCollapsed}`}
-            ref={mapRef} 
-            className="w-full h-full rounded-2xl"
-            style={{ 
-              height: expandedHeight,
-              minHeight: UI_CONFIG.MIN_HEIGHT 
-            }}
-          />
-          
-          {!isMapReady && <MapLoadingOverlay />}
-          <CollapseButton onClick={toggleCollapse} isCollapsed={isCollapsed} />
-        </div>
-      )}
+        {isCollapsed ? (
+          <div
+            className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-600 text-white rounded-2xl shadow cursor-pointer border border-blue-400"
+            style={{ borderRadius: '1rem' }}
+            onClick={toggleCollapse}
+          >
+            <span className="font-semibold text-base pl-2">Show Map</span>
+            <CollapseButton onClick={toggleCollapse} isCollapsed={isCollapsed} />
+          </div>
+        ) : (
+          <div className="relative w-full h-full">
+            <div
+              key={`map-${isCollapsed}`}
+              ref={mapRef}
+              className="w-full h-full rounded-2xl"
+              style={{
+                height: expandedHeight,
+                minHeight: UI_CONFIG.MIN_HEIGHT,
+              }}
+            />
+
+            {!isMapReady && <MapLoadingOverlay />}
+            <CollapseButton onClick={toggleCollapse} isCollapsed={isCollapsed} />
+          </div>
+        )}
       </div>
     </>
   );

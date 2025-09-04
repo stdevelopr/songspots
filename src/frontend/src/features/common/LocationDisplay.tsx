@@ -12,12 +12,9 @@ const LocationDisplay: React.FC<LocationDisplayProps> = ({
   latitude,
   longitude,
   showIcon = true,
-  className = ''
+  className = '',
 }) => {
   const { address, isLoading, error } = useReverseGeocode(latitude, longitude);
-
-  // Debug logging
-  console.log('LocationDisplay:', { latitude, longitude, address, isLoading, error });
 
   // Fallback coordinates display
   const fallbackCoords = `${parseFloat(latitude).toFixed(4)}, ${parseFloat(longitude).toFixed(4)}`;
@@ -62,9 +59,7 @@ const LocationDisplay: React.FC<LocationDisplayProps> = ({
           />
         </svg>
       )}
-      <span>
-        {address || fallbackCoords}
-      </span>
+      <span>{address || fallbackCoords}</span>
     </div>
   );
 };
