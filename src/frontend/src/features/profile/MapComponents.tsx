@@ -82,3 +82,18 @@ const ChevronDownIcon: React.FC = () => (
     />
   </svg>
 );
+
+interface MapCollapsedViewProps {
+  onToggleCollapse: () => void;
+}
+
+export const MapCollapsedView: React.FC<MapCollapsedViewProps> = ({ onToggleCollapse }) => (
+  <div
+    className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-600 text-white rounded-2xl shadow cursor-pointer border border-blue-400"
+    style={{ borderRadius: '1rem' }}
+    onClick={onToggleCollapse}
+  >
+    <span className="font-semibold text-base pl-2">Show Map</span>
+    <CollapseButton onClick={onToggleCollapse} isCollapsed={true} />
+  </div>
+);

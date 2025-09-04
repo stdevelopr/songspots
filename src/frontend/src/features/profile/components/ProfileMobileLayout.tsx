@@ -16,31 +16,28 @@ interface ProfileMobileLayoutProps {
   visiblePins: any[];
   userPins: any[];
   backendPinsForMap: any[];
-  
+
   // State
   isViewingOwnProfile: boolean;
   isEditing: boolean;
   isLoading: boolean;
   isLoadingPins: boolean;
   selectedPinId: string | null;
-  
+
   // Actions
   onEdit: () => void;
-  
+
   // Pin operations
   onPinClick: (pinId: string) => void;
   onEditPin: (pin: any) => void;
   onDeletePin: (pin: any) => void;
   onViewPinOnMap: (pin: any) => void;
-  
+
   // Edit form component
   editFormComponent?: React.ReactNode;
-  
+
   // Map focus and hover
   focusedMapPinId?: string | null;
-  hoveredMapPinId?: string | null;
-  onPinHover?: (pin: any) => void;
-  onPinHoverEnd?: () => void;
 }
 
 const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
@@ -65,9 +62,6 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
   onViewPinOnMap,
   editFormComponent,
   focusedMapPinId,
-  hoveredMapPinId,
-  onPinHover,
-  onPinHoverEnd,
 }) => {
   return (
     <div className="lg:hidden h-full min-h-0 overflow-y-auto">
@@ -89,7 +83,7 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
               isEditing={isEditing}
               onEdit={onEdit}
             />
-            
+
             <ProfileStats
               visiblePins={visiblePins}
               userPins={userPins}
@@ -107,8 +101,7 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
             className="mt-4 mb-6"
             expandedHeight="200px"
             onPinClick={onPinClick}
-            focusedPinId={focusedMapPinId}
-            hoveredPinId={hoveredMapPinId}
+            focusedPinId={focusedMapPinId ?? undefined}
           />
 
           {/* Spots List */}
@@ -123,8 +116,6 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
               onEdit={onEditPin}
               onDelete={onDeletePin}
               onViewOnMap={onViewPinOnMap}
-              onMouseEnter={onPinHover}
-              onMouseLeave={onPinHoverEnd}
               selectedPinId={selectedPinId}
             />
           </div>

@@ -18,7 +18,6 @@ interface ProfilePageProps {
 const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap }) => {
   // State for focused and hovered pins in profile map
   const [focusedMapPinId, setFocusedMapPinId] = useState<string | null>(null);
-  const [hoveredMapPinId, setHoveredMapPinId] = useState<string | null>(null);
 
   // Initialize all hooks
   const profileState = useProfileState({ userId });
@@ -54,31 +53,30 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap }) => 
     }
   }, [focusedMapPinId]);
   // Mobile edit form component
-  const mobileEditForm = profileState.isViewingOwnProfile && profileState.isEditing ? (
-    <ProfileMobileEditForm
-      name={profileState.name}
-      bio={profileState.bio}
-      error={profileState.error}
-      profilePicturePreview={profilePicture.profilePicturePreview}
-      profilePictureUrl={profilePicture.profilePictureUrl}
-      isUploading={profilePicture.isUploading}
-      saveProfileMutation={profileActions.saveProfileMutation}
-      onNameChange={(e) => profileState.setName(e.target.value)}
-      onBioChange={(e) => profileState.setBio(e.target.value)}
-      onProfilePictureChange={profilePicture.handleProfilePictureChange}
-      onCancel={profileActions.handleCancel}
-      onSave={profileActions.handleSave}
-      onRemoveProfilePicture={profilePicture.handleRemoveProfilePicture}
-      showToastMessage={profileActions.showToastMessage}
-    />
-  ) : null;
-
-
+  const mobileEditForm =
+    profileState.isViewingOwnProfile && profileState.isEditing ? (
+      <ProfileMobileEditForm
+        name={profileState.name}
+        bio={profileState.bio}
+        error={profileState.error}
+        profilePicturePreview={profilePicture.profilePicturePreview}
+        profilePictureUrl={profilePicture.profilePictureUrl}
+        isUploading={profilePicture.isUploading}
+        saveProfileMutation={profileActions.saveProfileMutation}
+        onNameChange={(e) => profileState.setName(e.target.value)}
+        onBioChange={(e) => profileState.setBio(e.target.value)}
+        onProfilePictureChange={profilePicture.handleProfilePictureChange}
+        onCancel={profileActions.handleCancel}
+        onSave={profileActions.handleSave}
+        onRemoveProfilePicture={profilePicture.handleRemoveProfilePicture}
+        showToastMessage={profileActions.showToastMessage}
+      />
+    ) : null;
 
   return (
     <div className="h-full min-h-0 bg-gray-50 flex flex-col text-gray-800">
       <style>{PIN_HIGHLIGHT_STYLES}</style>
-      
+
       {/* Desktop Layout */}
       <ProfileDesktopLayout
         displayName={profileState.getDisplayName()}
@@ -119,11 +117,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap }) => 
         formatDate={profileActions.formatDate}
         getProfileAccentColor={profileActions.getProfileAccentColor}
         focusedMapPinId={focusedMapPinId}
-        hoveredMapPinId={hoveredMapPinId}
-        onPinHover={(pin) => setHoveredMapPinId(pin.id.toString())}
-        onPinHoverEnd={() => setHoveredMapPinId(null)}
       />
-      
+
       {/* Mobile Layout */}
       <ProfileMobileLayout
         displayName={profileState.getDisplayName()}
@@ -147,11 +142,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap }) => 
         onViewPinOnMap={pinOperations.handleViewPinOnMap}
         editFormComponent={mobileEditForm}
         focusedMapPinId={focusedMapPinId}
-        hoveredMapPinId={hoveredMapPinId}
-        onPinHover={(pin) => setHoveredMapPinId(pin.id.toString())}
-        onPinHoverEnd={() => setHoveredMapPinId(null)}
       />
-
 
       {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal
@@ -180,14 +171,14 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap }) => 
         onCancel={pinOperations.handleEditCancel}
         isSubmitting={pinOperations.updatePinMutation.isPending}
       />
-      
+
       {/* Toast */}
       {profileActions.showToast && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-black/80 text-white text-sm px-3 py-2 rounded shadow">
           {profileActions.toastMessage}
         </div>
       )}
-      
+
       {/* Keyboard navigation hint */}
       {profileState.visiblePins.length > 0 && (
         <div className="keyboard-hint" id="keyboard-hint">
