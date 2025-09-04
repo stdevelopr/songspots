@@ -17,7 +17,6 @@ export interface PinUpdateData {
 
 export interface UsePinOperationsProps {
   visiblePins: Pin[];
-  onFocusMapPin: (pinId: string) => void;
 }
 
 export interface PinHighlightConfig {

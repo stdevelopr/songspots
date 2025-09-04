@@ -12,13 +12,10 @@ import { PIN_HIGHLIGHT_STYLES } from './styles/profileStyles';
 
 interface ProfilePageProps {
   userId?: string | null;
-  onViewPinOnMap?: (pinId: string, lat: number, lng: number, fromProfile?: boolean) => void;
   onBackToMap?: () => void;
 }
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
-  // State for focused and hovered pins in profile map
-  const [focusedMapPinId, setFocusedMapPinId] = useState<string | null>(null);
 
   // Initialize all hooks
   const profileState = useProfileState({ userId });
@@ -28,7 +25,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
   });
   const pinOperations = usePinOperations({
     visiblePins: profileState.visiblePins,
-    onFocusMapPin: setFocusedMapPinId,
   });
   const profileActions = useProfileActions({
     userProfile: profileState.userProfile,
@@ -43,17 +39,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
     resetProfilePicture: profilePicture.resetProfilePicture,
   });
 
-  console.log('focused Pin:', focusedMapPinId);
-
-  // Clear focused pin after 5 seconds
-  useEffect(() => {
-    if (focusedMapPinId) {
-      const timer = setTimeout(() => {
-        setFocusedMapPinId(null);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [focusedMapPinId]);
 
   // Mobile edit form component
   const mobileEditForm =
@@ -115,11 +100,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
         onPinClick={pinOperations.handlePinClick}
         onEditPin={pinOperations.handleEditPin}
         onDeletePin={pinOperations.handleDeletePin}
-        onViewPinOnMap={pinOperations.handleViewPinOnMap}
         spotRefs={pinOperations.spotRefs}
         formatDate={profileActions.formatDate}
-        getProfileAccentColor={profileActions.getProfileAccentColor}
-        focusedMapPinId={focusedMapPinId}
       />
 
       {/* Mobile Layout */}
@@ -142,9 +124,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
         onPinClick={pinOperations.handlePinClick}
         onEditPin={pinOperations.handleEditPin}
         onDeletePin={pinOperations.handleDeletePin}
-        onViewPinOnMap={pinOperations.handleViewPinOnMap}
         editFormComponent={mobileEditForm}
-        focusedMapPinId={focusedMapPinId}
       />
 
       {/* Delete Confirmation Modal */}

@@ -18,7 +18,6 @@ interface ProfileSpotListProps {
   isLoading: boolean;
   onEdit: (spot: Spot) => void;
   onDelete: (spot: Spot) => void;
-  onViewOnMap: (spot: Spot) => void;
   onMouseEnter?: (spot: Spot) => void;
   onMouseLeave?: () => void;
   selectedPinId?: string | null;
@@ -30,7 +29,6 @@ const ProfileSpotList: React.FC<ProfileSpotListProps> = ({
   isLoading,
   onEdit,
   onDelete,
-  onViewOnMap,
   onMouseEnter,
   onMouseLeave,
   selectedPinId,
@@ -166,26 +164,6 @@ const ProfileSpotList: React.FC<ProfileSpotListProps> = ({
                 className="text-gray-500"
               />
             </div>
-            <button
-              onClick={() => onViewOnMap(spot)}
-              className="mt-2 inline-flex items-center gap-2 text-indigo-700 hover:text-indigo-800 text-sm font-medium bg-indigo-50/70 hover:bg-indigo-100 px-3 py-1.5 rounded-md border border-indigo-100 transition"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-              View on Map
-            </button>
           </div>
         ))}
     </div>

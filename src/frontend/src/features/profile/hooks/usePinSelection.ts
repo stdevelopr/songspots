@@ -2,7 +2,6 @@ import { useState, useRef, useCallback } from 'react';
 import {
   clearAllHighlights,
   applyHighlightStyles,
-  addSelectedIndicator,
   removeHighlight,
   scrollToPinElement,
   findPinElementFallback
@@ -33,9 +32,6 @@ export const usePinSelection = () => {
       
       // Apply highlight styles
       applyHighlightStyles(element);
-      
-      // Add selected indicator
-      addSelectedIndicator(element);
       
       // Remove highlight after duration
       setTimeout(() => {

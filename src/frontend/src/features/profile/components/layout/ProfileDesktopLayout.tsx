@@ -52,15 +52,10 @@ interface ProfileDesktopLayoutProps {
   onPinClick: (pinId: string) => void;
   onEditPin: (pin: any) => void;
   onDeletePin: (pin: any) => void;
-  onViewPinOnMap: (pin: any) => void;
   spotRefs: React.MutableRefObject<{ [key: string]: HTMLDivElement | null }>;
 
   // Utility functions
   formatDate: () => string;
-  getProfileAccentColor: () => string;
-
-  // Map focus
-  focusedMapPinId?: string | null;
 }
 
 const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
@@ -97,11 +92,8 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
   onPinClick,
   onEditPin,
   onDeletePin,
-  onViewPinOnMap,
   spotRefs,
   formatDate,
-  getProfileAccentColor,
-  focusedMapPinId,
 }) => {
   return (
     <div className="hidden lg:flex h-full min-h-0 px-4 lg:px-8 py-6">
@@ -166,7 +158,7 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
             className="mb-4"
             expandedHeight="270px"
             onPinClick={onPinClick}
-            focusedPinId={focusedMapPinId ?? undefined}
+            focusedPinId={undefined}
           />
 
           {/* Scrollable container for the spots list */}
@@ -187,9 +179,7 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
                         isViewingOwnProfile={isViewingOwnProfile}
                         onEdit={onEditPin}
                         onDelete={onDeletePin}
-                        onViewOnMap={onViewPinOnMap}
                         formatDate={formatDate}
-                        getProfileAccentColor={getProfileAccentColor}
                         spotRef={(el) => (spotRefs.current[pin.id.toString()] = el)}
                       />
                     ))}

@@ -3,9 +3,9 @@ import { usePinModals } from './usePinModals';
 import { usePinSelection } from './usePinSelection';
 import { usePinKeyboardNavigation } from './usePinKeyboardNavigation';
 import { usePinErrorHandler } from './usePinErrorHandler';
-import type { UsePinOperationsProps, Pin, PinUpdateData } from './usePinOperations.types';
+import type { UsePinOperationsProps, PinUpdateData } from './usePinOperations.types';
 
-export const usePinOperations = ({ visiblePins, onFocusMapPin }: UsePinOperationsProps) => {
+export const usePinOperations = ({ visiblePins }: UsePinOperationsProps) => {
   // Compose hooks for different concerns
   const modalOperations = usePinModals();
   const pinSelection = usePinSelection();
@@ -36,10 +36,6 @@ export const usePinOperations = ({ visiblePins, onFocusMapPin }: UsePinOperation
     return result;
   }, [modalOperations, errorHandler]);
 
-  // View pin on map - always focus in embedded ProfileMap
-  const handleViewPinOnMap = useCallback((pin: Pin) => {
-    onFocusMapPin(pin.id.toString());
-  }, [onFocusMapPin]);
 
   return {
     // Error handling
@@ -65,7 +61,6 @@ export const usePinOperations = ({ visiblePins, onFocusMapPin }: UsePinOperation
     isScrolling: pinSelection.isScrolling,
     spotRefs: pinSelection.spotRefs,
     handlePinClick: pinSelection.handlePinClick,
-    handleViewPinOnMap,
     
     // Mutation states
     deletePinMutation: modalOperations.deletePinMutation,
