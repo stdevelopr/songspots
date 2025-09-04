@@ -188,7 +188,7 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
                 ) : visiblePins.length === 0 ? (
                   <EmptyState isViewingOwnProfile={isViewingOwnProfile} />
                 ) : (
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-4">
                     {visiblePins.map((pin, index) => (
                       <PinGrid
                         key={pin.id.toString()}
@@ -198,8 +198,6 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
                         onEdit={onEditPin}
                         onDelete={onDeletePin}
                         onViewOnMap={onViewPinOnMap}
-                        onMouseEnter={onPinHover}
-                        onMouseLeave={onPinHoverEnd}
                         formatDate={formatDate}
                         getProfileAccentColor={getProfileAccentColor}
                         spotRef={(el) => (spotRefs.current[pin.id.toString()] = el)}
