@@ -44,6 +44,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap, onBac
     resetProfilePicture: profilePicture.resetProfilePicture,
   });
 
+  console.log('focused Pin:', focusedMapPinId);
+
   // Clear focused pin after 5 seconds
   useEffect(() => {
     if (focusedMapPinId) {
@@ -53,6 +55,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap, onBac
       return () => clearTimeout(timer);
     }
   }, [focusedMapPinId]);
+
   // Mobile edit form component
   const mobileEditForm =
     profileState.isViewingOwnProfile && profileState.isEditing ? (
