@@ -5,7 +5,7 @@ import { usePinKeyboardNavigation } from './usePinKeyboardNavigation';
 import { usePinErrorHandler } from './usePinErrorHandler';
 import type { UsePinOperationsProps, Pin, PinUpdateData } from './usePinOperations.types';
 
-export const usePinOperations = ({ visiblePins, onViewPinOnMap, onFocusMapPin }: UsePinOperationsProps) => {
+export const usePinOperations = ({ visiblePins, onFocusMapPin }: UsePinOperationsProps) => {
   // Compose hooks for different concerns
   const modalOperations = usePinModals();
   const pinSelection = usePinSelection();
@@ -36,18 +36,10 @@ export const usePinOperations = ({ visiblePins, onViewPinOnMap, onFocusMapPin }:
     return result;
   }, [modalOperations, errorHandler]);
 
-  // View pin on map with proper type handling
+  // View pin on map - always focus in embedded ProfileMap
   const handleViewPinOnMap = useCallback((pin: Pin) => {
-    if (onFocusMapPin) {
-      // Focus on pin in profile map instead of navigating to main map
-      onFocusMapPin(pin.id.toString());
-    } else {
-      // Fallback to original behavior if onFocusMapPin is not provided
-      const lat = parseFloat(pin.latitude);
-      const lng = parseFloat(pin.longitude);
-      onViewPinOnMap(pin.id.toString(), lat, lng, true);
-    }
-  }, [onViewPinOnMap, onFocusMapPin]);
+    onFocusMapPin(pin.id.toString());
+  }, [onFocusMapPin]);
 
   return {
     // Error handling

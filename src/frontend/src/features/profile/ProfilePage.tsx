@@ -12,11 +12,11 @@ import { PIN_HIGHLIGHT_STYLES } from './styles/profileStyles';
 
 interface ProfilePageProps {
   userId?: string | null;
-  onViewPinOnMap: (pinId: string, lat: number, lng: number, fromProfile?: boolean) => void;
+  onViewPinOnMap?: (pinId: string, lat: number, lng: number, fromProfile?: boolean) => void;
   onBackToMap?: () => void;
 }
 
-const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap, onBackToMap }) => {
+const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
   // State for focused and hovered pins in profile map
   const [focusedMapPinId, setFocusedMapPinId] = useState<string | null>(null);
 
@@ -28,7 +28,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onViewPinOnMap, onBac
   });
   const pinOperations = usePinOperations({
     visiblePins: profileState.visiblePins,
-    onViewPinOnMap,
     onFocusMapPin: setFocusedMapPinId,
   });
   const profileActions = useProfileActions({

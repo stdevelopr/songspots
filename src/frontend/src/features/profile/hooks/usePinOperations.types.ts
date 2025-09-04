@@ -17,8 +17,7 @@ export interface PinUpdateData {
 
 export interface UsePinOperationsProps {
   visiblePins: Pin[];
-  onViewPinOnMap: (pinId: string, lat: number, lng: number, fromProfile?: boolean) => void;
-  onFocusMapPin?: (pinId: string) => void;
+  onFocusMapPin: (pinId: string) => void;
 }
 
 export interface PinHighlightConfig {
