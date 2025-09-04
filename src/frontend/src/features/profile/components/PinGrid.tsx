@@ -9,8 +9,6 @@ interface PinGridProps {
   onEdit: (pin: any) => void;
   onDelete: (pin: any) => void;
   onViewOnMap: (pin: any) => void;
-  onMouseEnter?: (pin: any) => void;
-  onMouseLeave?: () => void;
   formatDate: () => string;
   getProfileAccentColor: () => string;
   spotRef: (el: HTMLDivElement | null) => void;
@@ -23,8 +21,6 @@ const PinGrid: React.FC<PinGridProps> = ({
   onEdit,
   onDelete,
   onViewOnMap,
-  onMouseEnter,
-  onMouseLeave,
   formatDate,
   getProfileAccentColor,
   spotRef,

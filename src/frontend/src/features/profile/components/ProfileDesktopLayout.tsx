@@ -20,13 +20,13 @@ interface ProfileDesktopLayoutProps {
   visiblePins: any[];
   userPins: any[];
   backendPinsForMap: any[];
-  
+
   // State
   isViewingOwnProfile: boolean;
   isEditing: boolean;
   isLoading: boolean;
   isLoadingPins: boolean;
-  
+
   // Edit form props
   name: string;
   error: string;
@@ -42,28 +42,25 @@ interface ProfileDesktopLayoutProps {
   onDrop: (e: React.DragEvent) => void;
   onCancel: () => void;
   onSave: (e: React.FormEvent) => void;
-  
+
   // Actions
   onEdit: () => void;
   onCopyPrincipal: () => void;
   copied: boolean;
-  
+
   // Pin operations
   onPinClick: (pinId: string) => void;
   onEditPin: (pin: any) => void;
   onDeletePin: (pin: any) => void;
   onViewPinOnMap: (pin: any) => void;
   spotRefs: React.MutableRefObject<{ [key: string]: HTMLDivElement | null }>;
-  
+
   // Utility functions
   formatDate: () => string;
   getProfileAccentColor: () => string;
-  
-  // Map focus and hover
+
+  // Map focus
   focusedMapPinId?: string | null;
-  hoveredMapPinId?: string | null;
-  onPinHover?: (pin: any) => void;
-  onPinHoverEnd?: () => void;
 }
 
 const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
@@ -105,9 +102,6 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
   formatDate,
   getProfileAccentColor,
   focusedMapPinId,
-  hoveredMapPinId,
-  onPinHover,
-  onPinHoverEnd,
 }) => {
   return (
     <div className="hidden lg:flex h-full min-h-0 px-4 lg:px-8 py-6">
@@ -153,30 +147,26 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
               isEditing={isEditing}
               onEdit={onEdit}
             />
-            
+
             <ProfileStats
               visiblePins={visiblePins}
               userPins={userPins}
               isViewingOwnProfile={isViewingOwnProfile}
             />
-            
-            <ProfileQuickActions
-              onCopyPrincipal={onCopyPrincipal}
-              copied={copied}
-            />
+
+            <ProfileQuickActions onCopyPrincipal={onCopyPrincipal} copied={copied} />
           </div>
         </div>
 
         {/* Right Column - Map and Pins */}
         <div className="flex-1 min-h-0 flex flex-col">
           {/* Sticky ProfileMap above the scrollable list */}
-          <ProfileMap 
-            backendPins={backendPinsForMap} 
-            className="mb-4" 
+          <ProfileMap
+            backendPins={backendPinsForMap}
+            className="mb-4"
             expandedHeight="270px"
             onPinClick={onPinClick}
-            focusedPinId={focusedMapPinId}
-            hoveredPinId={hoveredMapPinId}
+            focusedPinId={focusedMapPinId ?? undefined}
           />
 
           {/* Scrollable container for the spots list */}
