@@ -50,14 +50,30 @@ persistent actor {
 
   // ** Application-specific user profile management **
   public type UserProfile = {
+    bio : Text;
     name : Text;
     profilePicture : ?Text; // Keep as optional Text for simplicity
-    bio : Text;
+    // Social media links (all optional)
+    socialMedia : {
+      facebook : ?Text;
+      instagram : ?Text;
+      tiktok : ?Text;
+      twitter : ?Text;
+      website : ?Text;
+      youtube : ?Text;
+      spotify : ?Text;
+      github : ?Text;
+    };
     // Other user's metadata if needed
   };
 
   transient let principalMap = Map.Make<Principal>(Principal.compare);
   var userProfiles = principalMap.empty<UserProfile>();
+
+  system func postupgrade() {
+    // Clear user profiles due to UserProfile type change (social media field order)
+    userProfiles := principalMap.empty<UserProfile>();
+  };
 
   public query ({ caller }) func getUserProfile() : async ?UserProfile {
     principalMap.get(userProfiles, caller);

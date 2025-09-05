@@ -28,6 +28,16 @@ export const idlFactory = ({ IDL }) => {
     'bio' : IDL.Text,
     'name' : IDL.Text,
     'profilePicture' : IDL.Opt(IDL.Text),
+    'socialMedia' : IDL.Record({
+      'tiktok' : IDL.Opt(IDL.Text),
+      'twitter' : IDL.Opt(IDL.Text),
+      'instagram' : IDL.Opt(IDL.Text),
+      'website' : IDL.Opt(IDL.Text),
+      'facebook' : IDL.Opt(IDL.Text),
+      'spotify' : IDL.Opt(IDL.Text),
+      'youtube' : IDL.Opt(IDL.Text),
+      'github' : IDL.Opt(IDL.Text),
+    }),
   });
   const StreamingToken = IDL.Record({
     'resource' : IDL.Text,

@@ -16,7 +16,6 @@ interface ProfilePageProps {
 }
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
-
   // Initialize all hooks
   const profileState = useProfileState({ userId });
   const profilePicture = useProfilePicture({
@@ -38,7 +37,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
     getProfilePictureForSave: profilePicture.getProfilePictureForSave,
     resetProfilePicture: profilePicture.resetProfilePicture,
   });
-
 
   // Mobile edit form component
   const mobileEditForm =

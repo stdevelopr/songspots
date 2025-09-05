@@ -9,6 +9,17 @@ type UserProfile =
    bio: text;
    name: text;
    profilePicture: opt text;
+   socialMedia:
+    record {
+      facebook: opt text;
+      github: opt text;
+      instagram: opt text;
+      spotify: opt text;
+      tiktok: opt text;
+      twitter: opt text;
+      website: opt text;
+      youtube: opt text;
+    };
  };
 type UserInfo = 
  record {

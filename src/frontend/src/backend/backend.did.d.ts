@@ -54,6 +54,16 @@ export interface UserProfile {
   'bio' : string,
   'name' : string,
   'profilePicture' : [] | [string],
+  'socialMedia' : {
+    'tiktok' : [] | [string],
+    'twitter' : [] | [string],
+    'instagram' : [] | [string],
+    'website' : [] | [string],
+    'facebook' : [] | [string],
+    'spotify' : [] | [string],
+    'youtube' : [] | [string],
+    'github' : [] | [string],
+  },
 }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
