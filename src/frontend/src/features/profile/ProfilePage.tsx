@@ -101,6 +101,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
         onMapPinClick={pinOperations.handleMapMarkerClick}
         onEditPin={pinOperations.handleEditPin}
         onDeletePin={pinOperations.handleDeletePin}
+        onResetSelection={pinOperations.resetSelection}
         spotRefs={pinOperations.spotRefs}
         formatDate={profileActions.formatDate}
         focusedPinId={pinOperations.focusedPinId}
@@ -129,6 +130,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
         onMapPinClick={pinOperations.handleMapMarkerClick}
         onEditPin={pinOperations.handleEditPin}
         onDeletePin={pinOperations.handleDeletePin}
+        onResetSelection={pinOperations.resetSelection}
         editFormComponent={mobileEditForm}
       />
 

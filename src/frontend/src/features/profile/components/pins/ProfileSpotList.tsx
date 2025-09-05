@@ -103,7 +103,7 @@ const ProfileSpotList: React.FC<ProfileSpotListProps> = ({
             key={spot.id.toString()}
             ref={(el) => (spotRefs.current[spot.id.toString()] = el)}
             data-pin-id={spot.id.toString()}
-            className="w-full bg-white/95 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 border border-gray-100 p-4 flex flex-col gap-2"
+            className="w-full bg-white/95 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-gray-100 p-4 flex flex-col gap-2"
             onMouseEnter={() => onMouseEnter?.(spot)}
             onMouseLeave={() => onMouseLeave?.()}
             onClick={() => onPinClick?.(spot.id.toString())}

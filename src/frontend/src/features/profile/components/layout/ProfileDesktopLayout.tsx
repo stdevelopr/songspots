@@ -53,6 +53,7 @@ interface ProfileDesktopLayoutProps {
   onMapPinClick: (pinId: string) => void; // map marker click
   onEditPin: (pin: any) => void;
   onDeletePin: (pin: any) => void;
+  onResetSelection?: () => void;
   spotRefs: React.MutableRefObject<{ [key: string]: HTMLDivElement | null }>;
   focusedPinId?: string | null;
   selectedPinId?: string | null;
@@ -96,6 +97,7 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
   onMapPinClick,
   onEditPin,
   onDeletePin,
+  onResetSelection,
   spotRefs,
   formatDate,
   focusedPinId,
@@ -173,6 +175,7 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
             onPinClick={onMapPinClick}
             focusedPinId={focusedPinId || undefined}
             highlightedPinId={selectedPinId || undefined}
+            onResetSelection={onResetSelection}
           />
 
           {/* Scrollable container for the spots list */}
@@ -195,7 +198,12 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
                         onDelete={onDeletePin}
                         formatDate={formatDate}
                         spotRef={(el) => (spotRefs.current[pin.id.toString()] = el)}
-                        onPinClick={(pinId: string) => onPinClick(pinId, handleRestoreBounds)}
+                        onPinClick={(pinId: string) => {
+                          // Auto-expand map if collapsed
+                          profileMapRef.current?.expandMap();
+                          // Then handle the pin click
+                          onPinClick(pinId, handleRestoreBounds);
+                        }}
                         isHighlighted={selectedPinId === pin.id.toString()}
                         isFocused={focusedPinId === pin.id.toString()}
                       />

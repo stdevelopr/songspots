@@ -3,7 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Pin as BackendPin } from '../../../../backend/backend.did';
 import { useMapInstance } from '../hooks/useMapInstance';
-import { MapLoadingOverlay, CollapseButton, MapCollapsedView } from './MapComponents';
+import { MapLoadingOverlay, CollapseButton, MapCollapsedView, ShowAllButton } from './MapComponents';
 import { useMapIcons, MapIconStyles } from './MapIcons';
 import { useMapMarkers } from '../hooks/MapMarkers';
 import { useMapContainerMonitor } from '../hooks/MapContainerMonitor';
@@ -18,10 +18,12 @@ interface ProfileMapProps {
   onPinClick?: (pinId: string) => void;
   focusedPinId?: string;
   highlightedPinId?: string;
+  onResetSelection?: () => void;
 }
 
 export interface ProfileMapRef {
   restoreBounds: () => void;
+  expandMap: () => void;
 }
 
 export const ProfileMap = React.forwardRef<ProfileMapRef, ProfileMapProps>(({
@@ -32,6 +34,7 @@ export const ProfileMap = React.forwardRef<ProfileMapRef, ProfileMapProps>(({
   onPinClick,
   focusedPinId,
   highlightedPinId,
+  onResetSelection,
 }, ref) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
@@ -81,8 +84,15 @@ export const ProfileMap = React.forwardRef<ProfileMapRef, ProfileMapProps>(({
   });
 
   const toggleCollapse = useCallback(() => {
-    setIsCollapsed((prev) => !prev);
-  }, []);
+    setIsCollapsed((prev) => {
+      const willCollapse = !prev;
+      // If collapsing, reset all pin states
+      if (willCollapse && onResetSelection) {
+        onResetSelection();
+      }
+      return willCollapse;
+    });
+  }, [onResetSelection]);
 
   const restoreBounds = useCallback(() => {
     if (!mapInstance || !backendPins.length) return;
@@ -131,10 +141,26 @@ export const ProfileMap = React.forwardRef<ProfileMapRef, ProfileMapProps>(({
     }
   }, [mapInstance, isCollapsed]);
 
-  // Expose restoreBounds function to parent via ref
+  const expandMap = useCallback(() => {
+    if (isCollapsed) {
+      setIsCollapsed(false);
+    }
+  }, [isCollapsed]);
+
+  const handleShowAll = useCallback(() => {
+    // Reset all pin states
+    if (onResetSelection) {
+      onResetSelection();
+    }
+    // Restore map bounds to show all pins
+    restoreBounds();
+  }, [onResetSelection, restoreBounds]);
+
+  // Expose functions to parent via ref
   useImperativeHandle(ref, () => ({
-    restoreBounds
-  }), [restoreBounds]);
+    restoreBounds,
+    expandMap
+  }), [restoreBounds, expandMap]);
 
   return (
     <>
@@ -164,6 +190,7 @@ export const ProfileMap = React.forwardRef<ProfileMapRef, ProfileMapProps>(({
             />
 
             {!isMapReady && <MapLoadingOverlay />}
+            <ShowAllButton onClick={handleShowAll} />
             <CollapseButton onClick={toggleCollapse} isCollapsed={isCollapsed} />
           </div>
         )}

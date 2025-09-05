@@ -32,7 +32,7 @@ const PinGrid: React.FC<PinGridProps> = ({
       key={pin.id.toString()}
       ref={spotRef}
       data-pin-id={pin.id.toString()}
-      className="w-full rounded-xl p-4 border border-gray-100 bg-white/90 backdrop-blur-sm shadow-sm transition-all duration-300 transform group cursor-pointer relative"
+      className="w-full rounded-xl p-4 border border-gray-100 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform group cursor-pointer relative"
       style={{ animationDelay: `${index * 100}ms` }}
       onClick={() => onPinClick?.(pin.id.toString())}
     >

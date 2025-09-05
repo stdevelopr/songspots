@@ -33,6 +33,7 @@ interface ProfileMobileLayoutProps {
   onMapPinClick: (pinId: string) => void; // map marker click
   onEditPin: (pin: any) => void;
   onDeletePin: (pin: any) => void;
+  onResetSelection?: () => void;
 
   // Edit form component
   editFormComponent?: React.ReactNode;
@@ -59,6 +60,7 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
   onMapPinClick,
   onEditPin,
   onDeletePin,
+  onResetSelection,
   editFormComponent,
 }) => {
   const profileMapRef = useRef<ProfileMapRef>(null);
@@ -108,6 +110,7 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
             onPinClick={onMapPinClick}
             focusedPinId={focusedPinId || undefined}
             highlightedPinId={selectedPinId || undefined}
+            onResetSelection={onResetSelection}
           />
 
           {/* Spots List */}
@@ -123,7 +126,12 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
               onDelete={onDeletePin}
               selectedPinId={selectedPinId}
               focusedPinId={focusedPinId}
-              onPinClick={(pinId: string) => onPinClick(pinId, handleRestoreBounds)}
+              onPinClick={(pinId: string) => {
+                // Auto-expand map if collapsed
+                profileMapRef.current?.expandMap();
+                // Then handle the pin click
+                onPinClick(pinId, handleRestoreBounds);
+              }}
             />
           </div>
         </div>
