@@ -46,7 +46,7 @@ export const applyHighlightStyles = (element: HTMLElement) => {
 export const addSelectedIndicator = (element: HTMLElement) => {
   const selectedIndicator = document.createElement('div');
   selectedIndicator.className =
-    'selected-pin-indicator absolute top-2 left-2 flex items-center gap-1 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-medium shadow-lg';
+    'selected-pin-indicator absolute top-2 left-2 flex items-center gap-1 bg-yellow-400 text-gray-800 text-xs px-2 py-1 rounded-full font-medium shadow-lg';
   selectedIndicator.innerHTML = SELECTED_INDICATOR_HTML;
   selectedIndicator.style.zIndex = PIN_OPERATION_CONSTANTS.HIGHLIGHT_Z_INDEX;
   element.appendChild(selectedIndicator);

@@ -196,6 +196,8 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
                         formatDate={formatDate}
                         spotRef={(el) => (spotRefs.current[pin.id.toString()] = el)}
                         onPinClick={(pinId: string) => onPinClick(pinId, handleRestoreBounds)}
+                        isHighlighted={selectedPinId === pin.id.toString()}
+                        isFocused={focusedPinId === pin.id.toString()}
                       />
                     ))}
                   </div>

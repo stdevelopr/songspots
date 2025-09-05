@@ -122,6 +122,7 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
               onEdit={onEditPin}
               onDelete={onDeletePin}
               selectedPinId={selectedPinId}
+              focusedPinId={focusedPinId}
               onPinClick={(pinId: string) => onPinClick(pinId, handleRestoreBounds)}
             />
           </div>

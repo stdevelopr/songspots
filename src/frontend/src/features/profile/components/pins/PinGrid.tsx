@@ -11,6 +11,8 @@ interface PinGridProps {
   formatDate: () => string;
   spotRef: (el: HTMLDivElement | null) => void;
   onPinClick?: (pinId: string) => void;
+  isHighlighted?: boolean;
+  isFocused?: boolean;
 }
 
 const PinGrid: React.FC<PinGridProps> = ({
@@ -22,13 +24,15 @@ const PinGrid: React.FC<PinGridProps> = ({
   formatDate,
   spotRef,
   onPinClick,
+  isHighlighted,
+  isFocused,
 }) => {
   return (
     <div
       key={pin.id.toString()}
       ref={spotRef}
       data-pin-id={pin.id.toString()}
-      className="w-full rounded-xl p-4 border border-gray-100 bg-white/90 backdrop-blur-sm shadow-sm transition-all duration-300 transform group"
+      className="w-full rounded-xl p-4 border border-gray-100 bg-white/90 backdrop-blur-sm shadow-sm transition-all duration-300 transform group cursor-pointer relative"
       style={{ animationDelay: `${index * 100}ms` }}
       onClick={() => onPinClick?.(pin.id.toString())}
     >
@@ -45,7 +49,7 @@ const PinGrid: React.FC<PinGridProps> = ({
         
         {/* Right side: Content */}
         <div className={`flex-1 flex flex-col justify-between ${pin.musicLink ? 'h-56' : 'h-auto'}`}>
-          {/* Header with title and privacy badge */}
+          {/* Header with title and action indicator */}
           <div className="flex items-start justify-between mb-3">
             <div className="flex-1 min-w-0">
               <h3 className="text-lg font-semibold text-gray-900 tracking-tight truncate mb-1">
@@ -57,21 +61,46 @@ const PinGrid: React.FC<PinGridProps> = ({
                 </p>
               )}
             </div>
-            {isViewingOwnProfile && (
-              <div className="flex-shrink-0 ml-3">
-                {pin.isPrivate ? (
-                  <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 ring-1 ring-slate-200">
-                    <span>🔒</span>
-                    <span>Private</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200">
-                    <span>🌍</span>
-                    <span>Public</span>
-                  </div>
-                )}
+            <div className="flex-shrink-0 ml-3 flex flex-col gap-2">
+              {/* Map marker action indicator */}
+              <div className="flex items-center gap-2">
+                {/* Simple circular marker matching map colors */}
+                <div className={`w-4 h-4 rounded-full border-2 border-white shadow-sm transition-all duration-300 ${
+                  isFocused 
+                    ? 'bg-red-500' 
+                    : isHighlighted 
+                      ? 'bg-yellow-400' 
+                      : 'bg-blue-500'
+                }`} style={isFocused ? { animation: 'smooth-pulse 2s ease-in-out infinite' } : {}}></div>
+                
+                {/* Action text */}
+                <span className={`text-xs font-medium transition-colors duration-300 ${
+                  isFocused
+                    ? 'text-red-600'
+                    : isHighlighted
+                      ? 'text-yellow-600'
+                      : 'text-blue-600'
+                }`}>
+                  {isFocused ? 'Focused' : isHighlighted ? 'Click to focus' : 'Click to highlight'}
+                </span>
               </div>
-            )}
+              {/* Privacy badge for own profile */}
+              {isViewingOwnProfile && (
+                <div>
+                  {pin.isPrivate ? (
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 ring-1 ring-slate-200">
+                      <span>🔒</span>
+                      <span>Private</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200">
+                      <span>🌍</span>
+                      <span>Public</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Info grid */}

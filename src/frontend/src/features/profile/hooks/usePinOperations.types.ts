@@ -36,11 +36,11 @@ export const PIN_OPERATION_CONSTANTS = {
 } as const;
 
 export const PIN_HIGHLIGHT_STYLES: PinHighlightConfig = {
-  transform: 'scale(1.02)',
-  boxShadow: '0 12px 40px rgba(59, 130, 246, 0.4), 0 4px 20px rgba(59, 130, 246, 0.2)',
-  borderColor: 'rgb(59, 130, 246)',
-  borderWidth: '2px',
-  background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 197, 253, 0.1) 100%)',
+  transform: 'scale(1.015)',
+  boxShadow: '0 8px 25px rgba(250, 204, 21, 0.15), 0 2px 10px rgba(250, 204, 21, 0.1)',
+  borderColor: 'rgb(250, 204, 21)',
+  borderWidth: '1px',
+  background: 'linear-gradient(135deg, rgba(250, 204, 21, 0.03) 0%, rgba(254, 240, 138, 0.05) 100%)',
   transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
 } as const;
 

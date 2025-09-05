@@ -34,7 +34,7 @@ export const useMapIcons = (): MapIcons => {
     () =>
       L.divIcon({
         className: 'custom-pin-icon focused',
-        html: `<div class="w-8 h-8 bg-red-500 rounded-full border-3 border-white shadow-xl animate-pulse" style="z-index: 1000; position: relative;"></div>`,
+        html: `<div class="w-8 h-8 bg-red-500 rounded-full border-3 border-white shadow-xl" style="z-index: 1000; position: relative; animation: smooth-pulse 2s ease-in-out infinite;"></div>`,
         iconSize: [32, 32],
         iconAnchor: [16, 16],
       }),
