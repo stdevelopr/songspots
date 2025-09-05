@@ -14,8 +14,9 @@ export const usePinOperations = ({ visiblePins }: UsePinOperationsProps) => {
   // Set up keyboard navigation
   usePinKeyboardNavigation({
     visiblePins,
-    selectedPinId: pinSelection.selectedPinId,
-    onPinClick: pinSelection.handlePinClick,
+    selectedPinId: pinSelection.highlightedPinId,
+    onPinClick: (pinId: string, onRestoreBounds?: () => void) => 
+      pinSelection.handleListItemClick(pinId, onRestoreBounds),
   });
 
   // Enhanced delete handler with error handling
@@ -57,10 +58,14 @@ export const usePinOperations = ({ visiblePins }: UsePinOperationsProps) => {
     handleEditCancel: modalOperations.handleEditCancel,
     
     // Pin interaction
-    selectedPinId: pinSelection.selectedPinId,
+    selectedPinId: pinSelection.highlightedPinId,
+    focusedPinId: pinSelection.focusedPinId,
     isScrolling: pinSelection.isScrolling,
     spotRefs: pinSelection.spotRefs,
-    handlePinClick: pinSelection.handlePinClick,
+    handlePinClick: (pinId: string, onRestoreBounds?: () => void) => 
+      pinSelection.handleListItemClick(pinId, onRestoreBounds),
+    handleMapMarkerClick: pinSelection.handleMapMarkerClick,
+    resetSelection: pinSelection.resetSelection,
     
     // Mutation states
     deletePinMutation: modalOperations.deletePinMutation,

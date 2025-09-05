@@ -5,7 +5,7 @@ import type { Pin } from './usePinOperations.types';
 interface UsePinKeyboardNavigationProps {
   visiblePins: Pin[];
   selectedPinId: string | null;
-  onPinClick: (pinId: string) => void;
+  onPinClick: (pinId: string, onRestoreBounds?: () => void) => void;
 }
 
 export const usePinKeyboardNavigation = ({

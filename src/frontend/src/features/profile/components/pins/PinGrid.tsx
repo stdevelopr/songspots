@@ -10,6 +10,7 @@ interface PinGridProps {
   onDelete: (pin: any) => void;
   formatDate: () => string;
   spotRef: (el: HTMLDivElement | null) => void;
+  onPinClick?: (pinId: string) => void;
 }
 
 const PinGrid: React.FC<PinGridProps> = ({
@@ -20,6 +21,7 @@ const PinGrid: React.FC<PinGridProps> = ({
   onDelete,
   formatDate,
   spotRef,
+  onPinClick,
 }) => {
   return (
     <div
@@ -28,6 +30,7 @@ const PinGrid: React.FC<PinGridProps> = ({
       data-pin-id={pin.id.toString()}
       className="w-full rounded-xl p-4 border border-gray-100 bg-white/90 backdrop-blur-sm shadow-sm transition-all duration-300 transform group"
       style={{ animationDelay: `${index * 100}ms` }}
+      onClick={() => onPinClick?.(pin.id.toString())}
     >
       {/* Desktop horizontal layout */}
       <div className={`flex gap-4 ${pin.musicLink ? 'h-56' : 'h-auto'}`}>

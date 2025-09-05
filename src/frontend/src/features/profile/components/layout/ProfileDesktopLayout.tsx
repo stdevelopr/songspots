@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import ProfileCard from '../shared/ProfileCard';
 import ProfileEditForm from '../forms/ProfileEditForm';
 import ProfileAbout from '../shared/ProfileAbout';
 import ProfileStats from '../shared/ProfileStats';
 import ProfileQuickActions from '../shared/ProfileQuickActions';
-import { ProfileMap } from '../../map/components/ProfileMap';
+import { ProfileMap, ProfileMapRef } from '../../map/components/ProfileMap';
 import LoadingState from '../shared/LoadingState';
 import EmptyState from '../shared/EmptyState';
 import PinGrid from '../pins/PinGrid';
@@ -49,10 +49,13 @@ interface ProfileDesktopLayoutProps {
   copied: boolean;
 
   // Pin operations
-  onPinClick: (pinId: string) => void;
+  onPinClick: (pinId: string, onRestoreBounds?: () => void) => void; // list item click
+  onMapPinClick: (pinId: string) => void; // map marker click
   onEditPin: (pin: any) => void;
   onDeletePin: (pin: any) => void;
   spotRefs: React.MutableRefObject<{ [key: string]: HTMLDivElement | null }>;
+  focusedPinId?: string | null;
+  selectedPinId?: string | null;
 
   // Utility functions
   formatDate: () => string;
@@ -90,11 +93,20 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
   onCopyPrincipal,
   copied,
   onPinClick,
+  onMapPinClick,
   onEditPin,
   onDeletePin,
   spotRefs,
   formatDate,
+  focusedPinId,
+  selectedPinId,
 }) => {
+  const profileMapRef = useRef<ProfileMapRef>(null);
+
+  const handleRestoreBounds = () => {
+    profileMapRef.current?.restoreBounds();
+  };
+
   return (
     <div className="hidden lg:flex h-full min-h-0 px-4 lg:px-8 py-6">
       <div className="w-full max-w-6xl mx-auto h-full min-h-0 flex gap-8">
@@ -154,11 +166,13 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
         <div className="flex-1 min-h-0 flex flex-col">
           {/* Sticky ProfileMap above the scrollable list */}
           <ProfileMap
+            ref={profileMapRef}
             backendPins={backendPinsForMap}
             className="mb-4"
             expandedHeight="270px"
-            onPinClick={onPinClick}
-            focusedPinId={undefined}
+            onPinClick={onMapPinClick}
+            focusedPinId={focusedPinId || undefined}
+            highlightedPinId={selectedPinId || undefined}
           />
 
           {/* Scrollable container for the spots list */}
@@ -181,6 +195,7 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
                         onDelete={onDeletePin}
                         formatDate={formatDate}
                         spotRef={(el) => (spotRefs.current[pin.id.toString()] = el)}
+                        onPinClick={(pinId: string) => onPinClick(pinId, handleRestoreBounds)}
                       />
                     ))}
                   </div>

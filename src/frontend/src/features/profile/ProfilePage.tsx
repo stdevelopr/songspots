@@ -98,10 +98,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
         onCopyPrincipal={profileActions.handleCopyPrincipal}
         copied={profileActions.copied}
         onPinClick={pinOperations.handlePinClick}
+        onMapPinClick={pinOperations.handleMapMarkerClick}
         onEditPin={pinOperations.handleEditPin}
         onDeletePin={pinOperations.handleDeletePin}
         spotRefs={pinOperations.spotRefs}
         formatDate={profileActions.formatDate}
+        focusedPinId={pinOperations.focusedPinId}
+        selectedPinId={pinOperations.selectedPinId}
       />
 
       {/* Mobile Layout */}
@@ -120,8 +123,10 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
         isLoading={profileState.isLoading}
         isLoadingPins={profileState.isLoadingPins}
         selectedPinId={pinOperations.selectedPinId}
+        focusedPinId={pinOperations.focusedPinId}
         onEdit={() => profileState.setIsEditing(true)}
         onPinClick={pinOperations.handlePinClick}
+        onMapPinClick={pinOperations.handleMapMarkerClick}
         onEditPin={pinOperations.handleEditPin}
         onDeletePin={pinOperations.handleDeletePin}
         editFormComponent={mobileEditForm}

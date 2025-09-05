@@ -9,54 +9,77 @@ import {
 import { PIN_OPERATION_CONSTANTS } from './usePinOperations.types';
 
 export const usePinSelection = () => {
-  const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
+  const [highlightedPinId, setHighlightedPinId] = useState<string | null>(null);
+  const [focusedPinId, setFocusedPinId] = useState<string | null>(null);
   const [isScrolling, setIsScrolling] = useState(false);
   const spotRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
-  // hover to the card of the selected pin
-  const handlePinClick = useCallback((pinId: string) => {
-    console.log('Pin clicked, scrolling to:', pinId);
-
-    setSelectedPinId(pinId);
-
-    // Clear existing highlights
+  const scrollAndHighlightCard = useCallback((pinId: string) => {
+    // Clear existing highlights on cards
     clearAllHighlights(spotRefs);
-
-    // Find the target element
     const element = spotRefs.current[pinId];
-
     if (element) {
-      console.log('Found element, scrolling to:', element);
-
-      // Scroll to element
       scrollToPinElement(element);
-
-      // Apply highlight styles
       applyHighlightStyles(element);
-
-      // Remove highlight after duration
-      setTimeout(() => {
-        if (element) {
-          removeHighlight(element);
-        }
-      }, PIN_OPERATION_CONSTANTS.HIGHLIGHT_DURATION);
     } else {
-      console.warn('No element ref found for pinId:', pinId);
-
-      // Try fallback method
       const fallbackElement = findPinElementFallback(pinId);
       if (fallbackElement) {
         scrollToPinElement(fallbackElement);
+        applyHighlightStyles(fallbackElement);
       }
     }
   }, []);
 
+  // List item click: first click highlights, second click focuses map
+  const handleListItemClick = useCallback(
+    (pinId: string, onRestoreBounds?: () => void) => {
+      if (highlightedPinId === pinId) {
+        // Second click -> focus
+        setFocusedPinId(pinId);
+        // Keep card visually emphasized
+        scrollAndHighlightCard(pinId);
+      } else {
+        // First click -> highlight
+        // If we had a focused pin and are switching to a different pin, restore bounds
+        if (focusedPinId && focusedPinId !== pinId && onRestoreBounds) {
+          onRestoreBounds();
+        }
+        setFocusedPinId(null);
+        setHighlightedPinId(pinId);
+        scrollAndHighlightCard(pinId);
+      }
+    },
+    [highlightedPinId, focusedPinId, scrollAndHighlightCard]
+  );
+
+  // Map marker click: just sync list highlight and scroll; do not change focus
+  const handleMapMarkerClick = useCallback(
+    (pinId: string) => {
+      setHighlightedPinId(pinId);
+      // Do not modify focused state on map marker click
+      scrollAndHighlightCard(pinId);
+    },
+    [scrollAndHighlightCard]
+  );
+
+  const resetSelection = useCallback(() => {
+    setHighlightedPinId(null);
+    setFocusedPinId(null);
+    // Also clear visual highlights in the list
+    clearAllHighlights(spotRefs);
+  }, []);
+
   return {
-    selectedPinId,
-    setSelectedPinId,
+    // States
+    highlightedPinId,
+    focusedPinId,
     isScrolling,
     setIsScrolling,
     spotRefs,
-    handlePinClick,
+
+    // Handlers
+    handleListItemClick,
+    handleMapMarkerClick,
+    resetSelection,
   };
 };

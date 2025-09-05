@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useImperativeHandle } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Pin as BackendPin } from '../../../../backend/backend.did';
@@ -17,21 +17,27 @@ interface ProfileMapProps {
   expandedHeight?: string;
   onPinClick?: (pinId: string) => void;
   focusedPinId?: string;
+  highlightedPinId?: string;
 }
 
-export const ProfileMap: React.FC<ProfileMapProps> = ({
+export interface ProfileMapRef {
+  restoreBounds: () => void;
+}
+
+export const ProfileMap = React.forwardRef<ProfileMapRef, ProfileMapProps>(({
   backendPins,
   className = '',
   style,
   expandedHeight = UI_CONFIG.DEFAULT_EXPANDED_HEIGHT,
   onPinClick,
   focusedPinId,
-}) => {
+  highlightedPinId,
+}, ref) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const isFocusAnimatingRef = useRef<boolean>(false);
 
-  const { normalIcon, focusedIcon } = useMapIcons();
+  const { normalIcon, highlightedIcon, focusedIcon } = useMapIcons();
 
   const { mapInstance, isMapReady, containerReady, setContainerReady, cleanupMap, initializeMap } =
     useMapInstance(mapRef, isCollapsed, backendPins, {
@@ -48,7 +54,9 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
     mapInstance,
     backendPins,
     normalIcon,
+    highlightedIcon,
     focusedIcon,
+    highlightedPinId,
     focusedPinId,
     isCollapsed,
     onPinClick,
@@ -76,6 +84,32 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
     setIsCollapsed((prev) => !prev);
   }, []);
 
+  const restoreBounds = useCallback(() => {
+    if (!mapInstance || !backendPins.length) return;
+    
+    // Reset animation flag to allow fitBounds to work
+    isFocusAnimatingRef.current = false;
+    
+    if (backendPins.length === 1) {
+      // Single pin - center on it with appropriate zoom
+      const pin = backendPins[0];
+      mapInstance.setView([parseFloat(pin.latitude), parseFloat(pin.longitude)], MAP_CONFIG.SINGLE_PIN_ZOOM, {
+        animate: true,
+        duration: 0.8
+      });
+    } else {
+      // Multiple pins - fit bounds to show all
+      const bounds = L.latLngBounds(
+        backendPins.map(pin => [parseFloat(pin.latitude), parseFloat(pin.longitude)] as [number, number])
+      );
+      mapInstance.fitBounds(bounds, { 
+        padding: [20, 20],
+        animate: true,
+        duration: 0.8
+      });
+    }
+  }, [mapInstance, backendPins, isFocusAnimatingRef]);
+
   // Handle map lifecycle
   useEffect(() => {
     if (isCollapsed) {
@@ -96,6 +130,11 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
       });
     }
   }, [mapInstance, isCollapsed]);
+
+  // Expose restoreBounds function to parent via ref
+  useImperativeHandle(ref, () => ({
+    restoreBounds
+  }), [restoreBounds]);
 
   return (
     <>
@@ -131,4 +170,6 @@ export const ProfileMap: React.FC<ProfileMapProps> = ({
       </div>
     </>
   );
-};
+});
+
+ProfileMap.displayName = 'ProfileMap';

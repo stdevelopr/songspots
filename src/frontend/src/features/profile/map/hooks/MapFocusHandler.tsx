@@ -23,16 +23,10 @@ export const useMapFocusHandler = ({
   setIsCollapsed,
   isFocusAnimatingRef,
 }: UseMapFocusHandlerProps) => {
-  const focusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const expandTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Handle focusing on a specific pin with two-stage animation
   useEffect(() => {
-    // Clear any existing timeouts when focusedPinId changes
-    if (focusTimeoutRef.current) {
-      clearTimeout(focusTimeoutRef.current);
-      focusTimeoutRef.current = null;
-    }
     if (expandTimeoutRef.current) {
       clearTimeout(expandTimeoutRef.current);
       expandTimeoutRef.current = null;
@@ -70,49 +64,17 @@ export const useMapFocusHandler = ({
 
       const markerLatLng = focusedMarker.getLatLng();
 
-      // Stage 1: Show full map view with all pins for context
-      if (backendPins.length > 1) {
-        const bounds = L.latLngBounds(
-          backendPins
-            .map((pin) => {
-              const coords = parseCoordinates(pin.latitude, pin.longitude);
-              return coords ? [coords.lat, coords.lng] : null;
-            })
-            .filter(Boolean) as [number, number][]
-        );
-
-        mapInstance.fitBounds(bounds, {
-          padding: UI_CONFIG.FIT_BOUNDS_PADDING,
-          maxZoom: UI_CONFIG.MAX_ZOOM_ON_FIT,
-          animate: true,
-          duration: 0.5,
-        });
-
-        // Stage 2: Zoom to focused pin after 1.5 seconds
-        focusTimeoutRef.current = setTimeout(() => {
-          if (mapInstance && focusedMarker) {
-            mapInstance.setView(markerLatLng, 15, { animate: true, duration: 0.8 });
-            // Keep animation flag true to preserve focus - don't clear it
-          }
-          focusTimeoutRef.current = null;
-        }, 1500);
-      } else {
-        // If only one pin, just zoom to it directly
-        mapInstance.setView(markerLatLng, 15, { animate: true, duration: 0.5 });
-        // Keep animation flag true to preserve focus - don't clear it
+      if (mapInstance && focusedMarker) {
+        mapInstance.setView(markerLatLng, 15, { animate: true, duration: 0.8 });
       }
     }
-
-    // Cleanup function to clear timeouts when component unmounts or dependencies change
-    return () => {
-      if (focusTimeoutRef.current) {
-        clearTimeout(focusTimeoutRef.current);
-        focusTimeoutRef.current = null;
-      }
-      if (expandTimeoutRef.current) {
-        clearTimeout(expandTimeoutRef.current);
-        expandTimeoutRef.current = null;
-      }
-    };
-  }, [focusedPinId, mapInstance, isCollapsed, backendPins, markersRef, setIsCollapsed, isFocusAnimatingRef]);
+  }, [
+    focusedPinId,
+    mapInstance,
+    isCollapsed,
+    backendPins,
+    markersRef,
+    setIsCollapsed,
+    isFocusAnimatingRef,
+  ]);
 };

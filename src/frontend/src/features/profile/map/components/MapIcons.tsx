@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 
 export interface MapIcons {
   normalIcon: L.DivIcon;
+  highlightedIcon: L.DivIcon;
   focusedIcon: L.DivIcon;
 }
 
@@ -18,6 +19,17 @@ export const useMapIcons = (): MapIcons => {
     []
   );
 
+  const highlightedIcon = useMemo(
+    () =>
+      L.divIcon({
+        className: 'custom-pin-icon highlighted',
+        html: `<div class="w-7 h-7 bg-yellow-400 rounded-full border-[3px] border-white shadow-xl" style="z-index: 500; position: relative;"></div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
+      }),
+    []
+  );
+
   const focusedIcon = useMemo(
     () =>
       L.divIcon({
@@ -29,13 +41,16 @@ export const useMapIcons = (): MapIcons => {
     []
   );
 
-  return { normalIcon, focusedIcon };
+  return { normalIcon, highlightedIcon, focusedIcon };
 };
 
 export const MapIconStyles: React.FC = () => (
   <style>{`
     .custom-pin-icon.focused {
       z-index: 1000 !important;
+    }
+    .custom-pin-icon.highlighted {
+      z-index: 500 !important;
     }
     .custom-pin-icon {
       z-index: 100;

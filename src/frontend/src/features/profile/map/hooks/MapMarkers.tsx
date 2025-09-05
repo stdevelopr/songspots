@@ -9,8 +9,10 @@ interface UseMapMarkersProps {
   mapInstance: L.Map | null;
   backendPins: BackendPin[];
   normalIcon: L.DivIcon;
+  highlightedIcon: L.DivIcon;
   focusedIcon: L.DivIcon;
   focusedPinId?: string;
+  highlightedPinId?: string;
   isCollapsed: boolean;
   onPinClick?: (pinId: string) => void;
   isFocusAnimatingRef: React.MutableRefObject<boolean>;
@@ -20,7 +22,9 @@ export const useMapMarkers = ({
   mapInstance,
   backendPins,
   normalIcon,
+  highlightedIcon,
   focusedIcon,
+  highlightedPinId,
   focusedPinId,
   isCollapsed,
   onPinClick,
@@ -54,8 +58,12 @@ export const useMapMarkers = ({
         validPins.push({ ...coords, pin });
 
         const pinId = pin.id.toString();
+        const isFocused = focusedPinId === pinId;
+        const isHighlighted = !isFocused && highlightedPinId === pinId;
+        const iconToUse = isFocused ? focusedIcon : isHighlighted ? highlightedIcon : normalIcon;
+
         const marker = L.marker([coords.lat, coords.lng], {
-          icon: normalIcon,
+          icon: iconToUse,
           zIndexOffset: 0,
         }).addTo(mapInstance);
 
@@ -83,7 +91,7 @@ export const useMapMarkers = ({
         maxZoom: UI_CONFIG.MAX_ZOOM_ON_FIT,
       });
     }
-  }, [mapInstance, backendPins, normalIcon, onPinClick, isCollapsed, isFocusAnimatingRef]);
+  }, [mapInstance, backendPins, normalIcon, highlightedIcon, focusedIcon, focusedPinId, highlightedPinId, onPinClick, isCollapsed, isFocusAnimatingRef]);
 
   // Update marker icons when focusedPinId changes (without recreating all markers)
   useEffect(() => {
@@ -91,6 +99,7 @@ export const useMapMarkers = ({
 
     markersRef.current.forEach((marker, pinId) => {
       const isFocused = focusedPinId === pinId;
+      const isHighlighted = !isFocused && highlightedPinId === pinId;
 
       let icon = normalIcon;
       let zIndex = 100;
@@ -98,12 +107,15 @@ export const useMapMarkers = ({
       if (isFocused) {
         icon = focusedIcon;
         zIndex = 1000;
+      } else if (isHighlighted) {
+        icon = highlightedIcon;
+        zIndex = 500;
       }
 
       marker.setIcon(icon);
       marker.setZIndexOffset(zIndex);
     });
-  }, [focusedPinId, normalIcon, focusedIcon, mapInstance, isCollapsed]);
+  }, [focusedPinId, highlightedPinId, normalIcon, highlightedIcon, focusedIcon, mapInstance, isCollapsed]);
 
   return { markersRef };
 };

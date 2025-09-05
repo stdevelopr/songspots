@@ -118,7 +118,7 @@ export const handleKeyboardNavigation = (
   e: KeyboardEvent,
   visiblePins: Pin[],
   selectedPinId: string | null,
-  onPinClick: (pinId: string) => void
+  onPinClick: (pinId: string, onRestoreBounds?: () => void) => void
 ) => {
   if (!visiblePins.length) return;
 

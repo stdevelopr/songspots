@@ -24,6 +24,8 @@ function App() {
   const [currentView, setCurrentView] = useState<'map' | 'profile'>('map');
   const [profileUserId, setProfileUserId] = useState<string | null>(null);
   const [selectedPin, setSelectedPin] = useState<SelectedPin | null>(null);
+
+  console.log('selectedPin in App.tsx:', selectedPin);
   const [isLoadingMapTransition, setIsLoadingMapTransition] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
@@ -201,11 +203,7 @@ function App() {
             fromProfile={fromProfile}
           />
         ) : (
-          <ProfilePage
-            onBackToMap={handleBackToMap}
-            userId={profileUserId}
-            onViewPinOnMap={handleViewPinOnMap}
-          />
+          <ProfilePage onBackToMap={handleBackToMap} userId={profileUserId} />
         )}
       </main>
     </div>

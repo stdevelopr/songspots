@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import ProfileCard from '../shared/ProfileCard';
 import ProfileAbout from '../shared/ProfileAbout';
 import ProfileStats from '../shared/ProfileStats';
-import { ProfileMap } from '../../map/components/ProfileMap';
+import { ProfileMap, ProfileMapRef } from '../../map/components/ProfileMap';
 import ProfileSpotList from '../pins/ProfileSpotList';
 
 interface ProfileMobileLayoutProps {
@@ -23,12 +23,14 @@ interface ProfileMobileLayoutProps {
   isLoading: boolean;
   isLoadingPins: boolean;
   selectedPinId: string | null;
+  focusedPinId?: string | null;
 
   // Actions
   onEdit: () => void;
 
   // Pin operations
-  onPinClick: (pinId: string) => void;
+  onPinClick: (pinId: string, onRestoreBounds?: () => void) => void; // list item click
+  onMapPinClick: (pinId: string) => void; // map marker click
   onEditPin: (pin: any) => void;
   onDeletePin: (pin: any) => void;
 
@@ -51,12 +53,20 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
   isLoading,
   isLoadingPins,
   selectedPinId,
+  focusedPinId,
   onEdit,
   onPinClick,
+  onMapPinClick,
   onEditPin,
   onDeletePin,
   editFormComponent,
 }) => {
+  const profileMapRef = useRef<ProfileMapRef>(null);
+
+  const handleRestoreBounds = () => {
+    profileMapRef.current?.restoreBounds();
+  };
+
   return (
     <div className="lg:hidden h-full min-h-0 overflow-y-auto">
       <div className="w-full max-w-2xl mx-auto px-3 py-3">
@@ -91,11 +101,13 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
 
           {/* ProfileMap for mobile - positioned after all profile info */}
           <ProfileMap
+            ref={profileMapRef}
             backendPins={backendPinsForMap}
             className="mt-4 mb-6"
             expandedHeight="200px"
-            onPinClick={onPinClick}
-            focusedPinId={undefined}
+            onPinClick={onMapPinClick}
+            focusedPinId={focusedPinId || undefined}
+            highlightedPinId={selectedPinId || undefined}
           />
 
           {/* Spots List */}
@@ -110,6 +122,7 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
               onEdit={onEditPin}
               onDelete={onDeletePin}
               selectedPinId={selectedPinId}
+              onPinClick={(pinId: string) => onPinClick(pinId, handleRestoreBounds)}
             />
           </div>
         </div>
