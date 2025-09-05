@@ -1,10 +1,17 @@
-import { PIN_HIGHLIGHT_STYLES, PIN_OPERATION_CONSTANTS, SELECTED_INDICATOR_HTML, type Pin } from './usePinOperations.types';
+import {
+  PIN_HIGHLIGHT_STYLES,
+  PIN_OPERATION_CONSTANTS,
+  SELECTED_INDICATOR_HTML,
+  type Pin,
+} from './usePinOperations.types';
 
 /**
  * Clears all highlight styles from pin elements
  */
-export const clearAllHighlights = (spotRefs: React.MutableRefObject<{ [key: string]: HTMLDivElement | null }>) => {
-  Object.values(spotRefs.current).forEach(element => {
+export const clearAllHighlights = (
+  spotRefs: React.MutableRefObject<{ [key: string]: HTMLDivElement | null }>
+) => {
+  Object.values(spotRefs.current).forEach((element) => {
     if (element) {
       element.style.transform = '';
       element.style.boxShadow = '';
@@ -12,12 +19,10 @@ export const clearAllHighlights = (spotRefs: React.MutableRefObject<{ [key: stri
       element.style.borderWidth = '';
       element.style.background = '';
       element.style.transition = '';
-      
-      element.classList.remove('animate-pulse-highlight');
-      
+
       // Remove any existing indicators
       const indicators = element.querySelectorAll('.animate-spin, .selected-pin-indicator');
-      indicators.forEach(indicator => indicator.remove());
+      indicators.forEach((indicator) => indicator.remove());
     }
   });
 };
@@ -33,8 +38,6 @@ export const applyHighlightStyles = (element: HTMLElement) => {
   element.style.background = PIN_HIGHLIGHT_STYLES.background;
   element.style.transition = PIN_HIGHLIGHT_STYLES.transition;
   element.style.position = 'relative';
-  
-  element.classList.add('animate-pulse-highlight');
 };
 
 /**
@@ -42,7 +45,8 @@ export const applyHighlightStyles = (element: HTMLElement) => {
  */
 export const addSelectedIndicator = (element: HTMLElement) => {
   const selectedIndicator = document.createElement('div');
-  selectedIndicator.className = 'selected-pin-indicator absolute top-2 left-2 flex items-center gap-1 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-medium shadow-lg';
+  selectedIndicator.className =
+    'selected-pin-indicator absolute top-2 left-2 flex items-center gap-1 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-medium shadow-lg';
   selectedIndicator.innerHTML = SELECTED_INDICATOR_HTML;
   selectedIndicator.style.zIndex = PIN_OPERATION_CONSTANTS.HIGHLIGHT_Z_INDEX;
   element.appendChild(selectedIndicator);
@@ -58,8 +62,7 @@ export const removeHighlight = (element: HTMLElement) => {
   element.style.borderWidth = '';
   element.style.background = '';
   element.style.transition = '';
-  element.classList.remove('animate-pulse-highlight');
-  
+
   const indicator = element.querySelector('.selected-pin-indicator');
   if (indicator) {
     indicator.remove();
@@ -74,7 +77,7 @@ export const scrollToPinElement = (element: HTMLElement) => {
   element.scrollIntoView({
     behavior: 'smooth',
     block: isMobile ? 'start' : 'center',
-    inline: 'nearest'
+    inline: 'nearest',
   });
 };
 
@@ -89,7 +92,11 @@ export const findPinElementFallback = (pinId: string): HTMLElement | null => {
 /**
  * Gets the next pin index for keyboard navigation
  */
-export const getNextPinIndex = (currentIndex: number, totalPins: number, direction: 'up' | 'down' | 'home' | 'end'): number => {
+export const getNextPinIndex = (
+  currentIndex: number,
+  totalPins: number,
+  direction: 'up' | 'down' | 'home' | 'end'
+): number => {
   switch (direction) {
     case 'up':
       return currentIndex > 0 ? currentIndex - 1 : totalPins - 1;
@@ -114,12 +121,13 @@ export const handleKeyboardNavigation = (
   onPinClick: (pinId: string) => void
 ) => {
   if (!visiblePins.length) return;
-  
-  const currentIndex = selectedPinId ? 
-    visiblePins.findIndex(pin => pin.id.toString() === selectedPinId) : -1;
-  
+
+  const currentIndex = selectedPinId
+    ? visiblePins.findIndex((pin) => pin.id.toString() === selectedPinId)
+    : -1;
+
   let direction: 'up' | 'down' | 'home' | 'end' | null = null;
-  
+
   switch (e.key) {
     case 'ArrowUp':
       e.preventDefault();
@@ -140,7 +148,7 @@ export const handleKeyboardNavigation = (
     default:
       return;
   }
-  
+
   if (direction) {
     const nextIndex = getNextPinIndex(currentIndex, visiblePins.length, direction);
     if (nextIndex !== currentIndex && nextIndex >= 0) {

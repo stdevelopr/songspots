@@ -8,7 +8,7 @@ export const PROFILE_STYLES = {
     emerald: 'from-emerald-500 via-teal-500 to-cyan-600',
     purple: 'from-purple-500 via-pink-500 to-rose-600',
   },
-  
+
   // Accent colors
   accentColors: {
     default: 'indigo',
@@ -16,14 +16,14 @@ export const PROFILE_STYLES = {
     emerald: 'emerald',
     purple: 'purple',
   },
-  
+
   // Common spacing and sizing
   spacing: {
     cardPadding: 'p-4 lg:p-6',
     sectionGap: 'space-y-4',
     contentGap: 'gap-6',
   },
-  
+
   // Animation styles
   animations: {
     pinHighlight: {
@@ -31,13 +31,15 @@ export const PROFILE_STYLES = {
       boxShadow: '0 12px 40px rgba(59, 130, 246, 0.4), 0 4px 20px rgba(59, 130, 246, 0.2)',
       borderColor: 'rgb(59, 130, 246)',
       borderWidth: '2px',
-      background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 197, 253, 0.1) 100%)',
+      background:
+        'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 197, 253, 0.1) 100%)',
       transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
     },
-    
-    cardHover: 'hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform hover:scale-[1.02]',
+
+    cardHover:
+      'hover:shadow-lg hover:-translate-y-1 transition-all duration-300 transform hover:scale-[1.02]',
   },
-  
+
   // Layout constants
   layout: {
     desktopSidebar: 'w-full lg:w-1/3',
@@ -49,20 +51,21 @@ export const PROFILE_STYLES = {
 
 // Utility functions
 export const getProfileHeaderGradient = (theme?: string): string => {
-  return PROFILE_STYLES.headerGradients[theme as keyof typeof PROFILE_STYLES.headerGradients] || 
-         PROFILE_STYLES.headerGradients.default;
+  return (
+    PROFILE_STYLES.headerGradients[theme as keyof typeof PROFILE_STYLES.headerGradients] ||
+    PROFILE_STYLES.headerGradients.default
+  );
 };
 
 export const getProfileAccentColor = (theme?: string): string => {
-  return PROFILE_STYLES.accentColors[theme as keyof typeof PROFILE_STYLES.accentColors] || 
-         PROFILE_STYLES.accentColors.default;
+  return (
+    PROFILE_STYLES.accentColors[theme as keyof typeof PROFILE_STYLES.accentColors] ||
+    PROFILE_STYLES.accentColors.default
+  );
 };
 
 // CSS-in-JS styles for dynamic elements
 export const PIN_HIGHLIGHT_STYLES = `
-  .animate-pulse-highlight {
-    animation: pulseHighlight 0.6s ease-in-out;
-  }
   
   @keyframes pulseHighlight {
     0% { transform: scale(1); }
@@ -77,11 +80,7 @@ export const PIN_HIGHLIGHT_STYLES = `
     }
   }
   
-  @media (prefers-reduced-motion: reduce) {
-    .animate-pulse-highlight {
-      animation: none;
-    }
-  }
+
   
   .keyboard-hint {
     position: fixed;
@@ -108,10 +107,15 @@ export const PIN_HIGHLIGHT_STYLES = `
 export const COMMON_CLASSES = {
   card: 'bg-white/95 rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-200',
   button: {
-    primary: 'bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg transition-colors',
-    secondary: 'bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-4 py-2 rounded-lg transition-colors',
-    outline: 'border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium px-4 py-2 rounded-lg transition-colors',
+    primary:
+      'bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg transition-colors',
+    secondary:
+      'bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-4 py-2 rounded-lg transition-colors',
+    outline:
+      'border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium px-4 py-2 rounded-lg transition-colors',
   },
-  input: 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent',
-  textarea: 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none',
+  input:
+    'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent',
+  textarea:
+    'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none',
 };
