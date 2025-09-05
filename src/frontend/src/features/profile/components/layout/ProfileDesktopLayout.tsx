@@ -4,11 +4,14 @@ import ProfileEditForm from '../forms/ProfileEditForm';
 import ProfileAbout from '../shared/ProfileAbout';
 import ProfileStats from '../shared/ProfileStats';
 import ProfileQuickActions from '../shared/ProfileQuickActions';
-import SocialMediaManager, { SocialMediaLink } from '../shared/SocialMediaManager';
+import SocialMediaManager, { SocialMediaLink, getPlatformMeta } from '../shared/SocialMediaManager';
 import { ProfileMap, ProfileMapRef } from '../../map/components/ProfileMap';
 import LoadingState from '../shared/LoadingState';
 import EmptyState from '../shared/EmptyState';
 import PinGrid from '../pins/PinGrid';
+import { useActor } from '../../../common/useActor';
+import { useGetUserProfile, useGetUserProfileByPrincipal } from '../../../common/useQueries';
+import type { UserProfile } from '../../../../backend/backend.did';
 
 interface ProfileDesktopLayoutProps {
   // Profile data
@@ -105,27 +108,89 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
   selectedPinId,
 }) => {
   const profileMapRef = useRef<ProfileMapRef>(null);
-  
-  // TODO: This should be stored in backend/database and loaded from user profile
-  const [socialLinks, setSocialLinks] = useState<SocialMediaLink[]>([
-    {
-      id: '1',
-      platform: 'Twitter',
-      url: 'https://twitter.com/username',
-      icon: 'M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z',
-      color: 'from-blue-50 to-blue-100 border-blue-200 text-blue-700 hover:from-blue-100 hover:to-blue-200 hover:text-blue-800'
-    }
-  ]);
+
+  const [socialLinks, setSocialLinks] = useState<SocialMediaLink[]>([]);
   const [isEditingSocial, setIsEditingSocial] = useState(false);
+  const { actor } = useActor();
+
+  // Load social links from backend profile (own or other user's)
+  const { data: ownProfile } = useGetUserProfile();
+
+  const { data: otherProfile } = useGetUserProfileByPrincipal(userPrincipalId);
+  const profileForLinks = isViewingOwnProfile ? ownProfile : otherProfile;
+
+  React.useEffect(() => {
+    if (!profileForLinks) {
+      setSocialLinks([]);
+      return;
+    }
+    const links: SocialMediaLink[] = [];
+    const pushIf = (platform: string, optUrl: [] | [string]) => {
+      if (
+        Array.isArray(optUrl) &&
+        optUrl.length > 0 &&
+        typeof optUrl[0] === 'string' &&
+        optUrl[0].trim().length > 0
+      ) {
+        const meta = getPlatformMeta(platform);
+        links.push({
+          id: platform.toLowerCase(),
+          platform,
+          url: optUrl[0].trim(),
+          icon: meta.icon,
+          color: meta.color,
+        });
+      }
+    };
+    pushIf('Twitter', profileForLinks.socialMedia?.twitter ?? []);
+    pushIf('Facebook', profileForLinks.socialMedia?.facebook ?? []);
+    pushIf('Instagram', profileForLinks.socialMedia?.instagram ?? []);
+    pushIf('TikTok', profileForLinks.socialMedia?.tiktok ?? []);
+    pushIf('YouTube', profileForLinks.socialMedia?.youtube ?? []);
+    pushIf('Website', profileForLinks.socialMedia?.website ?? []);
+    pushIf('Spotify', profileForLinks.socialMedia?.spotify ?? []);
+    pushIf('GitHub', profileForLinks.socialMedia?.github ?? []);
+    setSocialLinks(links);
+  }, [profileForLinks]);
 
   const handleRestoreBounds = () => {
     profileMapRef.current?.restoreBounds();
   };
 
-  const handleSocialLinksUpdate = (newLinks: SocialMediaLink[]) => {
+  const handleSocialLinksUpdate = async (newLinks: SocialMediaLink[]) => {
     setSocialLinks(newLinks);
-    // TODO: Save to backend/database
-    console.log('Social links updated:', newLinks);
+    try {
+      if (!actor) return;
+      const getUrl = (platform: string): [] | [string] => {
+        const found = newLinks.find((l) => l.platform.toLowerCase() === platform.toLowerCase());
+        if (found && found.url && found.url.trim().length > 0) {
+          return [found.url.trim()];
+        }
+        return [];
+      };
+      const rawProfile = await actor.getUserProfile();
+      const currentProfile = Array.isArray(rawProfile)
+        ? (rawProfile[0] ?? null)
+        : (rawProfile ?? null);
+      const mergedProfile: UserProfile = {
+        name: currentProfile?.name ?? displayName ?? '',
+        bio: currentProfile?.bio ?? bio ?? '',
+        profilePicture: currentProfile?.profilePicture ?? ([] as [] | [string]),
+        socialMedia: {
+          facebook: getUrl('Facebook'),
+          instagram: getUrl('Instagram'),
+          tiktok: getUrl('TikTok'),
+          twitter: getUrl('Twitter'),
+          website: getUrl('Website'),
+          youtube: getUrl('YouTube'),
+          spotify: getUrl('Spotify'),
+          github: getUrl('GitHub'),
+        },
+      };
+      await actor.saveUserProfile(mergedProfile);
+    } catch (e) {
+      console.error('Failed to save social links', e);
+    }
   };
 
   const handleToggleSocialEdit = () => {
@@ -177,23 +242,22 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
               onEdit={onEdit}
             />
 
-            {/* Conditional Content: Social Media Manager for own profile, Stats for others */}
-            {isViewingOwnProfile && !isEditing ? (
-              <SocialMediaManager
-                socialLinks={socialLinks}
-                onUpdate={handleSocialLinksUpdate}
-                isEditing={isEditingSocial}
-                onToggleEdit={handleToggleSocialEdit}
-              />
-            ) : (
-              /* ProfileStats for other users' profiles or when editing */
-              <ProfileStats
-                visiblePins={visiblePins}
-                userPins={userPins}
-                isViewingOwnProfile={isViewingOwnProfile}
-                isMobile={false}
-              />
-            )}
+            {/* Stats always visible */}
+            <ProfileStats
+              visiblePins={visiblePins}
+              userPins={userPins}
+              isViewingOwnProfile={isViewingOwnProfile}
+              isMobile={false}
+            />
+
+            {/* Social links visible for own and public profiles; editable only by owner */}
+            <SocialMediaManager
+              socialLinks={socialLinks}
+              onUpdate={handleSocialLinksUpdate}
+              isEditing={isViewingOwnProfile ? isEditingSocial : false}
+              onToggleEdit={isViewingOwnProfile ? handleToggleSocialEdit : () => {}}
+              canEdit={isViewingOwnProfile}
+            />
           </div>
         </div>
 

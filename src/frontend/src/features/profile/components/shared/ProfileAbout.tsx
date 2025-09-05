@@ -35,10 +35,10 @@ const ProfileAbout: React.FC<ProfileAboutProps> = ({
         {isViewingOwnProfile && !isEditing && (
           <button
             onClick={onEdit}
-            className="text-xs text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2 py-1 rounded-full font-medium flex items-center gap-1 transition-colors lg:px-2 lg:py-1 md:px-3 md:py-1.5"
+            className="text-xs text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 px-3 py-2 rounded-xl font-semibold flex items-center gap-2 transition-all duration-200 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
             <svg
-              className="w-3 h-3"
+              className="w-3.5 h-3.5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

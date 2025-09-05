@@ -99,7 +99,7 @@ export const useProfileState = ({ userId }: UseProfileStateProps) => {
     visiblePins,
     backendPinsForMap,
     isViewingOwnProfile,
-    
+
     // Form state
     isEditing,
     setIsEditing,
@@ -109,7 +109,7 @@ export const useProfileState = ({ userId }: UseProfileStateProps) => {
     setBio,
     error,
     setError,
-    
+
     // Utility functions
     getDisplayName,
     getUserPrincipalId,

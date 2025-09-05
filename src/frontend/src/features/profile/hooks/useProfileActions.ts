@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSaveUserProfile } from '../../common/useQueries';
 import { useInternetIdentity } from 'ic-use-internet-identity';
+import { useActor } from '../../common/useActor';
 
 interface UseProfileActionsProps {
   userProfile?: any;
@@ -28,8 +29,9 @@ export const useProfileActions = ({
   resetProfilePicture,
 }: UseProfileActionsProps) => {
   const { identity } = useInternetIdentity();
+  const { actor } = useActor();
   const saveProfileMutation = useSaveUserProfile();
-  
+
   // Toast state
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -52,10 +54,47 @@ export const useProfileActions = ({
     try {
       const finalProfilePictureForBackend = await getProfilePictureForSave();
 
+      // Fetch current profile to preserve social media data
+      let currentSocialMedia = {
+        facebook: [] as [] | [string],
+        instagram: [] as [] | [string],
+        tiktok: [] as [] | [string],
+        twitter: [] as [] | [string],
+        website: [] as [] | [string],
+        youtube: [] as [] | [string],
+        spotify: [] as [] | [string],
+        github: [] as [] | [string],
+      };
+
+      if (actor) {
+        try {
+          const rawProfile = await actor.getUserProfile();
+          const currentProfile = Array.isArray(rawProfile)
+            ? (rawProfile[0] ?? null)
+            : (rawProfile ?? null);
+          
+          if (currentProfile?.socialMedia) {
+            currentSocialMedia = {
+              facebook: currentProfile.socialMedia.facebook || [],
+              instagram: currentProfile.socialMedia.instagram || [],
+              tiktok: currentProfile.socialMedia.tiktok || [],
+              twitter: currentProfile.socialMedia.twitter || [],
+              website: currentProfile.socialMedia.website || [],
+              youtube: currentProfile.socialMedia.youtube || [],
+              spotify: currentProfile.socialMedia.spotify || [],
+              github: currentProfile.socialMedia.github || [],
+            };
+          }
+        } catch (error) {
+          console.warn('Could not fetch current profile for social media preservation:', error);
+        }
+      }
+
       const profileData = {
         name: name.trim(),
         profilePicture: finalProfilePictureForBackend,
         bio: bio.trim(),
+        socialMedia: currentSocialMedia,
       };
 
       console.log('Saving profile with data:', profileData);
@@ -122,18 +161,18 @@ export const useProfileActions = ({
     toastMessage,
     copied,
     showToastMessage,
-    
+
     // Profile actions
     handleSave,
     handleCancel,
     handleCopyPrincipal,
-    
+
     // Utility functions
     formatDate,
     getProfileHeaderGradient,
     getProfileAccentColor,
     getUserPrincipalId,
-    
+
     // Mutation state
     saveProfileMutation,
   };
