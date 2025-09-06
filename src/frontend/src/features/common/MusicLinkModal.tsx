@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { isValidMusicLink } from './validateLinks';
 
 interface PinData {
   name: string;
@@ -31,14 +32,7 @@ const MusicLinkModal: React.FC<MusicLinkModalProps> = ({ isOpen, onSubmit, onCan
     }
   }, [isOpen]);
 
-  const validateMusicLink = (link: string): boolean => {
-    if (!link.trim()) return true; // Empty link is allowed
-    
-    const youtubeRegex = /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\/.+/;
-    const spotifyRegex = /^https?:\/\/(open\.)?spotify\.com\/.+/;
-    
-    return youtubeRegex.test(link) || spotifyRegex.test(link);
-  };
+  const validateMusicLink = (link: string): boolean => isValidMusicLink(link);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,11 +62,11 @@ const MusicLinkModal: React.FC<MusicLinkModalProps> = ({ isOpen, onSubmit, onCan
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[2000]">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">Add New Pin</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[2000] p-2 sm:p-4">
+      <div className="bg-white rounded-lg shadow-xl max-w-sm sm:max-w-md w-full mx-2 sm:mx-4 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+        <div className="p-4 sm:p-6">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Add New Pin</h2>
             <button
               onClick={onCancel}
               disabled={isSubmitting}
@@ -84,9 +78,9 @@ const MusicLinkModal: React.FC<MusicLinkModalProps> = ({ isOpen, onSubmit, onCan
             </button>
           </div>
           
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             <div>
-              <label htmlFor="pinName" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="pinName" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                 Pin Name (Optional)
               </label>
               <input
@@ -96,13 +90,13 @@ const MusicLinkModal: React.FC<MusicLinkModalProps> = ({ isOpen, onSubmit, onCan
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter a name for this pin"
                 disabled={isSubmitting}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50"
                 maxLength={100}
               />
             </div>
 
             <div>
-              <label htmlFor="pinDescription" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="pinDescription" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                 Description (Optional)
               </label>
               <textarea
@@ -110,9 +104,9 @@ const MusicLinkModal: React.FC<MusicLinkModalProps> = ({ isOpen, onSubmit, onCan
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Add a description for this pin"
-                rows={3}
+                rows={2}
                 disabled={isSubmitting}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none disabled:opacity-50 disabled:bg-gray-50"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none disabled:opacity-50 disabled:bg-gray-50"
                 maxLength={500}
               />
               <div className="text-xs text-gray-500 mt-1">
@@ -121,7 +115,7 @@ const MusicLinkModal: React.FC<MusicLinkModalProps> = ({ isOpen, onSubmit, onCan
             </div>
             
             <div>
-              <label htmlFor="musicLink" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="musicLink" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                 Music Link (Optional)
               </label>
               <input
@@ -131,12 +125,12 @@ const MusicLinkModal: React.FC<MusicLinkModalProps> = ({ isOpen, onSubmit, onCan
                 onChange={handleMusicLinkChange}
                 placeholder="https://youtube.com/... or https://spotify.com/..."
                 disabled={isSubmitting}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50 ${
+                className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50 ${
                   error ? 'border-red-300' : 'border-gray-300'
                 }`}
               />
               {error && (
-                <p className="mt-1 text-sm text-red-600">{error}</p>
+                <p className="mt-1 text-xs sm:text-sm text-red-600">{error}</p>
               )}
               <p className="mt-1 text-xs text-gray-500">
                 Supported: YouTube and Spotify links
@@ -144,10 +138,10 @@ const MusicLinkModal: React.FC<MusicLinkModalProps> = ({ isOpen, onSubmit, onCan
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">
                 Privacy Setting
               </label>
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 <label className="flex items-center">
                   <input
                     type="radio"
@@ -158,7 +152,7 @@ const MusicLinkModal: React.FC<MusicLinkModalProps> = ({ isOpen, onSubmit, onCan
                     disabled={isSubmitting}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 disabled:opacity-50"
                   />
-                  <span className="ml-3 text-sm text-gray-700">
+                  <span className="ml-2 sm:ml-3 text-xs sm:text-sm text-gray-700">
                     <span className="font-medium">🌐 Public</span> - Visible to everyone
                   </span>
                 </label>
@@ -172,22 +166,22 @@ const MusicLinkModal: React.FC<MusicLinkModalProps> = ({ isOpen, onSubmit, onCan
                     disabled={isSubmitting}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 disabled:opacity-50"
                   />
-                  <span className="ml-3 text-sm text-gray-700">
+                  <span className="ml-2 sm:ml-3 text-xs sm:text-sm text-gray-700">
                     <span className="font-medium">🔒 Private</span> - Only visible to you
                   </span>
                 </label>
               </div>
             </div>
             
-            <div className="flex items-center space-x-3 pt-2">
+            <div className="flex items-center space-x-2 sm:space-x-3 pt-2 sm:pt-3">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center"
+                className="flex-1 bg-blue-600 text-white py-2.5 sm:py-2 px-3 sm:px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center text-sm"
               >
                 {isSubmitting ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-2"></div>
                     Saving...
                   </>
                 ) : (
@@ -198,7 +192,7 @@ const MusicLinkModal: React.FC<MusicLinkModalProps> = ({ isOpen, onSubmit, onCan
                 type="button"
                 onClick={onCancel}
                 disabled={isSubmitting}
-                className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors disabled:opacity-50 cursor-pointer"
+                className="flex-1 bg-gray-200 text-gray-800 py-2.5 sm:py-2 px-3 sm:px-4 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors disabled:opacity-50 cursor-pointer text-sm"
               >
                 Cancel
               </button>

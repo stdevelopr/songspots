@@ -40,11 +40,11 @@ const PinModal: React.FC<PinModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-auto max-h-[90vh] overflow-y-auto flex flex-col">
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex items-center justify-center p-2 sm:p-4">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-sm sm:max-w-md mx-auto max-h-[95vh] sm:max-h-[90vh] overflow-y-auto flex flex-col">
+        <div className="p-3 sm:p-4">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900">{title}</h2>
             <button
               onClick={onCancel}
               disabled={isSubmitting}
@@ -61,9 +61,9 @@ const PinModal: React.FC<PinModalProps> = ({
             </button>
           </div>
 
-          <form onSubmit={onSubmit} className="space-y-3">
+          <form onSubmit={onSubmit} className="space-y-2.5 sm:space-y-3">
             <div>
-              <label htmlFor="editPinName" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="editPinName" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                 Name (Optional)
               </label>
               <input
@@ -73,7 +73,7 @@ const PinModal: React.FC<PinModalProps> = ({
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter a name for this pin"
                 disabled={isSubmitting}
-                className="w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50"
                 maxLength={100}
               />
             </div>
@@ -81,7 +81,7 @@ const PinModal: React.FC<PinModalProps> = ({
             <div>
               <label
                 htmlFor="editPinDescription"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-xs sm:text-sm font-medium text-gray-700 mb-1"
               >
                 Description (Optional)
               </label>
@@ -92,7 +92,7 @@ const PinModal: React.FC<PinModalProps> = ({
                 placeholder="Add a description for this pin"
                 rows={2}
                 disabled={isSubmitting}
-                className="w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none disabled:opacity-50 disabled:bg-gray-50"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none disabled:opacity-50 disabled:bg-gray-50"
                 maxLength={500}
               />
               <div className="text-xs text-gray-500 mt-1">{description.length}/500 characters</div>
@@ -101,7 +101,7 @@ const PinModal: React.FC<PinModalProps> = ({
             <div>
               <label
                 htmlFor="editMusicLink"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-xs sm:text-sm font-medium text-gray-700 mb-1"
               >
                 Music Link (Optional)
               </label>
@@ -112,7 +112,7 @@ const PinModal: React.FC<PinModalProps> = ({
                 onChange={setMusicLink}
                 placeholder="https://youtube.com/... or https://spotify.com/..."
                 disabled={isSubmitting}
-                className={`w-full px-3 py-1.5 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50 ${error ? 'border-amber-300' : 'border-gray-300'}`}
+                className={`w-full px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50 ${error ? 'border-amber-300' : 'border-gray-300'}`}
               />
               {error && <p className="mt-1 text-sm text-amber-600 flex items-center gap-1">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -136,10 +136,10 @@ const PinModal: React.FC<PinModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">
                 Privacy Setting
               </label>
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 <label className="flex items-center">
                   <input
                     type="radio"
@@ -150,7 +150,7 @@ const PinModal: React.FC<PinModalProps> = ({
                     disabled={isSubmitting}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 disabled:opacity-50"
                   />
-                  <span className="ml-3 text-sm text-gray-700">
+                  <span className="ml-2 sm:ml-3 text-xs sm:text-sm text-gray-700">
                     <span className="font-medium">🌐 Public</span> - Visible to everyone
                   </span>
                 </label>
@@ -164,22 +164,22 @@ const PinModal: React.FC<PinModalProps> = ({
                     disabled={isSubmitting}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 disabled:opacity-50"
                   />
-                  <span className="ml-3 text-sm text-gray-700">
+                  <span className="ml-2 sm:ml-3 text-xs sm:text-sm text-gray-700">
                     <span className="font-medium">🔒 Private</span> - Only visible to you
                   </span>
                 </label>
               </div>
             </div>
 
-            <div className="flex items-center space-x-2 pt-2">
+            <div className="flex items-center space-x-2 pt-2 sm:pt-3">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center"
+                className="flex-1 bg-blue-600 text-white py-2.5 sm:py-2 px-3 sm:px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center text-sm"
               >
                 {isSubmitting ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white mr-2"></div>
                     {submitText}
                   </>
                 ) : (
@@ -190,7 +190,7 @@ const PinModal: React.FC<PinModalProps> = ({
                 type="button"
                 onClick={onCancel}
                 disabled={isSubmitting}
-                className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors disabled:opacity-50 cursor-pointer"
+                className="flex-1 bg-gray-200 text-gray-800 py-2.5 sm:py-2 px-3 sm:px-4 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors disabled:opacity-50 cursor-pointer text-sm"
               >
                 Cancel
               </button>

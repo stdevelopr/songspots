@@ -15,10 +15,22 @@ export function useActor() {
     queryFn: async () => {
       console.log('Creating actor...', { isAuthenticated: !!identity });
 
+      const isIC =
+        process.env.DFX_NETWORK === 'ic' ||
+        window.location.hostname.endsWith('.icp0.io') ||
+        window.location.hostname.endsWith('.raw.icp0.io');
+
+      const host = isIC ? window.location.origin : 'http://localhost:4943';
+
       if (!identity) {
         // Return anonymous actor if not authenticated
         console.log('Creating anonymous actor', canisterId);
-        return await createActor(canisterId);
+        return await createActor(canisterId, {
+          agentOptions: {
+            // IC in prod: same-origin boundary; local dev: replica
+            host,
+          },
+        });
       }
 
       console.log(
@@ -28,6 +40,8 @@ export function useActor() {
 
       const actorOptions = {
         agentOptions: {
+          // IC in prod: same-origin boundary; local dev: replica
+          host,
           identity: identity as unknown as Identity,
         },
       };

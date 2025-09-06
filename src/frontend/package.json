@@ -7,7 +7,8 @@
     "setup": "npm i && dfx canister create music-memories-backend && dfx generate music-memories-backend && dfx deploy",
     "start": "vite --port 3000",
     "prebuild": "dfx generate",
-    "build": "tsc && vite build",
+    "build": "sh -c 'if [ -n \"$SKIP_WORKSPACE_BUILD\" ]; then echo Skipping frontend build; else tsc && vite build; fi'",
+    "postbuild": "cp ../../.ic-assets.json5 ./dist/.ic-assets.json5 || true",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "format": "prettier . --write"
   },

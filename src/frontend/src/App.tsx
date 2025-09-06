@@ -213,7 +213,7 @@ function App() {
   if (status === 'initializing' || isLoadingPins) return <Loader />;
 
   return (
-    <div className="h-screen w-screen flex flex-col">
+    <div className="h-screen w-screen flex flex-col touch-manipulation">
       {/* Initial loading overlay - covers entire app until all conditions are met */}
 
       <AppHeader
@@ -224,7 +224,7 @@ function App() {
         onBackToMap={handleBackToMap}
       />
 
-      <main className="flex-1 relative overflow-hidden min-h-0">
+      <main className="flex-1 relative overflow-hidden min-h-0 w-full">
         {/* Loading overlay for map transitions - only show when transitioning to map */}
         {isLoadingMapTransition && currentView === 'map' && !isInitialLoading && (
           <div className="absolute inset-0 bg-white bg-opacity-95 flex items-center justify-center z-40 pointer-events-none">

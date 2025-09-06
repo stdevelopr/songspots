@@ -212,6 +212,47 @@
     max-width: 95vw !important;
     margin: 0 !important;
   }
+
+  /* Make popup content more mobile-friendly */
+  .redesigned-popup {
+    min-width: 280px;
+    max-width: 95vw;
+    font-size: 14px;
+  }
+
+  .redesigned-title {
+    font-size: 18px;
+  }
+
+  .redesigned-header {
+    padding: 16px 16px 12px 16px;
+  }
+
+  .redesigned-description,
+  .redesigned-metadata,
+  .redesigned-actions {
+    padding: 12px 16px;
+  }
+
+  .enhanced-pin-popup {
+    min-width: 260px;
+    max-width: 95vw;
+    font-size: 13px;
+  }
+
+  .pin-title {
+    font-size: 16px;
+  }
+
+  .popup-header {
+    padding: 16px;
+  }
+
+  .pin-description,
+  .pin-metadata,
+  .popup-actions {
+    padding: 12px 16px;
+  }
 }
 @import "tailwindcss";
 
@@ -787,6 +828,13 @@
   box-sizing: border-box;
 }
 
+html {
+  /* Prevent zoom on iOS when focusing inputs */
+  -webkit-text-size-adjust: 100%;
+  /* Smooth scrolling for better UX */
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -794,9 +842,62 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Prevent overscroll bounce on iOS */
+  overscroll-behavior: none;
+  /* Improve touch scrolling */
+  -webkit-overflow-scrolling: touch;
 }
 
 #root {
   height: 100vh;
   width: 100vw;
+  /* Support for mobile viewport units */
+  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Improve touch targets for mobile */
+@media (max-width: 768px) {
+  button, 
+  [role="button"],
+  input[type="button"],
+  input[type="submit"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Landscape mobile adjustments */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  /* Reduce header height in landscape */
+  .sticky {
+    position: sticky;
+  }
+
+  /* Adjust modal sizing for landscape */
+  .fixed.inset-0 {
+    padding: 8px;
+  }
+
+  /* Make popups smaller in landscape mobile */
+  .redesigned-popup,
+  .enhanced-pin-popup {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  /* Smaller spacing in landscape */
+  .space-y-3 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0.5rem;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
+  /* Ensure crisp images and icons on retina displays */
+  .pin-marker,
+  .user-location-pin {
+    image-rendering: -webkit-optimize-contrast;
+  }
 }

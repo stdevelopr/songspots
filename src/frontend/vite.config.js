@@ -6,6 +6,9 @@ import dotenv from 'dotenv';
 import tailwindcss from '@tailwindcss/vite'
 
 
+// Load network-specific env first if present, then fallback to .env
+const network = process.env.DFX_NETWORK || (process.env.NODE_ENV === 'production' ? 'ic' : 'local');
+dotenv.config({ path: `../../.env.${network}` });
 dotenv.config({ path: '../../.env' });
 
 export default defineConfig({

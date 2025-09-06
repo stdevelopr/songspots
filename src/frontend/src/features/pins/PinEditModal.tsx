@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { isValidMusicLink } from '../common/validateLinks';
 import PinModal from './PinModal';
 
 interface Pin {
@@ -54,14 +55,7 @@ const PinEditModal: React.FC<PinEditModalProps> = ({
     }
   }, [isOpen, pin]);
 
-  const validateMusicLink = (link: string): boolean => {
-    if (!link.trim()) return true; // Empty link is allowed
-
-    const youtubeRegex = /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\/(watch|shorts|embed)\/.+/;
-    const spotifyRegex = /^https?:\/\/(open\.)?spotify\.com\/.+/;
-
-    return youtubeRegex.test(link) || spotifyRegex.test(link);
-  };
+  const validateMusicLink = (link: string): boolean => isValidMusicLink(link);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
