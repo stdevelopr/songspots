@@ -84,6 +84,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
         profilePictureUrl2={profilePicture.profilePictureUrl}
         isUploading={profilePicture.isUploading}
         isDragOver={profilePicture.isDragOver}
+        saveProfileMutation={profileActions.saveProfileMutation}
         onNameChange={(e) => profileState.setName(e.target.value)}
         onBioChange={(e) => profileState.setBio(e.target.value)}
         onProfilePictureChange={profilePicture.handleProfilePictureChange}

@@ -37,6 +37,7 @@ interface ProfileDesktopLayoutProps {
   profilePictureUrl2?: string;
   isUploading: boolean;
   isDragOver: boolean;
+  saveProfileMutation: any;
   onNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBioChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onProfilePictureChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -85,6 +86,7 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
   profilePictureUrl2,
   isUploading,
   isDragOver,
+  saveProfileMutation,
   onNameChange,
   onBioChange,
   onProfilePictureChange,
@@ -223,6 +225,7 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
                 profilePictureUrl={profilePictureUrl2}
                 isUploading={isUploading}
                 isDragOver={isDragOver}
+                saveProfileMutation={saveProfileMutation}
                 onNameChange={onNameChange}
                 onBioChange={onBioChange}
                 onProfilePictureChange={onProfilePictureChange}

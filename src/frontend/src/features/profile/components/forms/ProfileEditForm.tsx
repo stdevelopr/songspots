@@ -8,6 +8,7 @@ interface ProfileEditFormProps {
   profilePictureUrl: string | undefined;
   isUploading: boolean;
   isDragOver: boolean;
+  saveProfileMutation: any;
   onNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBioChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onProfilePictureChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -26,6 +27,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
   profilePictureUrl,
   isUploading,
   isDragOver,
+  saveProfileMutation,
   onNameChange,
   onBioChange,
   onProfilePictureChange,
@@ -178,23 +180,28 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
           placeholder="Tell people about yourself..."
         />
       </div>
-      <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
+      <div className="flex justify-center gap-3 pt-6 border-t border-gray-100">
         <button
           type="button"
           onClick={onCancel}
-          className="px-6 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300/50 transition-all duration-200 cursor-pointer"
+          className="w-32 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300/50 transition-all duration-200 cursor-pointer flex items-center justify-center"
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold shadow-lg shadow-blue-500/25 hover:from-blue-700 hover:to-blue-800 hover:shadow-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer"
+          disabled={isUploading || saveProfileMutation.isPending}
+          className="w-32 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold shadow-lg shadow-blue-500/25 hover:from-blue-700 hover:to-blue-800 hover:shadow-blue-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
         >
-          <span className="flex items-center gap-2">
+          {isUploading || saveProfileMutation.isPending ? (
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          ) : (
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
-            Save Profile
+          )}
+          <span className="text-sm">
+            {isUploading || saveProfileMutation.isPending ? 'Saving...' : 'Save'}
           </span>
         </button>
       </div>

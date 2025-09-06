@@ -57,7 +57,7 @@ const PinEditModal: React.FC<PinEditModalProps> = ({
   const validateMusicLink = (link: string): boolean => {
     if (!link.trim()) return true; // Empty link is allowed
 
-    const youtubeRegex = /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\/.+/;
+    const youtubeRegex = /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\/(watch|shorts|embed)\/.+/;
     const spotifyRegex = /^https?:\/\/(open\.)?spotify\.com\/.+/;
 
     return youtubeRegex.test(link) || spotifyRegex.test(link);
@@ -66,15 +66,13 @@ const PinEditModal: React.FC<PinEditModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateMusicLink(musicLink)) {
-      setError('Please enter a valid YouTube or Spotify link');
-      return;
-    }
+    // Allow submission but clear invalid music links
+    const validMusicLink = validateMusicLink(musicLink) ? musicLink.trim() : '';
 
     onSubmit({
       name: name.trim(),
       description: description.trim(),
-      musicLink: musicLink.trim(),
+      musicLink: validMusicLink,
       isPrivate,
     });
   };
@@ -83,7 +81,10 @@ const PinEditModal: React.FC<PinEditModalProps> = ({
     const value = e.target.value;
     setMusicLink(value);
 
-    if (error && (value === '' || validateMusicLink(value))) {
+    // Show warning for invalid links, but don't prevent submission
+    if (value.trim() !== '' && !validateMusicLink(value)) {
+      setError('Link is not valid');
+    } else {
       setError('');
     }
   };
@@ -99,7 +100,7 @@ const PinEditModal: React.FC<PinEditModalProps> = ({
       description={description}
       setDescription={setDescription}
       musicLink={musicLink}
-      setMusicLink={setMusicLink}
+      setMusicLink={handleMusicLinkChange}
       isPrivate={isPrivate}
       setIsPrivate={setIsPrivate}
       error={error}

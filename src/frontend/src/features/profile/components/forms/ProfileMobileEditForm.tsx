@@ -187,27 +187,27 @@ const ProfileMobileEditForm: React.FC<ProfileMobileEditFormProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col gap-3 pt-4 border-t border-gray-100">
+          <div className="flex gap-3 pt-4 border-t border-gray-100">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="flex-1 py-3 text-base font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center justify-center min-h-[48px]"
+            >
+              Cancel
+            </button>
             <button
               type="submit"
               disabled={isUploading || saveProfileMutation.isPending}
-              className="w-full px-4 py-3 text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors flex items-center justify-center gap-2"
+              className="flex-1 py-3 text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors flex items-center justify-center gap-2 min-h-[48px]"
             >
               {isUploading || saveProfileMutation.isPending ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Saving...
+                  <span>Saving...</span>
                 </>
               ) : (
-                'Save Changes'
+                <span>Save</span>
               )}
-            </button>
-            <button
-              type="button"
-              onClick={onCancel}
-              className="w-full px-4 py-3 text-base font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-            >
-              Cancel
             </button>
           </div>
         </form>

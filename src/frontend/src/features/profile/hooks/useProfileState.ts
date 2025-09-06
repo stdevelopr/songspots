@@ -78,7 +78,8 @@ export const useProfileState = ({ userId }: UseProfileStateProps) => {
       return userProfile.name;
     }
     if (isViewingOwnProfile) {
-      return 'Create Profile';
+      const principalId = identity?.getPrincipal().toString() || '';
+      return principalId ? `User ${principalId.slice(0, 8)}...` : 'Unknown User';
     }
     return userId ? `User ${userId.slice(0, 8)}...` : 'Unknown User';
   };

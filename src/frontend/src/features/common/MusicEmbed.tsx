@@ -6,14 +6,24 @@ interface MusicEmbedProps {
 
 // Helper functions for parsing
 function getYouTubeEmbedUrl(url: string): string {
+  // Handle YouTube Shorts
+  const shortsMatch = url.match(/youtube\.com\/shorts\/([\w-]{11})/);
+  if (shortsMatch && shortsMatch[1]) {
+    return `https://www.youtube.com/embed/${shortsMatch[1]}`;
+  }
+  
+  // Handle regular YouTube videos
   const youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/);
   if (youtubeMatch && youtubeMatch[1]) {
     return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
   }
+  
+  // Handle v parameter
   const vParam = url.match(/[?&]v=([\w-]{11})/);
   if (vParam && vParam[1]) {
     return `https://www.youtube.com/embed/${vParam[1]}`;
   }
+  
   return url;
 }
 

@@ -116,8 +116,12 @@ export const useProfileActions = ({
     if (userProfile) {
       setName(userProfile.name);
       setBio(userProfile.bio || '');
-      setIsEditing(false);
+    } else {
+      // Reset to empty values when no profile exists
+      setName('');
+      setBio('');
     }
+    setIsEditing(false);
     setError('');
     resetProfilePicture();
   };
