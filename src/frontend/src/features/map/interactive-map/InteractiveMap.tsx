@@ -32,6 +32,8 @@ interface Props {
   fromProfile?: boolean;
   setSelectedPin: React.Dispatch<React.SetStateAction<SelectedPin | null>>;
   profileMode?: boolean;
+  onShowLoginPrompt?: (action?: string) => void;
+  isAuthenticated?: boolean;
 }
 
 const InteractiveMap: React.FC<Props> = (props) => {
@@ -51,6 +53,8 @@ const InteractiveMap: React.FC<Props> = (props) => {
     fromProfile = false,
     setSelectedPin,
     profileMode,
+    onShowLoginPrompt,
+    isAuthenticated = false,
   } = props;
 
   const [newPinLocation, setNewPinLocation] = React.useState<{ lat: number; lng: number } | null>(
@@ -134,7 +138,10 @@ const InteractiveMap: React.FC<Props> = (props) => {
     if (!mapInstance) return;
     const onClick = (e: L.LeafletMouseEvent) => {
       mapInstance.closePopup();
-      if (!identity) return alert('Please log in to create pins');
+      if (!identity) {
+        onShowLoginPrompt?.('create your first vibe spot');
+        return;
+      }
       setPinToEdit(null); // Clear previous edit state
       setNewPinLocation({ lat: e.latlng.lat, lng: e.latlng.lng });
       setPinCreateModalOpen(true);

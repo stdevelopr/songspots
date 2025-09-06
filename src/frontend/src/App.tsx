@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import LoginButton from './features/common/LoginButton';
 import AppHeader from './features/common/AppHeader';
 import ProfilePage from './features/profile/ProfilePage';
+import WelcomeModal from './features/common/WelcomeModal';
+import LoginPromptModal from './features/common/LoginPromptModal';
 import { useInternetIdentity } from 'ic-use-internet-identity';
 import { useGetAllPins } from './features/common/useQueries';
 import { useQueryClient } from '@tanstack/react-query';
@@ -16,7 +18,7 @@ interface SelectedPin {
 }
 
 function App() {
-  const { identity, status, clear } = useInternetIdentity();
+  const { identity, status, clear, login } = useInternetIdentity();
 
   const queryClient = useQueryClient();
   const isAuthenticated = !!identity;
@@ -24,6 +26,11 @@ function App() {
   const [currentView, setCurrentView] = useState<'map' | 'profile'>('map');
   const [profileUserId, setProfileUserId] = useState<string | null>(null);
   const [selectedPin, setSelectedPin] = useState<SelectedPin | null>(null);
+
+  // Modal states
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [showLoginPromptModal, setShowLoginPromptModal] = useState(false);
+  const [loginPromptAction, setLoginPromptAction] = useState('start creating and tracking your vibes');
 
   console.log('selectedPin in App.tsx:', selectedPin);
   const [isLoadingMapTransition, setIsLoadingMapTransition] = useState(false);
@@ -78,6 +85,50 @@ function App() {
       queryClient.clear();
     }
   }, [isAuthenticated, queryClient]);
+
+  // Show welcome modal for first-time visitors
+  useEffect(() => {
+    if (!isAuthenticated && !localStorage.getItem('hasSeenWelcome')) {
+      setShowWelcomeModal(true);
+    }
+  }, [isAuthenticated]);
+
+  // Debug function to show welcome modal (remove in production)
+  useEffect(() => {
+    const showModal = () => {
+      if (window.location.hash === '#welcome') {
+        setShowWelcomeModal(true);
+      }
+    };
+    showModal();
+    window.addEventListener('hashchange', showModal);
+    return () => window.removeEventListener('hashchange', showModal);
+  }, []);
+
+  // Handle login from modals
+  const handleLoginFromModal = async () => {
+    try {
+      await login();
+      setShowWelcomeModal(false);
+      setShowLoginPromptModal(false);
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
+  };
+
+  // Handle welcome modal close
+  const handleWelcomeModalClose = () => {
+    setShowWelcomeModal(false);
+    localStorage.setItem('hasSeenWelcome', 'true');
+  };
+
+  // Handle showing login prompt for actions
+  const handleShowLoginPrompt = (action?: string) => {
+    if (!isAuthenticated) {
+      setLoginPromptAction(action || 'start creating and tracking your vibes');
+      setShowLoginPromptModal(true);
+    }
+  };
 
   const handleProfileClick = () => {
     setProfileUserId(null); // View own profile
@@ -201,11 +252,27 @@ function App() {
             isLoadingTransition={isLoadingMapTransition}
             isInitialLoading={isInitialLoading}
             fromProfile={fromProfile}
+            onShowLoginPrompt={handleShowLoginPrompt}
+            isAuthenticated={isAuthenticated}
           />
         ) : (
           <ProfilePage onBackToMap={handleBackToMap} userId={profileUserId} />
         )}
       </main>
+
+      {/* Modals */}
+      <WelcomeModal
+        isOpen={showWelcomeModal}
+        onClose={handleWelcomeModalClose}
+        onLogin={handleLoginFromModal}
+      />
+      
+      <LoginPromptModal
+        isOpen={showLoginPromptModal}
+        onClose={() => setShowLoginPromptModal(false)}
+        onLogin={handleLoginFromModal}
+        action={loginPromptAction}
+      />
     </div>
   );
 }

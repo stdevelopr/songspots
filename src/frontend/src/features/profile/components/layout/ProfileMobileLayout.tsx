@@ -97,14 +97,19 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
 
     const links: SocialMediaLink[] = [];
     const pushIf = (platform: string, optUrl: [] | [string]) => {
-      if (Array.isArray(optUrl) && optUrl.length > 0 && optUrl[0].trim().length > 0) {
+      if (
+        Array.isArray(optUrl) &&
+        optUrl.length > 0 &&
+        typeof optUrl[0] === 'string' &&
+        optUrl[0].trim().length > 0
+      ) {
         const meta = getPlatformMeta(platform);
         links.push({
           id: platform.toLowerCase(),
           platform,
-          url: optUrl[0].trim(),
-          icon: meta.icon,
-          color: meta.color,
+          url: optUrl[0]!.trim(),
+          icon: meta?.icon,
+          color: meta?.color,
         });
       }
     };
@@ -181,6 +186,9 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
           photoUrl={profilePictureUrl}
           headerGradient={headerGradient}
           totalCount={totalCount}
+          visiblePins={visiblePins}
+          userPins={userPins}
+          isViewingOwnProfile={isViewingOwnProfile}
         />
 
         <div className="pt-3 pb-6">

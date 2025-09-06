@@ -64,6 +64,9 @@ interface ProfileDesktopLayoutProps {
 
   // Utility functions
   formatDate: () => string;
+
+  // Navigation
+  onBackToMap?: () => void;
 }
 
 const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
@@ -107,6 +110,7 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
   formatDate,
   focusedPinId,
   selectedPinId,
+  onBackToMap,
 }) => {
   const profileMapRef = useRef<ProfileMapRef>(null);
 
@@ -279,7 +283,7 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
                 {isLoading || isLoadingPins ? (
                   <LoadingState />
                 ) : visiblePins.length === 0 ? (
-                  <EmptyState isViewingOwnProfile={isViewingOwnProfile} />
+                  <EmptyState isViewingOwnProfile={isViewingOwnProfile} onBackToMap={onBackToMap} />
                 ) : (
                   <div className="space-y-4">
                     {visiblePins.map((pin, index) => (

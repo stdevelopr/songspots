@@ -15,7 +15,7 @@ interface ProfilePageProps {
   onBackToMap?: () => void;
 }
 
-const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
+const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onBackToMap }) => {
   // Initialize all hooks
   const profileState = useProfileState({ userId });
   const profilePicture = useProfilePicture({
@@ -105,6 +105,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId }) => {
         formatDate={profileActions.formatDate}
         focusedPinId={pinOperations.focusedPinId}
         selectedPinId={pinOperations.selectedPinId}
+        onBackToMap={onBackToMap}
       />
 
       {/* Mobile Layout */}

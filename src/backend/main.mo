@@ -68,12 +68,8 @@ persistent actor {
   };
 
   transient let principalMap = Map.Make<Principal>(Principal.compare);
-  var userProfiles = principalMap.empty<UserProfile>();
-
-  system func postupgrade() {
-    // Clear user profiles due to UserProfile type change (social media field order)
-    userProfiles := principalMap.empty<UserProfile>();
-  };
+  var userProfilesStable : [(Principal, UserProfile)] = [];
+  transient var userProfiles = principalMap.empty<UserProfile>();
 
   public query ({ caller }) func getUserProfile() : async ?UserProfile {
     principalMap.get(userProfiles, caller);
@@ -129,8 +125,10 @@ persistent actor {
   };
 
   transient let pinMap = Map.Make<Nat>(Nat.compare);
-  var pins : Map.Map<Nat, Pin> = pinMap.empty<Pin>();
-  var nextPinId : Nat = 0;
+  var pinsStable : [(Nat, Pin)] = [];
+  var nextPinIdStable : Nat = 0;
+  transient var pins : Map.Map<Nat, Pin> = pinMap.empty<Pin>();
+  transient var nextPinId : Nat = 0;
 
   public shared ({ caller }) func createPin(name : Text, description : Text, musicLink : Text, latitude : Text, longitude : Text, isPrivate : Bool) : async () {
     if (not (MultiUserSystem.hasPermission(multiUserState, caller, #user, false))) {
@@ -217,5 +215,21 @@ persistent actor {
         },
       )
     );
+  };
+
+  system func preupgrade() {
+    userProfilesStable := Iter.toArray(principalMap.entries(userProfiles));
+    pinsStable := Iter.toArray(pinMap.entries(pins));
+    nextPinIdStable := nextPinId;
+  };
+
+  system func postupgrade() {
+    userProfiles := principalMap.fromIter(userProfilesStable.vals());
+    pins := pinMap.fromIter(pinsStable.vals());
+    nextPinId := nextPinIdStable;
+    
+    // Clear stable arrays to save memory
+    userProfilesStable := [];
+    pinsStable := [];
   };
 };
