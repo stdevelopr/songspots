@@ -8,9 +8,9 @@ interface PinActionButtonProps {
 }
 
 const colorMap = {
-  edit: 'w-full px-4 py-2 rounded-lg font-semibold shadow transition text-base bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800',
+  edit: 'w-full px-4 py-2 rounded-lg font-semibold shadow transition text-base bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 cursor-pointer',
   delete:
-    'w-full px-4 py-2 rounded-lg font-semibold shadow transition text-base bg-rose-100 dark:bg-rose-900 text-rose-800 dark:text-rose-200 hover:bg-rose-200 dark:hover:bg-rose-800',
+    'w-full px-4 py-2 rounded-lg font-semibold shadow transition text-base bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 cursor-pointer',
 };
 
 const PinActionButton: React.FC<PinActionButtonProps> = ({

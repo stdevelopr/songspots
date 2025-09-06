@@ -26,7 +26,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
             <button
               onClick={onCancel}
               disabled={isDeleting}
-              className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
+              className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50 cursor-pointer"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -71,7 +71,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
               type="button"
               onClick={onCancel}
               disabled={isDeleting}
-              className="flex-1 bg-gray-200 text-gray-800 py-3 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors disabled:opacity-50 font-medium"
+              className="flex-1 bg-gray-200 text-gray-800 py-3 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors disabled:opacity-50 font-medium cursor-pointer"
             >
               Cancel
             </button>
@@ -79,7 +79,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
               type="button"
               onClick={onConfirm}
               disabled={isDeleting}
-              className="flex-1 bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center font-medium"
+              className="flex-1 bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center font-medium"
             >
               {isDeleting ? (
                 <>

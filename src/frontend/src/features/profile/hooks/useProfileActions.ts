@@ -140,7 +140,7 @@ export const useProfileActions = ({
   const formatDate = () => {
     try {
       const date = new Date();
-      return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+      return date.toLocaleDateString();
     } catch {
       return 'Unknown date';
     }

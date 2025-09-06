@@ -3,7 +3,7 @@ export const Loader = () => {
     <div className="fixed inset-0 bg-white z-[9999] flex items-center justify-center">
       <div className="text-center">
         <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-6"></div>
-        <h3 className="text-2xl font-semibold text-gray-900 mb-3">Loading Song Spots</h3>
+        <h3 className="text-2xl font-semibold text-gray-900 mb-3">Loading Vibe Spots</h3>
         <p className="text-gray-600 max-w-md mx-auto mb-4">
           Initializing map, loading pins, requesting location, and centering map...
         </p>

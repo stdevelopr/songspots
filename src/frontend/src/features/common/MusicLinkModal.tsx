@@ -76,7 +76,7 @@ const MusicLinkModal: React.FC<MusicLinkModalProps> = ({ isOpen, onSubmit, onCan
             <button
               onClick={onCancel}
               disabled={isSubmitting}
-              className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
+              className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50 cursor-pointer"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -183,7 +183,7 @@ const MusicLinkModal: React.FC<MusicLinkModalProps> = ({ isOpen, onSubmit, onCan
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center"
               >
                 {isSubmitting ? (
                   <>
@@ -198,7 +198,7 @@ const MusicLinkModal: React.FC<MusicLinkModalProps> = ({ isOpen, onSubmit, onCan
                 type="button"
                 onClick={onCancel}
                 disabled={isSubmitting}
-                className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors disabled:opacity-50"
+                className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors disabled:opacity-50 cursor-pointer"
               >
                 Cancel
               </button>

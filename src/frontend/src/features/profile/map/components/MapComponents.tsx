@@ -1,7 +1,7 @@
 import React from 'react';
 
 export const MapLoadingOverlay: React.FC = () => (
-  <div 
+  <div
     className="absolute inset-0 bg-white/95 backdrop-blur-sm rounded-2xl flex items-center justify-center"
     style={{ zIndex: 1000 }}
   >
@@ -27,7 +27,7 @@ export const CollapseButton: React.FC<CollapseButtonProps> = ({ onClick, isColla
     return (
       <button
         onClick={handleClick}
-        className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors border border-white/20"
+        className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors border border-white/20 cursor-pointer"
         title="Expand map"
         style={{ marginLeft: '0.5rem' }}
       >
@@ -39,11 +39,11 @@ export const CollapseButton: React.FC<CollapseButtonProps> = ({ onClick, isColla
   return (
     <button
       onClick={handleClick}
-      className="absolute top-3 right-3 p-2 rounded-lg bg-white/95 hover:bg-white shadow-lg border border-gray-200 transition-all duration-200"
+      className="absolute top-3 right-3 p-2 rounded-lg bg-white/95 hover:bg-white shadow-lg border border-gray-200 transition-all duration-200 cursor-pointer"
       title="Collapse map"
-      style={{ 
+      style={{
         zIndex: 1000,
-        pointerEvents: 'auto'
+        pointerEvents: 'auto',
       }}
     >
       <ChevronUpIcon />
@@ -58,12 +58,7 @@ const ChevronUpIcon: React.FC = () => (
     stroke="currentColor"
     viewBox="0 0 24 24"
   >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M5 15l7-7 7 7"
-    />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
   </svg>
 );
 
@@ -74,12 +69,7 @@ const ChevronDownIcon: React.FC = () => (
     stroke="currentColor"
     viewBox="0 0 24 24"
   >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M19 9l-7 7-7-7"
-    />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
   </svg>
 );
 
@@ -93,7 +83,7 @@ export const MapCollapsedView: React.FC<MapCollapsedViewProps> = ({ onToggleColl
     style={{ borderRadius: '1rem' }}
     onClick={onToggleCollapse}
   >
-    <span className="font-semibold text-base pl-2">Show Map</span>
+    <span className="font-semibold text-base pl-2">Find My Vibe</span>
     <CollapseButton onClick={onToggleCollapse} isCollapsed={true} />
   </div>
 );
@@ -111,11 +101,11 @@ export const ShowAllButton: React.FC<ShowAllButtonProps> = ({ onClick }) => {
   return (
     <button
       onClick={handleClick}
-      className="absolute bottom-3 left-3 px-3 py-2 rounded-lg bg-white/95 hover:bg-white shadow-lg border border-gray-200 transition-all duration-200 text-sm font-medium text-gray-700 hover:text-gray-900"
+      className="absolute bottom-3 left-3 px-3 py-2 rounded-lg bg-white/95 hover:bg-white shadow-lg border border-gray-200 transition-all duration-200 text-sm font-medium text-gray-700 hover:text-gray-900 cursor-pointer"
       title="Show all pins"
-      style={{ 
+      style={{
         zIndex: 1000,
-        pointerEvents: 'auto'
+        pointerEvents: 'auto',
       }}
     >
       <div className="flex items-center gap-1.5">
@@ -127,12 +117,7 @@ export const ShowAllButton: React.FC<ShowAllButtonProps> = ({ onClick }) => {
 };
 
 const ShowAllIcon: React.FC = () => (
-  <svg
-    className="w-4 h-4"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path
       strokeLinecap="round"
       strokeLinejoin="round"

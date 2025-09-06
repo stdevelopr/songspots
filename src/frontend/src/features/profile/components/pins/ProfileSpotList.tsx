@@ -47,14 +47,14 @@ const ProfileSpotList: React.FC<ProfileSpotListProps> = ({
         element.scrollIntoView({
           behavior: 'smooth',
           block: 'center',
-          inline: 'nearest'
+          inline: 'nearest',
         });
-        
+
         // Add temporary highlight effect
         element.style.transform = 'scale(1.02)';
         element.style.boxShadow = '0 8px 32px rgba(59, 130, 246, 0.3)';
         element.style.borderColor = 'rgb(59, 130, 246)';
-        
+
         // Remove highlight after animation
         setTimeout(() => {
           if (element) {
@@ -103,7 +103,7 @@ const ProfileSpotList: React.FC<ProfileSpotListProps> = ({
             key={spot.id.toString()}
             ref={(el) => (spotRefs.current[spot.id.toString()] = el)}
             data-pin-id={spot.id.toString()}
-            className="w-full bg-white/95 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-gray-100 p-4 flex flex-col gap-2"
+            className="w-full bg-white/95 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-gray-100 p-4 flex flex-col gap-2 cursor-pointer"
             onMouseEnter={() => onMouseEnter?.(spot)}
             onMouseLeave={() => onMouseLeave?.()}
             onClick={() => onPinClick?.(spot.id.toString())}
@@ -119,36 +119,45 @@ const ProfileSpotList: React.FC<ProfileSpotListProps> = ({
                   </h3>
                 </div>
               </div>
-              
+
               {/* Top right indicators */}
               <div className="flex flex-col gap-1 items-end">
                 {/* Map marker action indicator */}
                 <div className="flex items-center gap-2">
                   {/* Simple circular marker matching map colors */}
-                  <div className={`w-3 h-3 rounded-full border border-white shadow-sm transition-all duration-300 ${
-                    focusedPinId === spot.id.toString()
-                      ? 'bg-red-500' 
-                      : selectedPinId === spot.id.toString()
-                        ? 'bg-yellow-400' 
-                        : 'bg-blue-500'
-                  }`} style={focusedPinId === spot.id.toString() ? { animation: 'smooth-pulse 2s ease-in-out infinite' } : {}}></div>
-                  
+                  <div
+                    className={`w-3 h-3 rounded-full border border-white shadow-sm transition-all duration-300 ${
+                      focusedPinId === spot.id.toString()
+                        ? 'bg-red-500'
+                        : selectedPinId === spot.id.toString()
+                          ? 'bg-yellow-400'
+                          : 'bg-blue-500'
+                    }`}
+                    style={
+                      focusedPinId === spot.id.toString()
+                        ? { animation: 'smooth-pulse 2s ease-in-out infinite' }
+                        : {}
+                    }
+                  ></div>
+
                   {/* Action text */}
-                  <span className={`text-xs font-medium transition-colors duration-300 ${
-                    focusedPinId === spot.id.toString()
-                      ? 'text-red-600'
+                  <span
+                    className={`text-xs font-medium transition-colors duration-300 ${
+                      focusedPinId === spot.id.toString()
+                        ? 'text-red-600'
+                        : selectedPinId === spot.id.toString()
+                          ? 'text-yellow-600'
+                          : 'text-blue-600'
+                    }`}
+                  >
+                    {focusedPinId === spot.id.toString()
+                      ? 'Focused'
                       : selectedPinId === spot.id.toString()
-                        ? 'text-yellow-600'
-                        : 'text-blue-600'
-                  }`}>
-                    {focusedPinId === spot.id.toString() 
-                      ? 'Focused' 
-                      : selectedPinId === spot.id.toString() 
-                        ? 'Click to focus' 
+                        ? 'Click to focus'
                         : 'Click to highlight'}
                   </span>
                 </div>
-                
+
                 {/* Privacy badge for own profile */}
                 {isViewingOwnProfile && (
                   <div>
@@ -165,7 +174,7 @@ const ProfileSpotList: React.FC<ProfileSpotListProps> = ({
                 )}
               </div>
             </div>
-            
+
             {isViewingOwnProfile && (
               <div className="flex gap-2 mt-2">
                 <button
@@ -173,8 +182,22 @@ const ProfileSpotList: React.FC<ProfileSpotListProps> = ({
                     e.stopPropagation();
                     onEdit(spot);
                   }}
-                  className="text-indigo-700 bg-indigo-50/60 hover:bg-indigo-100 border border-indigo-200 text-sm px-2.5 py-1 rounded-md"
+                  className="text-indigo-700 bg-indigo-50/60 hover:bg-indigo-100 border border-indigo-200 text-sm px-2.5 py-1 rounded-md cursor-pointer flex items-center gap-1"
+                  style={{ cursor: 'pointer' }}
                 >
+                  <svg
+                    className="w-3 h-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
                   Edit
                 </button>
                 <button
@@ -182,8 +205,22 @@ const ProfileSpotList: React.FC<ProfileSpotListProps> = ({
                     e.stopPropagation();
                     onDelete(spot);
                   }}
-                  className="text-red-700 bg-red-50/60 hover:bg-red-100 border border-red-200 text-sm px-2.5 py-1 rounded-md"
+                  className="text-red-700 bg-red-50/60 hover:bg-red-100 border border-red-200 text-sm px-2.5 py-1 rounded-md cursor-pointer flex items-center gap-1"
+                  style={{ cursor: 'pointer' }}
                 >
+                  <svg
+                    className="w-3 h-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6m0 12L6 6"
+                    />
+                  </svg>
                   Delete
                 </button>
               </div>

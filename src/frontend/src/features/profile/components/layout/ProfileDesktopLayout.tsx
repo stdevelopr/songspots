@@ -2,7 +2,6 @@ import React, { useRef, useState } from 'react';
 import ProfileCard from '../shared/ProfileCard';
 import ProfileEditForm from '../forms/ProfileEditForm';
 import ProfileAbout from '../shared/ProfileAbout';
-import ProfileStats from '../shared/ProfileStats';
 import ProfileQuickActions from '../shared/ProfileQuickActions';
 import SocialMediaManager, { SocialMediaLink, getPlatformMeta } from '../shared/SocialMediaManager';
 import { ProfileMap, ProfileMapRef } from '../../map/components/ProfileMap';
@@ -208,6 +207,9 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
             photoUrl={profilePictureUrl}
             headerGradient={headerGradient}
             totalCount={totalCount}
+            visiblePins={visiblePins}
+            userPins={userPins}
+            isViewingOwnProfile={isViewingOwnProfile}
           />
 
           {/* Edit Profile Form (Desktop) */}
@@ -233,21 +235,13 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
             </div>
           )}
 
-          {/* Enhanced Profile Section */}
-          <div className="mt-4 space-y-4">
+          {/* Enhanced Profile Section - Combined About & Stats */}
+          <div className="mt-3 space-y-3">
             <ProfileAbout
               bio={bio}
               isViewingOwnProfile={isViewingOwnProfile}
               isEditing={isEditing}
               onEdit={onEdit}
-            />
-
-            {/* Stats always visible */}
-            <ProfileStats
-              visiblePins={visiblePins}
-              userPins={userPins}
-              isViewingOwnProfile={isViewingOwnProfile}
-              isMobile={false}
             />
 
             {/* Social links visible for own and public profiles; editable only by owner */}

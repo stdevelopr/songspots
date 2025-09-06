@@ -136,7 +136,7 @@ const ProfileMobileEditForm: React.FC<ProfileMobileEditFormProps> = ({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="text-sm px-4 py-2 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition-colors font-medium"
+                  className="text-sm px-4 py-2 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition-colors font-medium cursor-pointer"
                 >
                   Change Photo
                 </button>
@@ -144,7 +144,7 @@ const ProfileMobileEditForm: React.FC<ProfileMobileEditFormProps> = ({
                   <button
                     type="button"
                     onClick={handleRemoveClick}
-                    className="text-sm px-4 py-2 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 transition-colors font-medium"
+                    className="text-sm px-4 py-2 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 transition-colors font-medium cursor-pointer"
                   >
                     Remove
                   </button>
