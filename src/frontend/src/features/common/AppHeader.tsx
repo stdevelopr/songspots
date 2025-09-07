@@ -3,7 +3,7 @@ import LoginButton from './LoginButton';
 interface AppHeaderProps {
   onProfileClick: () => void;
   onLogout: () => void;
-  currentView: 'map' | 'profile';
+  currentView: 'map' | 'profile' | 'responsive-demo';
   isAuthenticated: boolean;
   onBackToMap?: () => void;
 }

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { ResponsiveComponent } from '../common/ResponsiveComponent';
 import { useProfileState } from './hooks/useProfileState';
 import { useProfilePicture } from './hooks/useProfilePicture';
 import { usePinOperations } from './hooks/usePinOperations';
@@ -64,75 +65,79 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onBackToMap }) => {
       <style>{PIN_HIGHLIGHT_STYLES}</style>
 
       {/* Desktop Layout */}
-      <ProfileDesktopLayout
-        displayName={profileState.getDisplayName()}
-        userPrincipalId={profileState.getUserPrincipalId()}
-        profilePictureUrl={profilePicture.profilePictureUrl}
-        headerGradient={profileActions.getProfileHeaderGradient()}
-        totalCount={profileState.visiblePins?.length || 0}
-        bio={profileState.bio}
-        visiblePins={profileState.visiblePins}
-        userPins={profileState.userPins}
-        backendPinsForMap={profileState.backendPinsForMap}
-        isViewingOwnProfile={profileState.isViewingOwnProfile}
-        isEditing={profileState.isEditing}
-        isLoading={profileState.isLoading}
-        isLoadingPins={profileState.isLoadingPins}
-        name={profileState.name}
-        error={profileState.error}
-        profilePicturePreview={profilePicture.profilePicturePreview}
-        profilePictureUrl2={profilePicture.profilePictureUrl}
-        isUploading={profilePicture.isUploading}
-        isDragOver={profilePicture.isDragOver}
-        saveProfileMutation={profileActions.saveProfileMutation}
-        onNameChange={(e) => profileState.setName(e.target.value)}
-        onBioChange={(e) => profileState.setBio(e.target.value)}
-        onProfilePictureChange={profilePicture.handleProfilePictureChange}
-        onDragOver={profilePicture.handleDragOver}
-        onDragLeave={profilePicture.handleDragLeave}
-        onDrop={profilePicture.handleDrop}
-        onCancel={profileActions.handleCancel}
-        onSave={profileActions.handleSave}
-        onEdit={() => profileState.setIsEditing(true)}
-        onCopyPrincipal={profileActions.handleCopyPrincipal}
-        copied={profileActions.copied}
-        onPinClick={pinOperations.handlePinClick}
-        onMapPinClick={pinOperations.handleMapMarkerClick}
-        onEditPin={pinOperations.handleEditPin}
-        onDeletePin={pinOperations.handleDeletePin}
-        onResetSelection={pinOperations.resetSelection}
-        spotRefs={pinOperations.spotRefs}
-        formatDate={profileActions.formatDate}
-        focusedPinId={pinOperations.focusedPinId}
-        selectedPinId={pinOperations.selectedPinId}
-        onBackToMap={onBackToMap}
-      />
+      <ResponsiveComponent showOnDesktop showOnTablet hideOnMobile>
+        <ProfileDesktopLayout
+          displayName={profileState.getDisplayName()}
+          userPrincipalId={profileState.getUserPrincipalId()}
+          profilePictureUrl={profilePicture.profilePictureUrl}
+          headerGradient={profileActions.getProfileHeaderGradient()}
+          totalCount={profileState.visiblePins?.length || 0}
+          bio={profileState.bio}
+          visiblePins={profileState.visiblePins}
+          userPins={profileState.userPins}
+          backendPinsForMap={profileState.backendPinsForMap}
+          isViewingOwnProfile={profileState.isViewingOwnProfile}
+          isEditing={profileState.isEditing}
+          isLoading={profileState.isLoading}
+          isLoadingPins={profileState.isLoadingPins}
+          name={profileState.name}
+          error={profileState.error}
+          profilePicturePreview={profilePicture.profilePicturePreview}
+          profilePictureUrl2={profilePicture.profilePictureUrl}
+          isUploading={profilePicture.isUploading}
+          isDragOver={profilePicture.isDragOver}
+          saveProfileMutation={profileActions.saveProfileMutation}
+          onNameChange={(e) => profileState.setName(e.target.value)}
+          onBioChange={(e) => profileState.setBio(e.target.value)}
+          onProfilePictureChange={profilePicture.handleProfilePictureChange}
+          onDragOver={profilePicture.handleDragOver}
+          onDragLeave={profilePicture.handleDragLeave}
+          onDrop={profilePicture.handleDrop}
+          onCancel={profileActions.handleCancel}
+          onSave={profileActions.handleSave}
+          onEdit={() => profileState.setIsEditing(true)}
+          onCopyPrincipal={profileActions.handleCopyPrincipal}
+          copied={profileActions.copied}
+          onPinClick={pinOperations.handlePinClick}
+          onMapPinClick={pinOperations.handleMapMarkerClick}
+          onEditPin={pinOperations.handleEditPin}
+          onDeletePin={pinOperations.handleDeletePin}
+          onResetSelection={pinOperations.resetSelection}
+          spotRefs={pinOperations.spotRefs}
+          formatDate={profileActions.formatDate}
+          focusedPinId={pinOperations.focusedPinId}
+          selectedPinId={pinOperations.selectedPinId}
+          onBackToMap={onBackToMap}
+        />
+      </ResponsiveComponent>
 
       {/* Mobile Layout */}
-      <ProfileMobileLayout
-        displayName={profileState.getDisplayName()}
-        userPrincipalId={profileState.getUserPrincipalId()}
-        profilePictureUrl={profilePicture.profilePictureUrl}
-        headerGradient={profileActions.getProfileHeaderGradient()}
-        totalCount={profileState.visiblePins?.length || 0}
-        bio={profileState.bio}
-        visiblePins={profileState.visiblePins}
-        userPins={profileState.userPins}
-        backendPinsForMap={profileState.backendPinsForMap}
-        isViewingOwnProfile={profileState.isViewingOwnProfile}
-        isEditing={profileState.isEditing}
-        isLoading={profileState.isLoading}
-        isLoadingPins={profileState.isLoadingPins}
-        selectedPinId={pinOperations.selectedPinId}
-        focusedPinId={pinOperations.focusedPinId}
-        onEdit={() => profileState.setIsEditing(true)}
-        onPinClick={pinOperations.handlePinClick}
-        onMapPinClick={pinOperations.handleMapMarkerClick}
-        onEditPin={pinOperations.handleEditPin}
-        onDeletePin={pinOperations.handleDeletePin}
-        onResetSelection={pinOperations.resetSelection}
-        editFormComponent={mobileEditForm}
-      />
+      <ResponsiveComponent showOnMobile hideOnTablet hideOnDesktop>
+        <ProfileMobileLayout
+          displayName={profileState.getDisplayName()}
+          userPrincipalId={profileState.getUserPrincipalId()}
+          profilePictureUrl={profilePicture.profilePictureUrl}
+          headerGradient={profileActions.getProfileHeaderGradient()}
+          totalCount={profileState.visiblePins?.length || 0}
+          bio={profileState.bio}
+          visiblePins={profileState.visiblePins}
+          userPins={profileState.userPins}
+          backendPinsForMap={profileState.backendPinsForMap}
+          isViewingOwnProfile={profileState.isViewingOwnProfile}
+          isEditing={profileState.isEditing}
+          isLoading={profileState.isLoading}
+          isLoadingPins={profileState.isLoadingPins}
+          selectedPinId={pinOperations.selectedPinId}
+          focusedPinId={pinOperations.focusedPinId}
+          onEdit={() => profileState.setIsEditing(true)}
+          onPinClick={pinOperations.handlePinClick}
+          onMapPinClick={pinOperations.handleMapMarkerClick}
+          onEditPin={pinOperations.handleEditPin}
+          onDeletePin={pinOperations.handleDeletePin}
+          onResetSelection={pinOperations.resetSelection}
+          editFormComponent={mobileEditForm}
+        />
+      </ResponsiveComponent>
 
       {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal

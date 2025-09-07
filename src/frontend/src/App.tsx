@@ -5,6 +5,8 @@ import AppHeader from './features/common/AppHeader';
 import ProfilePage from './features/profile/ProfilePage';
 import WelcomeModal from './features/common/WelcomeModal';
 import LoginPromptModal from './features/common/LoginPromptModal';
+import { DeviceInfoDisplay } from './features/common/DeviceInfoDisplay';
+import { ThreeLayoutExample } from './features/common/ThreeLayoutExample';
 import { useInternetIdentity } from 'ic-use-internet-identity';
 import { useGetAllPins } from './features/common/useQueries';
 import { useQueryClient } from '@tanstack/react-query';
@@ -23,7 +25,10 @@ function App() {
   const queryClient = useQueryClient();
   const isAuthenticated = !!identity;
 
-  const [currentView, setCurrentView] = useState<'map' | 'profile'>('map');
+  const [currentView, setCurrentView] = useState<'map' | 'profile' | 'responsive-demo'>(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('demo') === 'responsive' ? 'responsive-demo' : 'map';
+  });
   const [profileUserId, setProfileUserId] = useState<string | null>(null);
   const [selectedPin, setSelectedPin] = useState<SelectedPin | null>(null);
 
@@ -138,7 +143,7 @@ function App() {
 
   const handleLogout = async () => {
     await clear();
-    setCurrentView('map');
+    setCurrentView('map' as const);
     setProfileUserId(null);
     setSelectedPin(null);
     setIsLoadingMapTransition(false);
@@ -146,12 +151,12 @@ function App() {
 
   const handleViewUserProfile = (userId: string | null) => {
     setProfileUserId(userId);
-    setCurrentView('profile');
+    setCurrentView('profile' as const);
     setIsLoadingMapTransition(false);
   };
 
   const handleBackToMap = () => {
-    setCurrentView('map');
+    setCurrentView('map' as const);
     setProfileUserId(null);
     setSelectedPin(null); // Clear selected pin when navigating back normally
     setIsLoadingMapTransition(false); // Ensure loading is dismissed
@@ -166,7 +171,7 @@ function App() {
   ) => {
     setSelectedPin({ id: pinId, lat, lng });
     setIsLoadingMapTransition(true); // Show loading indicator only when navigating to map
-    setCurrentView('map');
+    setCurrentView('map' as const);
     setProfileUserId(null);
     setFromProfile(!!fromProfileFlag);
   };
@@ -255,6 +260,8 @@ function App() {
             onShowLoginPrompt={handleShowLoginPrompt}
             isAuthenticated={isAuthenticated}
           />
+        ) : currentView === 'responsive-demo' ? (
+          <ThreeLayoutExample />
         ) : (
           <ProfilePage onBackToMap={handleBackToMap} userId={profileUserId} />
         )}
@@ -273,6 +280,9 @@ function App() {
         onLogin={handleLoginFromModal}
         action={loginPromptAction}
       />
+
+      {/* Device info display - only shows in development */}
+      <DeviceInfoDisplay />
     </div>
   );
 }

@@ -178,7 +178,7 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
   };
 
   return (
-    <div className="lg:hidden h-full min-h-0 overflow-y-auto">
+    <div className="h-full min-h-0 overflow-y-auto">
       <div className="w-full max-w-2xl mx-auto px-3 py-3">
         <ProfileCard
           name={displayName}
