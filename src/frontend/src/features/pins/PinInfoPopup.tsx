@@ -24,6 +24,8 @@ const PinInfoPopup: React.FC<PinInfoPopupProps> = ({
   showTimestamp = true,
   modalLayout = false,
 }) => {
+  const hasMedia = Boolean(pin.musicLink);
+  const hasDescription = Boolean((pin.description || '').trim());
   const privacy = pin.isPrivate ? (
     <span className="privacy-badge private">
       <span className="privacy-icon">🔒</span> Private
@@ -33,8 +35,14 @@ const PinInfoPopup: React.FC<PinInfoPopupProps> = ({
   );
 
   const containerClasses = modalLayout
-    ? 'w-[92vw] max-w-5xl rounded-2xl bg-white/20 shadow-2xl backdrop-blur-md border border-white/20 flex flex-col animate-fade-in max-h-screen overflow-y-auto'
+    ? hasMedia
+      ? 'w-[92vw] max-w-3xl rounded-2xl bg-white/20 shadow-2xl backdrop-blur-md border border-white/20 flex flex-col animate-fade-in'
+      : 'w-auto max-w-lg rounded-2xl bg-white/20 shadow-2xl backdrop-blur-md border border-white/20 flex flex-col animate-fade-in'
     : 'w-[300px] max-w-[92vw] rounded-xl bg-white/20 shadow-xl backdrop-blur-md border border-white/20 flex flex-col animate-fade-in max-h-[90vh] overflow-y-auto';
+
+  const contentWrapperClasses = modalLayout
+    ? 'p-4'
+    : '';
 
   return (
     <div className={containerClasses}>
@@ -69,26 +77,38 @@ const PinInfoPopup: React.FC<PinInfoPopupProps> = ({
 
       {modalLayout ? (
         <>
-          <div className="p-4 flex-1 min-h-0 overflow-y-auto sm:overflow-hidden">
-            <div className="h-full min-h-0 sm:grid sm:grid-cols-3 gap-4">
-              <div className="sm:col-span-2 flex items-center justify-center min-w-0">
-                {pin.musicLink && (
-                  <div className="w-full h-[42vh] sm:h-[50vh]">
-                    <MusicEmbed musicLink={pin.musicLink} className="h-full" />
+          {(hasMedia || hasDescription) && (
+            <div className={contentWrapperClasses}>
+              {hasMedia ? (
+              <div className={`sm:grid ${hasDescription ? 'sm:grid-cols-3' : ''} gap-4`}>
+                <div className={`${hasDescription ? 'sm:col-span-2' : 'sm:col-span-3'} flex items-center justify-center min-w-0`}>
+                  <div className="w-full">
+                    <MusicEmbed musicLink={pin.musicLink!} />
+                  </div>
+                </div>
+                {hasDescription && (
+                  <div className="sm:col-span-1 flex flex-col gap-3 overflow-auto min-h-0">
+                    <div className="border border-gray-100 rounded-lg p-3 bg-white/30">
+                      <p className="text-sm text-gray-700 leading-relaxed break-words">
+                        {pin.description}
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
-              <div className="sm:col-span-1 flex flex-col gap-3 overflow-auto min-h-0">
-                {pin.description && (
-                  <div className="border border-gray-100 rounded-lg p-3 bg-white/30">
-                    <p className="text-sm text-gray-700 leading-relaxed break-words">
-                      {pin.description}
-                    </p>
-                  </div>
-                )}
-              </div>
+              ) : (
+                <div>
+                  {pin.description && (
+                    <div className="border border-gray-100 rounded-lg p-3 bg-white/30">
+                      <p className="text-sm text-gray-700 leading-relaxed break-words">
+                        {pin.description}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-          </div>
+          )}
           <div className="px-3 pb-3 pt-2 border-t border-white/20 bg-white/10 backdrop-blur-sm rounded-b-2xl">
             <div className="grid grid-cols-2 gap-2 items-center">
               <PinActionButton

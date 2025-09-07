@@ -51,33 +51,24 @@ const MusicEmbed: React.FC<MusicEmbedProps> = ({ musicLink, className }) => {
   else if (isYouTube) embedSrc = getYouTubeEmbedUrl(musicLink);
   else embedSrc = musicLink;
 
+  const heightPx = isSpotify ? 152 : isYouTube ? 315 : 240;
+
   return (
     <div
       className={`w-full flex flex-col items-center gap-2 relative ${className || ''}`}
-      style={{ maxHeight: '60vh', height: '100%' }}
     >
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center z-10">
           <div className="animate-spin-slow h-10 w-10 rounded-full border-4 border-blue-400 border-t-transparent"></div>
         </div>
       )}
-      <div
-        style={{
-          flex: 1,
-          width: '100%',
-          display: 'flex',
-          alignItems: 'stretch',
-          justifyContent: 'center',
-        }}
-      >
+      <div style={{ width: '100%' }}>
         <iframe
           data-testid="embed-iframe"
           style={{
             borderRadius: '12px',
             width: '100%',
-            minHeight: 200,
-            maxHeight: '100%',
-            height: '100%',
+            height: heightPx,
           }}
           src={embedSrc}
           frameBorder="0"
