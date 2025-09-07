@@ -21,7 +21,7 @@ const PinDetailModal: React.FC<Props> = ({
 }) => {
   if (!isOpen || !pin) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 z-[2000] flex items-center justify-center">
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-white/10 backdrop-blur-sm">
       <PinInfoPopup
         pin={pin}
         onViewProfile={onViewProfile}
@@ -30,6 +30,7 @@ const PinDetailModal: React.FC<Props> = ({
         onClose={onClose}
         showPrivacy={true}
         showTimestamp={true}
+        modalLayout
       />
     </div>
   );
