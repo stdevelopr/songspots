@@ -58,24 +58,19 @@ export const usePins = ({
       }
     },
     onPinClick: (pin) => {
-      if (isMobile) {
-        if (mapInstance) {
-          mapInstance.panTo([pin.lat, pin.lng], { animate: true });
-          const handleMoveEnd = () => {
-            setSelectedPinDetail(pin);
-            setPinDetailModalOpen(true);
-
-            mapInstance.off('moveend', handleMoveEnd);
-          };
-          mapInstance.on('moveend', handleMoveEnd);
-        } else {
+      // Always show fullscreen modal for both mobile and desktop
+      if (mapInstance) {
+        mapInstance.panTo([pin.lat, pin.lng], { animate: true });
+        const handleMoveEnd = () => {
           setSelectedPinDetail(pin);
           setPinDetailModalOpen(true);
-        }
+
+          mapInstance.off('moveend', handleMoveEnd);
+        };
+        mapInstance.on('moveend', handleMoveEnd);
       } else {
-        if (onPinSelected) {
-          onPinSelected(pin);
-        }
+        setSelectedPinDetail(pin);
+        setPinDetailModalOpen(true);
       }
     },
   });
@@ -127,17 +122,10 @@ export const usePins = ({
     }
 
     if (fromProfile) {
-      // Instantly center and open popup when coming from profile
+      // Instantly center and open fullscreen modal when coming from profile
       mapInstance.setView([target.lat, target.lng], 16, { animate: false });
-      const markerLayer = Object.values((mapInstance as any)._layers).find(
-        (layer: any) =>
-          layer instanceof L.Marker &&
-          layer.getLatLng().lat === target.lat &&
-          layer.getLatLng().lng === target.lng
-      ) as L.Marker | undefined;
-      if (markerLayer && typeof markerLayer.openPopup === 'function') {
-        markerLayer.openPopup();
-      }
+      setSelectedPinDetail(target);
+      setPinDetailModalOpen(true);
       onMapReady?.();
       return;
     }
@@ -154,19 +142,10 @@ export const usePins = ({
     const offsetLatLng = mapInstance.unproject(offsetPoint, mapInstance.getZoom());
     mapInstance.flyTo([offsetLatLng.lat, offsetLatLng.lng], 16);
 
-    // Handler to open popup after moveend
+    // Handler to open fullscreen modal after moveend
     const handleMoveEnd = () => {
-      if (!isMobile) {
-        const markerLayer = Object.values((mapInstance as any)._layers).find(
-          (layer: any) =>
-            layer instanceof L.Marker &&
-            layer.getLatLng().lat === target.lat &&
-            layer.getLatLng().lng === target.lng
-        ) as L.Marker | undefined;
-        if (markerLayer && typeof markerLayer.openPopup === 'function') {
-          markerLayer.openPopup();
-        }
-      }
+      setSelectedPinDetail(target);
+      setPinDetailModalOpen(true);
       mapInstance.off('moveend', handleMoveEnd);
     };
     mapInstance.on('moveend', handleMoveEnd);

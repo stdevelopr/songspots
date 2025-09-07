@@ -50,21 +50,8 @@ export function usePinLayer({
 
       const m = L.marker([pin.lat, pin.lng], { icon });
 
-      // Only bind popup on desktop
-      if (!isMobile) {
-        bindReactPopup(m, () => (
-          <PinPopup
-            key={pin.id + pin.name}
-            pin={pin}
-            onViewProfile={onViewProfile}
-            onEdit={onEdit}
-            onDelete={onDelete}
-            onClose={() => m.closePopup()}
-          />
-        ));
-      }
+      // No popup binding - we'll use fullscreen modal for all clicks
       m.on('click', () => {
-        m.openPopup();
         if (onPinClick) {
           onPinClick(pin);
         }

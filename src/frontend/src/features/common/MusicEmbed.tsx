@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 interface MusicEmbedProps {
   musicLink: string;
+  className?: string;
 }
 
 // Helper functions for parsing
@@ -11,19 +12,19 @@ function getYouTubeEmbedUrl(url: string): string {
   if (shortsMatch && shortsMatch[1]) {
     return `https://www.youtube.com/embed/${shortsMatch[1]}`;
   }
-  
+
   // Handle regular YouTube videos
   const youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/);
   if (youtubeMatch && youtubeMatch[1]) {
     return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
   }
-  
+
   // Handle v parameter
   const vParam = url.match(/[?&]v=([\w-]{11})/);
   if (vParam && vParam[1]) {
     return `https://www.youtube.com/embed/${vParam[1]}`;
   }
-  
+
   return url;
 }
 
@@ -39,7 +40,7 @@ function getSpotifyEmbedUrl(url: string): string {
   return '';
 }
 
-const MusicEmbed: React.FC<MusicEmbedProps> = ({ musicLink }) => {
+const MusicEmbed: React.FC<MusicEmbedProps> = ({ musicLink, className }) => {
   const [loading, setLoading] = useState(true);
   if (!musicLink) return null;
   const isSpotify = musicLink.includes('spotify.com');
@@ -52,8 +53,8 @@ const MusicEmbed: React.FC<MusicEmbedProps> = ({ musicLink }) => {
 
   return (
     <div
-      className="w-full flex flex-col items-center gap-2 relative"
-      style={{ minHeight: 220, maxHeight: '60vh', height: '100%' }}
+      className={`w-full flex flex-col items-center gap-2 relative ${className || ''}`}
+      style={{ maxHeight: '60vh', height: '100%' }}
     >
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center z-10">
