@@ -1,7 +1,4 @@
-export { default as PinCreateModal } from './PinCreateModal';
-export { default as PinDetailModal } from './PinDetailModal';
-export { default as PinEditModal } from './PinEditModal';
-export { default as PinPopup } from './PinPopup';
-// Re-export hooks and components for single-surface imports
-export * from './hooks';
+// Re-export all pin-related functionality
 export * from './components';
+export * from './hooks';
+export * from './types';

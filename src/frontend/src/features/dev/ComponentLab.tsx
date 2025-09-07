@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useResponsive } from '../common/ResponsiveProvider';
-import PinInfoPopup from '../pins/PinInfoPopup';
+import { PinInfoPopup } from '../pins';
 import type { Pin } from '../map/types/map';
 
 function makeMockPin(opts?: Partial<Pin>): Pin {

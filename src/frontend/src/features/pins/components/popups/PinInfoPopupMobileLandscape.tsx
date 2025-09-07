@@ -1,8 +1,7 @@
 import React from 'react';
-import ActionButton from './ActionButton';
-import { Pin } from '../../map/types/map';
-import { usePinDisplay } from '../hooks';
-import { Header, MusicBlock, DescriptionBlock, ProfileButton } from '.';
+import { Pin } from '../../../map/types/map';
+import { usePinDisplay } from '../../hooks';
+import { Header, MusicBlock, DescriptionBlock, ProfileButton, ActionButton } from '../shared';
 
 interface PinInfoPopupMobileLandscapeProps {
   pin: Pin;

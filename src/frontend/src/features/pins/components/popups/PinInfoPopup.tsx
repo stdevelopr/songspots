@@ -1,9 +1,9 @@
 import React from 'react';
-import { ResponsiveComponent } from '../common/ResponsiveComponent';
-import PinInfoPopupDesktop from './components/PinInfoPopupDesktop';
-import PinInfoPopupMobilePortrait from './components/PinInfoPopupMobilePortrait';
-import PinInfoPopupMobileLandscape from './components/PinInfoPopupMobileLandscape';
-import { Pin } from '../map/types/map';
+import { ResponsiveComponent } from '../../../common/ResponsiveComponent';
+import PinInfoPopupDesktop from './PinInfoPopupDesktop';
+import PinInfoPopupMobilePortrait from './PinInfoPopupMobilePortrait';
+import PinInfoPopupMobileLandscape from './PinInfoPopupMobileLandscape';
+import { Pin } from '../../../map/types/map';
 
 interface PinInfoPopupProps {
   pin: Pin;

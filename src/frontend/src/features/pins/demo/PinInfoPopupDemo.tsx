@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import PinInfoPopup from '../PinInfoPopup';
+import PinInfoPopup from '../components/popups/PinInfoPopup';
 import type { Pin } from '../../map/types/map';
 
 const mockPin: Pin = {

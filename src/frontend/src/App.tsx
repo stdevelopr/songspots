@@ -15,6 +15,7 @@ import InteractiveMap from './features/map/interactive-map';
 import { Loader } from './features/common/Loader';
 import PinInfoPopupDemo from './features/pins/demo/PinInfoPopupDemo';
 import ComponentLab from './features/dev/ComponentLab';
+import AdminPage from './features/admin/AdminPage';
 
 interface SelectedPin {
   lat: number;
@@ -297,6 +298,7 @@ function App() {
           <Route path="/profile/:userId" element={<ProfileRoute onBackToMap={handleBackToMap} />} />
           <Route path="/dev/pin-popup-demo" element={<PinInfoPopupDemo />} />
           <Route path="/dev/lab" element={<ComponentLab />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="/dev/responsive-demo" element={<ThreeLayoutExample />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

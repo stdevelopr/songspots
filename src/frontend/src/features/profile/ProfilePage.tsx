@@ -8,7 +8,7 @@ import ProfileDesktopLayout from './components/layout/ProfileDesktopLayout';
 import ProfileMobileLayout from './components/layout/ProfileMobileLayout';
 import ProfileMobileEditForm from './components/forms/ProfileMobileEditForm';
 import DeleteConfirmationModal from '../common/DeleteConfirmationModal';
-import PinEditModal from '../pins/PinEditModal';
+import { PinEditModal } from '../pins';
 import { PIN_HIGHLIGHT_STYLES } from './styles/profileStyles';
 
 interface ProfilePageProps {

@@ -1,5 +1,5 @@
 import React from 'react';
-import MusicEmbed from '../../common/MusicEmbed';
+import MusicEmbed from '../../../common/MusicEmbed';
 
 interface MusicBlockProps {
   musicLink?: string;

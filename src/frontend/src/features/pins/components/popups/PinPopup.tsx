@@ -1,6 +1,6 @@
 import React from 'react';
 import PinInfoPopup from './PinInfoPopup';
-import { Pin } from '../map/types/map';
+import { Pin } from '../../../map/types/map';
 
 interface Props {
   pin: Pin;

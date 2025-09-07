@@ -9,10 +9,8 @@ import { MapHUD } from '../MapHUD';
 import { useInternetIdentity } from 'ic-use-internet-identity';
 import type { Pin as BackendPin } from '../../../backend/backend.did';
 import { useMap } from '../useMap';
-import PinDetailModal from '../../pins/PinDetailModal';
+import { PinDetailModal, PinEditModal, PinCreateModal } from '../../pins';
 import { useIsMobile } from '../../common/useIsMobile';
-import PinEditModal from '../../pins/PinEditModal';
-import PinCreateModal from '../../pins/PinCreateModal';
 import { usePins } from '../usePins';
 
 const DEFAULT_CENTER: [number, number] = [40.7128, -74.006];

@@ -1,8 +1,7 @@
 import React from 'react';
-import ActionButton from './ActionButton';
-import { Pin } from '../../map/types/map';
-import { usePinDisplay } from '../hooks';
-import { Header, MusicBlock, DescriptionBlock, ProfileButton, TimestampRow } from '.';
+import { Pin } from '../../../map/types/map';
+import { usePinDisplay } from '../../hooks';
+import { Header, MusicBlock, DescriptionBlock, ProfileButton, TimestampRow, ActionButton } from '../shared';
 
 interface PinInfoPopupDesktopProps {
   pin: Pin;

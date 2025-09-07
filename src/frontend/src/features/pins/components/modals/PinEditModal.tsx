@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { isValidMusicLink } from '../common/validateLinks';
+import { isValidMusicLink } from '../../../common/validateLinks';
 import PinModal from './PinModal';
 
 interface Pin {

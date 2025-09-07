@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { isValidMusicLink } from '../common/validateLinks';
+import { isValidMusicLink } from '../../../common/validateLinks';
 import PinModal from './PinModal';
-
-interface PinData {
-  name: string;
-  description: string;
-  musicLink: string;
-  isPrivate: boolean;
-}
+import { PinData } from '../../types';
 
 interface PinCreateModalProps {
   isOpen: boolean;
