@@ -48,13 +48,13 @@ const PinInfoPopup: React.FC<PinInfoPopupProps> = ({
         <PinInfoPopupMobilePortrait {...commonProps} />
       </ResponsiveComponent>
 
-      {/* Mobile Landscape Layout */}
-      <ResponsiveComponent showOnLayoutTypes={['mobile-landscape']}>
+      {/* Mobile Landscape Layout - Also used for Tablet Landscape */}
+      <ResponsiveComponent showOnLayoutTypes={['mobile-landscape', 'tablet-landscape']}>
         <PinInfoPopupMobileLandscape {...commonProps} />
       </ResponsiveComponent>
 
-      {/* Tablet Layouts - Use mobile portrait for now, can be customized later */}
-      <ResponsiveComponent showOnLayoutTypes={['tablet-portrait', 'tablet-landscape']}>
+      {/* Tablet Portrait Layout */}
+      <ResponsiveComponent showOnLayoutTypes={['tablet-portrait']}>
         <PinInfoPopupMobilePortrait {...commonProps} />
       </ResponsiveComponent>
     </>

@@ -35,7 +35,9 @@ function App() {
   // Modal states
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [showLoginPromptModal, setShowLoginPromptModal] = useState(false);
-  const [loginPromptAction, setLoginPromptAction] = useState('start creating and tracking your vibes');
+  const [loginPromptAction, setLoginPromptAction] = useState(
+    'start creating and tracking your vibes'
+  );
 
   console.log('selectedPin in App.tsx:', selectedPin);
   const [isLoadingMapTransition, setIsLoadingMapTransition] = useState(false);
@@ -273,7 +275,7 @@ function App() {
         onClose={handleWelcomeModalClose}
         onLogin={handleLoginFromModal}
       />
-      
+
       <LoginPromptModal
         isOpen={showLoginPromptModal}
         onClose={() => setShowLoginPromptModal(false)}
@@ -282,7 +284,7 @@ function App() {
       />
 
       {/* Device info display - only shows in development */}
-      <DeviceInfoDisplay />
+      {/* <DeviceInfoDisplay /> */}
     </div>
   );
 }
