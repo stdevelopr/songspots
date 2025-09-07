@@ -3,6 +3,7 @@ import { InternetIdentityProvider } from 'ic-use-internet-identity';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ResponsiveProvider } from './features/common/ResponsiveProvider';
 import App from './App';
+import { BrowserRouter } from 'react-router-dom';
 import './index.css';
 
 const queryClient = new QueryClient();
@@ -18,7 +19,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       }}
     >
       <ResponsiveProvider>
-        <App />
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
       </ResponsiveProvider>
     </InternetIdentityProvider>
   </QueryClientProvider>

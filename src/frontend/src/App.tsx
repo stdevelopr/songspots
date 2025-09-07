@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Routes, Route, useLocation, useNavigate, useParams, Navigate } from 'react-router-dom';
 
 import LoginButton from './features/common/LoginButton';
 import AppHeader from './features/common/AppHeader';
@@ -12,6 +13,8 @@ import { useGetAllPins } from './features/common/useQueries';
 import { useQueryClient } from '@tanstack/react-query';
 import InteractiveMap from './features/map/interactive-map';
 import { Loader } from './features/common/Loader';
+import PinInfoPopupDemo from './features/pins/demo/PinInfoPopupDemo';
+import ComponentLab from './features/dev/ComponentLab';
 
 interface SelectedPin {
   lat: number;
@@ -19,16 +22,28 @@ interface SelectedPin {
   id: string;
 }
 
+function ProfileRoute({ onBackToMap }: { onBackToMap: () => void }) {
+  const { userId } = useParams();
+  return <ProfilePage onBackToMap={onBackToMap} userId={userId ?? null} />;
+}
+
 function App() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isDevPopupDemo = typeof window !== 'undefined' && window.location.pathname === '/dev/pin-popup-demo';
+  if (isDevPopupDemo) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-gray-50">
+        <PinInfoPopupDemo />
+      </div>
+    );
+  }
   const { identity, status, clear, login } = useInternetIdentity();
 
   const queryClient = useQueryClient();
   const isAuthenticated = !!identity;
 
-  const [currentView, setCurrentView] = useState<'map' | 'profile' | 'responsive-demo'>(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('demo') === 'responsive' ? 'responsive-demo' : 'map';
-  });
+  const [currentView, setCurrentView] = useState<'map' | 'profile' | 'responsive-demo'>(() => 'map');
   const [profileUserId, setProfileUserId] = useState<string | null>(null);
   const [selectedPin, setSelectedPin] = useState<SelectedPin | null>(null);
 
@@ -138,14 +153,14 @@ function App() {
   };
 
   const handleProfileClick = () => {
-    setProfileUserId(null); // View own profile
-    setCurrentView('profile');
+    setProfileUserId(null);
     setIsLoadingMapTransition(false);
+    navigate('/profile');
   };
 
   const handleLogout = async () => {
     await clear();
-    setCurrentView('map' as const);
+    navigate('/');
     setProfileUserId(null);
     setSelectedPin(null);
     setIsLoadingMapTransition(false);
@@ -153,12 +168,16 @@ function App() {
 
   const handleViewUserProfile = (userId: string | null) => {
     setProfileUserId(userId);
-    setCurrentView('profile' as const);
     setIsLoadingMapTransition(false);
+    if (userId) {
+      navigate(`/profile/${encodeURIComponent(userId)}`);
+    } else {
+      navigate('/profile');
+    }
   };
 
   const handleBackToMap = () => {
-    setCurrentView('map' as const);
+    navigate('/');
     setProfileUserId(null);
     setSelectedPin(null); // Clear selected pin when navigating back normally
     setIsLoadingMapTransition(false); // Ensure loading is dismissed
@@ -173,7 +192,7 @@ function App() {
   ) => {
     setSelectedPin({ id: pinId, lat, lng });
     setIsLoadingMapTransition(true); // Show loading indicator only when navigating to map
-    setCurrentView('map' as const);
+    navigate('/');
     setProfileUserId(null);
     setFromProfile(!!fromProfileFlag);
   };
@@ -211,11 +230,18 @@ function App() {
   }, [isLoadingMapTransition]);
 
   // Always dismiss loading indicator when switching to profile view
+  // Track currentView based on the URL
   useEffect(() => {
-    if (currentView === 'profile') {
-      setIsLoadingMapTransition(false);
+    const path = location.pathname;
+    if (path.startsWith('/profile')) {
+      setCurrentView('profile');
+    } else if (path.startsWith('/dev/responsive-demo')) {
+      setCurrentView('responsive-demo');
+    } else {
+      setCurrentView('map');
     }
-  }, [currentView]);
+    if (path.startsWith('/profile')) setIsLoadingMapTransition(false);
+  }, [location.pathname]);
 
   if (status === 'initializing' || isLoadingPins) return <Loader />;
 
@@ -245,28 +271,35 @@ function App() {
           </div>
         )}
 
-        {currentView === 'map' ? (
-          <InteractiveMap
-            backendPins={pins}
-            onViewUserProfile={handleViewUserProfile}
-            selectedPin={selectedPin}
-            setSelectedPin={setSelectedPin}
-            onPinSelected={(pin: { id: string; lat: number; lng: number }) => setSelectedPin(pin)}
-            onMapReady={handleMapReady}
-            onMapInitialized={handleMapInitialized}
-            onLocationProcessed={handleLocationProcessed}
-            onMapCentered={handleMapCentered}
-            isLoadingTransition={isLoadingMapTransition}
-            isInitialLoading={isInitialLoading}
-            fromProfile={fromProfile}
-            onShowLoginPrompt={handleShowLoginPrompt}
-            isAuthenticated={isAuthenticated}
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <InteractiveMap
+                backendPins={pins}
+                onViewUserProfile={handleViewUserProfile}
+                selectedPin={selectedPin}
+                setSelectedPin={setSelectedPin}
+                onPinSelected={(pin: { id: string; lat: number; lng: number }) => setSelectedPin(pin)}
+                onMapReady={handleMapReady}
+                onMapInitialized={handleMapInitialized}
+                onLocationProcessed={handleLocationProcessed}
+                onMapCentered={handleMapCentered}
+                isLoadingTransition={isLoadingMapTransition}
+                isInitialLoading={isInitialLoading}
+                fromProfile={fromProfile}
+                onShowLoginPrompt={handleShowLoginPrompt}
+                isAuthenticated={isAuthenticated}
+              />
+            }
           />
-        ) : currentView === 'responsive-demo' ? (
-          <ThreeLayoutExample />
-        ) : (
-          <ProfilePage onBackToMap={handleBackToMap} userId={profileUserId} />
-        )}
+          <Route path="/profile" element={<ProfilePage onBackToMap={handleBackToMap} userId={null} />} />
+          <Route path="/profile/:userId" element={<ProfileRoute onBackToMap={handleBackToMap} />} />
+          <Route path="/dev/pin-popup-demo" element={<PinInfoPopupDemo />} />
+          <Route path="/dev/lab" element={<ComponentLab />} />
+          <Route path="/dev/responsive-demo" element={<ThreeLayoutExample />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </main>
 
       {/* Modals */}

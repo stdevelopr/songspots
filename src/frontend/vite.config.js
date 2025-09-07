@@ -44,6 +44,27 @@ export default defineConfig({
           new URL("../declarations", import.meta.url)
         ),
       },
+      {
+        find: 'react/jsx-runtime',
+        replacement: fileURLToPath(new URL('../../node_modules/react/jsx-runtime.js', import.meta.url)),
+      },
+      {
+        find: 'react/jsx-dev-runtime',
+        replacement: fileURLToPath(new URL('../../node_modules/react/jsx-dev-runtime.js', import.meta.url)),
+      },
+      {
+        find: 'react-dom/client',
+        replacement: fileURLToPath(new URL('../../node_modules/react-dom/client.js', import.meta.url)),
+      },
+      // Ensure React resolves from the monorepo root when hoisted
+      {
+        find: 'react',
+        replacement: fileURLToPath(new URL('../../node_modules/react/index.js', import.meta.url)),
+      },
+      {
+        find: 'react-dom',
+        replacement: fileURLToPath(new URL('../../node_modules/react-dom/index.js', import.meta.url)),
+      },
     ],
     dedupe: ['@dfinity/agent'],
   },

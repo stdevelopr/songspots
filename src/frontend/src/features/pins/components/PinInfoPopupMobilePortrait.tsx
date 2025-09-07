@@ -1,8 +1,8 @@
 import React from 'react';
-import MusicEmbed from '../../common/MusicEmbed';
 import ActionButton from './ActionButton';
 import { Pin } from '../../map/types/map';
-import usePinDisplay from '../usePinDisplay';
+import { usePinDisplay } from '../hooks';
+import { Header, MusicBlock, DescriptionBlock, ProfileButton, TimestampBadge } from '.';
 
 interface PinInfoPopupMobilePortraitProps {
   pin: Pin;
@@ -25,50 +25,18 @@ const PinInfoPopupMobilePortrait: React.FC<PinInfoPopupMobilePortraitProps> = ({
 
   return (
     <div className="w-[95vw] max-w-sm rounded-2xl bg-white/20 shadow-xl backdrop-blur-md border border-white/20 flex flex-col max-h-[85vh] overflow-hidden animate-fade-in">
-      {/* Header */}
-      <div className="h-14 w-full relative rounded-t-2xl flex items-center justify-between px-4 py-3 bg-gradient-to-r from-white/30 via-white/20 to-white/10 border-b border-white/30 flex-shrink-0">
-        <h3 className="text-base font-semibold text-gray-900 truncate flex-1 pr-2">
-          {display.title}
-        </h3>
-        {onClose && (
-          <button
-            className="cursor-pointer bg-white text-gray-700 hover:bg-gray-50 transition-all duration-200 rounded-full w-8 h-8 flex items-center justify-center shadow-md border border-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-0 flex-shrink-0 ml-2"
-            onClick={onClose}
-            aria-label="Close"
-            title="Close"
-          >
-            <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                fill="currentColor"
-                d="M6 6L18 18M6 18L18 6"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        )}
-      </div>
+      <Header title={display.title} onClose={onClose} size="sm" />
 
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto">
         {/* Description */}
-        {display.hasDescription && (
-          <div className="px-4 py-3 border-b border-gray-100/50">
-            <div className="bg-white/20 rounded-lg p-3 border border-white/30">
-              <p className="text-sm text-gray-700 leading-relaxed break-words line-clamp-6">
-                {display.description}
-              </p>
-            </div>
-          </div>
-        )}
+        {display.hasDescription && <DescriptionBlock size="sm" text={display.description} />}
 
         {/* Music Embed */}
         {display.hasMedia && (
           <div className="px-4 py-3 border-b border-gray-100/50">
             <div className="scale-[0.98] origin-center transform">
-              {display.musicLink && <MusicEmbed musicLink={display.musicLink} />}
+              <MusicBlock musicLink={display.musicLink} />
             </div>
           </div>
         )}
@@ -100,21 +68,7 @@ const PinInfoPopupMobilePortrait: React.FC<PinInfoPopupMobilePortraitProps> = ({
       <div className="px-4 py-4 bg-white/10 backdrop-blur-sm rounded-b-2xl border-t border-white/20 flex-shrink-0">
         {/* Primary Action - View Profile */}
         {display.showProfileButton && (
-          <button
-            type="button"
-            className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-500/90 text-white font-semibold py-3 px-4 hover:bg-indigo-600/90 active:bg-indigo-700/90 transition-all duration-200 border border-indigo-400/50 shadow-lg mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2"
-            onClick={() => onViewProfile(display.profileButton.userId)}
-          >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
-            <span className="text-sm">{display.profileButton.label}</span>
-          </button>
+          <ProfileButton className="mb-3" fullWidth label={display.profileButton.label} onClick={() => onViewProfile(display.profileButton.userId)} />
         )}
 
         {/* Owner Actions */}
@@ -142,19 +96,7 @@ const PinInfoPopupMobilePortrait: React.FC<PinInfoPopupMobilePortraitProps> = ({
         )}
 
         {/* Timestamp */}
-        {display.hasTimestamp && display.timestampDate && (
-          <div className="mt-3 pt-3 border-t border-white/10">
-            <div className="text-center">
-              <span className="text-xs font-medium text-gray-600 bg-white/20 px-3 py-1 rounded-full">
-                {display.timestampDate.toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
-              </span>
-            </div>
-          </div>
-        )}
+        {display.hasTimestamp && <TimestampBadge date={display.timestampDate} />}
       </div>
     </div>
   );
