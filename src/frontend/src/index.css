@@ -354,6 +354,81 @@
   border-top-color: #6b7280 !important;
 }
 
+/* New mood marker styles - circular badges without pin shapes */
+.mood-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+.mood-vibe-marker {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mood-vibe-marker:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.mood-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.mood-emoji-main {
+  font-size: 18px;
+  line-height: 1;
+  position: relative;
+  z-index: 2;
+}
+
+.mood-music-note {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: bold;
+  color: #333;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  z-index: 3;
+}
+
+.mood-lock-icon {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background: rgba(107, 114, 128, 0.95);
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  z-index: 3;
+}
+
 /* User location marker styles */
 .user-location-marker {
   background: transparent !important;
