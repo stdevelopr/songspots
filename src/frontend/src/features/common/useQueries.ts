@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import { Principal } from '@dfinity/principal';
-import type { UserProfile, Pin } from '../../backend/backend.did';
+import type { UserProfile, Vibe } from '../../backend/backend.did';
 
 // User profile queries
 export function useGetUserProfile() {
@@ -62,14 +62,14 @@ export function useGetUserProfileByPrincipal(principalId: string) {
   });
 }
 
-export function useGetPinsByOwner(principalId: string) {
+export function useGetVibesByOwner(principalId: string) {
   const { actor, isFetching } = useActor();
 
-  return useQuery<Pin[]>({
-    queryKey: ['pinsByOwner', principalId],
+  return useQuery<Vibe[]>({
+    queryKey: ['vibesByOwner', principalId],
     queryFn: async () => {
       if (!actor || !principalId) return [];
-      return actor.getPinsByOwner(Principal.fromText(principalId));
+      return actor.getVibesByOwner(Principal.fromText(principalId));
     },
     enabled: !!actor && !isFetching && !!principalId,
   });
@@ -113,47 +113,47 @@ export function useIsCurrentUserAdmin() {
   });
 }
 
-// Pin queries
-export function useGetAllPins() {
+// Vibe queries
+export function useGetAllVibes() {
   const { actor, isFetching } = useActor();
 
-  return useQuery<Pin[]>({
-    queryKey: ['pins'],
+  return useQuery<Vibe[]>({
+    queryKey: ['vibes'],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getAllPins();
+      return actor.getAllVibes();
     },
     enabled: !!actor && !isFetching,
   });
 }
 
-export function useGetPin(id: bigint) {
+export function useGetVibe(id: bigint) {
   const { actor, isFetching } = useActor();
 
-  return useQuery<Pin | null>({
-    queryKey: ['pin', id.toString()],
+  return useQuery<Vibe | null>({
+    queryKey: ['vibe', id.toString()],
     queryFn: async () => {
       if (!actor) return null;
-      const pinResult = await actor.getPin(id);
-      // The backend might return Pin, null, undefined, [] or [Pin].
-      // We need to normalize it to Pin | null.
+      const vibeResult = await actor.getVibe(id);
+      // The backend might return Vibe, null, undefined, [] or [Vibe].
+      // We need to normalize it to Vibe | null.
       if (
-        pinResult === undefined ||
-        pinResult === null ||
-        (Array.isArray(pinResult) && pinResult.length === 0)
+        vibeResult === undefined ||
+        vibeResult === null ||
+        (Array.isArray(vibeResult) && vibeResult.length === 0)
       ) {
         return null;
       }
-      if (Array.isArray(pinResult)) {
-        return pinResult[0]; // Assuming it's [Pin]
+      if (Array.isArray(vibeResult)) {
+        return vibeResult[0]; // Assuming it's [Vibe]
       }
-      return pinResult; // This handles the case where it's already Pin
+      return vibeResult; // This handles the case where it's already Vibe
     },
     enabled: !!actor && !isFetching,
   });
 }
 
-export function useCreatePin() {
+export function useCreateVibe() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
@@ -174,16 +174,16 @@ export function useCreatePin() {
       isPrivate: boolean;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.createPin(name, description, musicLink, latitude, longitude, isPrivate);
+      return actor.createVibe(name, description, musicLink, latitude, longitude, isPrivate);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pins'] });
-      queryClient.invalidateQueries({ queryKey: ['pinsByOwner'] });
+      queryClient.invalidateQueries({ queryKey: ['vibes'] });
+      queryClient.invalidateQueries({ queryKey: ['vibesByOwner'] });
     },
   });
 }
 
-export function useUpdatePin() {
+export function useUpdateVibe() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
@@ -206,27 +206,27 @@ export function useUpdatePin() {
       isPrivate: boolean;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.updatePin(id, name, description, musicLink, latitude, longitude, isPrivate);
+      return actor.updateVibe(id, name, description, musicLink, latitude, longitude, isPrivate);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pins'] });
-      queryClient.invalidateQueries({ queryKey: ['pinsByOwner'] });
+      queryClient.invalidateQueries({ queryKey: ['vibes'] });
+      queryClient.invalidateQueries({ queryKey: ['vibesByOwner'] });
     },
   });
 }
 
-export function useDeletePin() {
+export function useDeleteVibe() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (id: bigint) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.deletePin(id);
+      return actor.deleteVibe(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pins'] });
-      queryClient.invalidateQueries({ queryKey: ['pinsByOwner'] });
+      queryClient.invalidateQueries({ queryKey: ['vibes'] });
+      queryClient.invalidateQueries({ queryKey: ['vibesByOwner'] });
     },
   });
 }
@@ -301,3 +301,11 @@ export function useDeleteData() {
     },
   });
 }
+
+// Legacy pin aliases for backward compatibility
+export const useGetAllPins = useGetAllVibes;
+export const useGetPin = useGetVibe;
+export const useCreatePin = useCreateVibe;
+export const useUpdatePin = useUpdateVibe;
+export const useDeletePin = useDeleteVibe;
+export const useGetPinsByOwner = useGetVibesByOwner;

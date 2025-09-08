@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useImperativeHandle } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import type { Pin as BackendPin } from '../../../../backend/backend.did';
+import type { Vibe as BackendPin } from '../../../../backend/backend.did';
 import { useMapInstance } from '../hooks/useMapInstance';
 import { MapLoadingOverlay, CollapseButton, MapCollapsedView, ShowAllButton } from './MapComponents';
 import { useMapIcons, MapIconStyles } from './MapIcons';

@@ -2,13 +2,13 @@ import React from 'react';
 import { ResponsiveComponent } from '../common/ResponsiveComponent';
 import { useProfileState } from './hooks/useProfileState';
 import { useProfilePicture } from './hooks/useProfilePicture';
-import { usePinOperations } from './hooks/usePinOperations';
+import { useVibeOperations } from './hooks/useVibeOperations';
 import { useProfileActions } from './hooks/useProfileActions';
 import ProfileDesktopLayout from './components/layout/ProfileDesktopLayout';
 import ProfileMobileLayout from './components/layout/ProfileMobileLayout';
 import ProfileMobileEditForm from './components/forms/ProfileMobileEditForm';
 import DeleteConfirmationModal from '../common/DeleteConfirmationModal';
-import { PinEditModal } from '../pins';
+import { VibeEditModal } from '../vibes';
 import { PIN_HIGHLIGHT_STYLES } from './styles/profileStyles';
 
 interface ProfilePageProps {
@@ -23,8 +23,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onBackToMap }) => {
     userProfile: profileState.userProfile,
     onToast: (message: string) => profileActions.showToastMessage(message),
   });
-  const pinOperations = usePinOperations({
-    visiblePins: profileState.visiblePins,
+  const vibeOperations = useVibeOperations({
+    visibleVibes: profileState.visiblePins,
   });
   const profileActions = useProfileActions({
     userProfile: profileState.userProfile,
@@ -98,15 +98,15 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onBackToMap }) => {
           onEdit={() => profileState.setIsEditing(true)}
           onCopyPrincipal={profileActions.handleCopyPrincipal}
           copied={profileActions.copied}
-          onPinClick={pinOperations.handlePinClick}
-          onMapPinClick={pinOperations.handleMapMarkerClick}
-          onEditPin={pinOperations.handleEditPin}
-          onDeletePin={pinOperations.handleDeletePin}
-          onResetSelection={pinOperations.resetSelection}
-          spotRefs={pinOperations.spotRefs}
+          onPinClick={vibeOperations.handleVibeClick}
+          onMapPinClick={vibeOperations.handleMapMarkerClick}
+          onEditPin={vibeOperations.handleEditVibe}
+          onDeletePin={vibeOperations.handleDeleteVibe}
+          onResetSelection={vibeOperations.resetSelection}
+          spotRefs={vibeOperations.spotRefs}
           formatDate={profileActions.formatDate}
-          focusedPinId={pinOperations.focusedPinId}
-          selectedPinId={pinOperations.selectedPinId}
+          focusedPinId={vibeOperations.focusedVibeId}
+          selectedPinId={vibeOperations.selectedVibeId}
           onBackToMap={onBackToMap}
         />
       </ResponsiveComponent>
@@ -127,44 +127,44 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onBackToMap }) => {
           isEditing={profileState.isEditing}
           isLoading={profileState.isLoading}
           isLoadingPins={profileState.isLoadingPins}
-          selectedPinId={pinOperations.selectedPinId}
-          focusedPinId={pinOperations.focusedPinId}
+          selectedPinId={vibeOperations.selectedVibeId}
+          focusedPinId={vibeOperations.focusedVibeId}
           onEdit={() => profileState.setIsEditing(true)}
-          onPinClick={pinOperations.handlePinClick}
-          onMapPinClick={pinOperations.handleMapMarkerClick}
-          onEditPin={pinOperations.handleEditPin}
-          onDeletePin={pinOperations.handleDeletePin}
-          onResetSelection={pinOperations.resetSelection}
+          onPinClick={vibeOperations.handleVibeClick}
+          onMapPinClick={vibeOperations.handleMapMarkerClick}
+          onEditPin={vibeOperations.handleEditVibe}
+          onDeletePin={vibeOperations.handleDeleteVibe}
+          onResetSelection={vibeOperations.resetSelection}
           editFormComponent={mobileEditForm}
         />
       </ResponsiveComponent>
 
       {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal
-        isOpen={pinOperations.showDeleteModal}
-        onConfirm={pinOperations.handleDeleteConfirm}
-        onCancel={pinOperations.handleDeleteCancel}
-        isDeleting={pinOperations.deletePinMutation.isPending}
-        pinName={pinOperations.pinToDelete?.name || 'Unnamed Pin'}
+        isOpen={vibeOperations.showDeleteModal}
+        onConfirm={vibeOperations.handleDeleteConfirm}
+        onCancel={vibeOperations.handleDeleteCancel}
+        isDeleting={vibeOperations.deleteVibeMutation.isPending}
+        pinName={vibeOperations.vibeToDelete?.name || 'Unnamed Vibe'}
       />
 
-      {/* Pin Edit Modal */}
-      <PinEditModal
-        isOpen={pinOperations.showEditModal}
-        pin={
-          pinOperations.pinToEdit
+      {/* Vibe Edit Modal */}
+      <VibeEditModal
+        isOpen={vibeOperations.showEditModal}
+        vibe={
+          vibeOperations.vibeToEdit
             ? {
-                id: pinOperations.pinToEdit.id.toString(),
-                name: pinOperations.pinToEdit.name,
-                description: pinOperations.pinToEdit.description,
-                musicLink: pinOperations.pinToEdit.musicLink,
-                isPrivate: pinOperations.pinToEdit.isPrivate,
+                id: vibeOperations.vibeToEdit.id.toString(),
+                name: vibeOperations.vibeToEdit.name,
+                description: vibeOperations.vibeToEdit.description,
+                musicLink: vibeOperations.vibeToEdit.musicLink,
+                isPrivate: vibeOperations.vibeToEdit.isPrivate,
               }
             : null
         }
-        onSubmit={pinOperations.handleEditSubmit}
-        onCancel={pinOperations.handleEditCancel}
-        isSubmitting={pinOperations.updatePinMutation.isPending}
+        onSubmit={vibeOperations.handleEditSubmit}
+        onCancel={vibeOperations.handleEditCancel}
+        isSubmitting={vibeOperations.updateVibeMutation.isPending}
       />
 
       {/* Toast */}

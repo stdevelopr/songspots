@@ -12,6 +12,10 @@ dotenv.config({ path: `../../.env.${network}` });
 dotenv.config({ path: '../../.env' });
 
 export default defineConfig({
+  css: {
+    // Ensure css config object exists for Tailwind Vite plugin compatibility
+    devSourcemap: false,
+  },
   build: {
     emptyOutDir: true,
   },

@@ -13,11 +13,11 @@ import { useGetAllPins } from './features/common/useQueries';
 import { useQueryClient } from '@tanstack/react-query';
 import InteractiveMap from './features/map/interactive-map';
 import { Loader } from './features/common/Loader';
-import PinInfoPopupDemo from './features/pins/demo/PinInfoPopupDemo';
+import VibeInfoPopupDemo from './features/vibes/demo/VibeInfoPopupDemo';
 import ComponentLab from './features/dev/ComponentLab';
 import AdminPage from './features/admin/AdminPage';
 
-interface SelectedPin {
+interface SelectedVibe {
   lat: number;
   lng: number;
   id: string;
@@ -31,11 +31,11 @@ function ProfileRoute({ onBackToMap }: { onBackToMap: () => void }) {
 function App() {
   const location = useLocation();
   const navigate = useNavigate();
-  const isDevPopupDemo = typeof window !== 'undefined' && window.location.pathname === '/dev/pin-popup-demo';
+  const isDevPopupDemo = typeof window !== 'undefined' && window.location.pathname === '/dev/vibe-popup-demo';
   if (isDevPopupDemo) {
     return (
       <div className="h-screen w-screen flex items-center justify-center bg-gray-50">
-        <PinInfoPopupDemo />
+        <VibeInfoPopupDemo />
       </div>
     );
   }
@@ -46,7 +46,7 @@ function App() {
 
   const [currentView, setCurrentView] = useState<'map' | 'profile' | 'responsive-demo'>(() => 'map');
   const [profileUserId, setProfileUserId] = useState<string | null>(null);
-  const [selectedPin, setSelectedPin] = useState<SelectedPin | null>(null);
+  const [selectedVibe, setSelectedVibe] = useState<SelectedVibe | null>(null);
 
   // Modal states
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
@@ -55,27 +55,27 @@ function App() {
     'start creating and tracking your vibes'
   );
 
-  console.log('selectedPin in App.tsx:', selectedPin);
+  console.log('selectedVibe in App.tsx:', selectedVibe);
   const [isLoadingMapTransition, setIsLoadingMapTransition] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   // Track individual loading states
   const [isMapInitialized, setIsMapInitialized] = useState(false);
   const [isLocationProcessed, setIsLocationProcessed] = useState(false);
-  const [isPinsLoaded, setIsPinsLoaded] = useState(false);
+  const [isVibesLoaded, setIsVibesLoaded] = useState(false);
   const [isMapCentered, setIsMapCentered] = useState(false);
 
-  // Get pins data to check if they're loaded
-  const { data: pins = [], isLoading: isLoadingPins, isFetching: isFetchingPins } = useGetAllPins();
+  // Get vibes data to check if they're loaded
+  const { data: vibes = [], isLoading: isLoadingVibes, isFetching: isFetchingVibes } = useGetAllPins();
 
-  // Track when pins are loaded
+  // Track when vibes are loaded
   useEffect(() => {
-    if (!isLoadingPins && !isFetchingPins) {
-      setIsPinsLoaded(true);
+    if (!isLoadingVibes && !isFetchingVibes) {
+      setIsVibesLoaded(true);
     } else {
-      setIsPinsLoaded(false);
+      setIsVibesLoaded(false);
     }
-  }, [isLoadingPins, isFetchingPins]);
+  }, [isLoadingVibes, isFetchingVibes]);
 
   // Reset all loading states on component mount to ensure fresh state on every page load
   useEffect(() => {
@@ -83,7 +83,7 @@ function App() {
     setIsInitialLoading(true);
     setIsMapInitialized(false);
     setIsLocationProcessed(false);
-    setIsPinsLoaded(false);
+    setIsVibesLoaded(false);
     setIsMapCentered(false);
   }, []); // Empty dependency array ensures this runs on every mount
 
@@ -91,7 +91,7 @@ function App() {
   useEffect(() => {
     // All conditions must be true to dismiss the loading indicator
     const allConditionsMet =
-      isMapInitialized && isPinsLoaded && isLocationProcessed && isMapCentered;
+      isMapInitialized && isVibesLoaded && isLocationProcessed && isMapCentered;
 
     if (allConditionsMet && isInitialLoading) {
       // Add a small delay to ensure everything is rendered and positioned
@@ -100,7 +100,7 @@ function App() {
       }, 200);
       return () => clearTimeout(timer);
     }
-  }, [isMapInitialized, isPinsLoaded, isLocationProcessed, isMapCentered, isInitialLoading]);
+  }, [isMapInitialized, isVibesLoaded, isLocationProcessed, isMapCentered, isInitialLoading]);
 
   // Clear all cached data when logging out
   useEffect(() => {
@@ -163,7 +163,7 @@ function App() {
     await clear();
     navigate('/');
     setProfileUserId(null);
-    setSelectedPin(null);
+    setSelectedVibe(null);
     setIsLoadingMapTransition(false);
   };
 
@@ -180,18 +180,18 @@ function App() {
   const handleBackToMap = () => {
     navigate('/');
     setProfileUserId(null);
-    setSelectedPin(null); // Clear selected pin when navigating back normally
+    setSelectedVibe(null); // Clear selected vibe when navigating back normally
     setIsLoadingMapTransition(false); // Ensure loading is dismissed
   };
 
   const [fromProfile, setFromProfile] = useState(false);
-  const handleViewPinOnMap = (
-    pinId: string,
+  const handleViewVibeOnMap = (
+    vibeId: string,
     lat: number,
     lng: number,
     fromProfileFlag?: boolean
   ) => {
-    setSelectedPin({ id: pinId, lat, lng });
+    setSelectedVibe({ id: vibeId, lat, lng });
     setIsLoadingMapTransition(true); // Show loading indicator only when navigating to map
     navigate('/');
     setProfileUserId(null);
@@ -201,7 +201,7 @@ function App() {
   const handleMapReady = () => {
     // Hide loading indicator when map is ready and centered
     setIsLoadingMapTransition(false);
-    setFromProfile(false); // Reset fromProfile so future pin selections fly over
+    setFromProfile(false); // Reset fromProfile so future vibe selections fly over
   };
 
   const handleMapInitialized = () => {
@@ -244,7 +244,7 @@ function App() {
     if (path.startsWith('/profile')) setIsLoadingMapTransition(false);
   }, [location.pathname]);
 
-  if (status === 'initializing' || isLoadingPins) return <Loader />;
+  if (status === 'initializing' || isLoadingVibes) return <Loader />;
 
   return (
     <div className="h-screen w-screen flex flex-col touch-manipulation">
@@ -266,7 +266,7 @@ function App() {
               <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-6"></div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Preparing Map</h3>
               <p className="text-gray-600 max-w-md mx-auto">
-                Centering map on the selected pin location...
+                Centering map on the selected vibe location...
               </p>
             </div>
           </div>
@@ -277,11 +277,11 @@ function App() {
             path="/"
             element={
               <InteractiveMap
-                backendPins={pins}
+                backendPins={vibes}
                 onViewUserProfile={handleViewUserProfile}
-                selectedPin={selectedPin}
-                setSelectedPin={setSelectedPin}
-                onPinSelected={(pin: { id: string; lat: number; lng: number }) => setSelectedPin(pin)}
+                selectedPin={selectedVibe}
+                setSelectedPin={setSelectedVibe}
+                onPinSelected={(pin: { id: string; lat: number; lng: number }) => setSelectedVibe(pin)}
                 onMapReady={handleMapReady}
                 onMapInitialized={handleMapInitialized}
                 onLocationProcessed={handleLocationProcessed}
@@ -296,7 +296,7 @@ function App() {
           />
           <Route path="/profile" element={<ProfilePage onBackToMap={handleBackToMap} userId={null} />} />
           <Route path="/profile/:userId" element={<ProfileRoute onBackToMap={handleBackToMap} />} />
-          <Route path="/dev/pin-popup-demo" element={<PinInfoPopupDemo />} />
+          <Route path="/dev/vibe-popup-demo" element={<VibeInfoPopupDemo />} />
           <Route path="/dev/lab" element={<ComponentLab />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/dev/responsive-demo" element={<ThreeLayoutExample />} />

@@ -1,3 +1,14 @@
+type Vibe = 
+ record {
+   description: text;
+   id: nat;
+   isPrivate: bool;
+   latitude: text;
+   longitude: text;
+   musicLink: text;
+   name: text;
+   owner: principal;
+ };
 type UserRole = 
  variant {
    admin;
@@ -45,17 +56,6 @@ type StreamingCallbackHttpResponse =
  };
 type StreamingCallback = func (StreamingToken) ->
                           (StreamingCallbackHttpResponse) query;
-type Pin = 
- record {
-   description: text;
-   id: nat;
-   isPrivate: bool;
-   latitude: text;
-   longitude: text;
-   musicLink: text;
-   name: text;
-   owner: principal;
- };
 type HttpResponse = 
  record {
    body: blob;
@@ -89,20 +89,20 @@ type ApprovalStatus =
  };
 service : {
   assignRole: (user: principal, newRole: UserRole) -> ();
-  createPin: (name: text, description: text, musicLink: text, latitude: 
+  createVibe: (name: text, description: text, musicLink: text, latitude:
    text, longitude: text, isPrivate: bool) -> ();
-  deletePin: (id: nat) -> ();
+  deleteVibe: (id: nat) -> ();
   fileDelete: (path: text) -> ();
   fileList: () -> (vec FileMetadata) query;
   fileUpload: (path: text, mimeType: text, chunk: blob, complete: bool) -> ();
-  getAllPins: () -> (vec Pin) query;
+  getAllVibes: () -> (vec Vibe) query;
   getApprovalStatus: (user: principal) -> (ApprovalStatus) query;
   getCurrentUserApprovalStatus: () -> (ApprovalStatus) query;
   getCurrentUserRole: () -> (UserRole) query;
-  getPin: (id: nat) -> (opt Pin) query;
-  getPinsByOwner: (owner: principal) -> (vec Pin) query;
   getProfileByPrincipal: ("principal": principal) -> (opt UserProfile) query;
   getUserProfile: () -> (opt UserProfile) query;
+  getVibe: (id: nat) -> (opt Vibe) query;
+  getVibesByOwner: (owner: principal) -> (vec Vibe) query;
   httpStreamingCallback: (token: StreamingToken) ->
    (StreamingCallbackHttpResponse) query;
   http_request: (request: HttpRequest) -> (HttpResponse) query;
@@ -111,6 +111,6 @@ service : {
   listUsers: () -> (vec UserInfo) query;
   saveUserProfile: (profile: UserProfile) -> ();
   setApproval: (user: principal, approval: ApprovalStatus) -> ();
-  updatePin: (id: nat, name: text, description: text, musicLink: text,
+  updateVibe: (id: nat, name: text, description: text, musicLink: text,
    latitude: text, longitude: text, isPrivate: bool) -> ();
 }

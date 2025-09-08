@@ -23,16 +23,6 @@ export interface HttpResponse {
   'streaming_strategy' : [] | [StreamingStrategy],
   'status_code' : number,
 }
-export interface Pin {
-  'id' : bigint,
-  'latitude' : string,
-  'owner' : Principal,
-  'name' : string,
-  'description' : string,
-  'isPrivate' : boolean,
-  'longitude' : string,
-  'musicLink' : string,
-}
 export type StreamingCallback = ActorMethod<
   [StreamingToken],
   StreamingCallbackHttpResponse
@@ -68,27 +58,37 @@ export interface UserProfile {
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
+export interface Vibe {
+  'id' : bigint,
+  'latitude' : string,
+  'owner' : Principal,
+  'name' : string,
+  'description' : string,
+  'isPrivate' : boolean,
+  'longitude' : string,
+  'musicLink' : string,
+}
 export interface _SERVICE {
   'assignRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'createPin' : ActorMethod<
+  'createVibe' : ActorMethod<
     [string, string, string, string, string, boolean],
     undefined
   >,
-  'deletePin' : ActorMethod<[bigint], undefined>,
+  'deleteVibe' : ActorMethod<[bigint], undefined>,
   'fileDelete' : ActorMethod<[string], undefined>,
   'fileList' : ActorMethod<[], Array<FileMetadata>>,
   'fileUpload' : ActorMethod<
     [string, string, Uint8Array | number[], boolean],
     undefined
   >,
-  'getAllPins' : ActorMethod<[], Array<Pin>>,
+  'getAllVibes' : ActorMethod<[], Array<Vibe>>,
   'getApprovalStatus' : ActorMethod<[Principal], ApprovalStatus>,
   'getCurrentUserApprovalStatus' : ActorMethod<[], ApprovalStatus>,
   'getCurrentUserRole' : ActorMethod<[], UserRole>,
-  'getPin' : ActorMethod<[bigint], [] | [Pin]>,
-  'getPinsByOwner' : ActorMethod<[Principal], Array<Pin>>,
   'getProfileByPrincipal' : ActorMethod<[Principal], [] | [UserProfile]>,
   'getUserProfile' : ActorMethod<[], [] | [UserProfile]>,
+  'getVibe' : ActorMethod<[bigint], [] | [Vibe]>,
+  'getVibesByOwner' : ActorMethod<[Principal], Array<Vibe>>,
   'httpStreamingCallback' : ActorMethod<
     [StreamingToken],
     StreamingCallbackHttpResponse
@@ -99,7 +99,7 @@ export interface _SERVICE {
   'listUsers' : ActorMethod<[], Array<UserInfo>>,
   'saveUserProfile' : ActorMethod<[UserProfile], undefined>,
   'setApproval' : ActorMethod<[Principal, ApprovalStatus], undefined>,
-  'updatePin' : ActorMethod<
+  'updateVibe' : ActorMethod<
     [bigint, string, string, string, string, string, boolean],
     undefined
   >,

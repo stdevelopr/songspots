@@ -7,11 +7,11 @@ import type { Pin, SelectedPin } from '../types/map';
 import { useLocation } from '../../common/useLocation';
 import { MapHUD } from '../MapHUD';
 import { useInternetIdentity } from 'ic-use-internet-identity';
-import type { Pin as BackendPin } from '../../../backend/backend.did';
+import type { Vibe as BackendVibe } from '../../../backend/backend.did';
 import { useMap } from '../useMap';
-import { PinDetailModal, PinEditModal, PinCreateModal } from '../../pins';
+import { VibeDetailModal, VibeEditModal, VibeCreateModal } from '../../vibes';
 import { useIsMobile } from '../../common/useIsMobile';
-import { usePins } from '../usePins';
+import { useVibes } from '../useVibes';
 
 const DEFAULT_CENTER: [number, number] = [40.7128, -74.006];
 const DEFAULT_ZOOM = 10;
@@ -26,7 +26,7 @@ interface Props {
   onMapCentered?: () => void;
   isLoadingTransition?: boolean;
   isInitialLoading?: boolean;
-  backendPins: BackendPin[];
+  backendPins: BackendVibe[];
   fromProfile?: boolean;
   setSelectedPin: React.Dispatch<React.SetStateAction<SelectedPin | null>>;
   profileMode?: boolean;
@@ -82,20 +82,20 @@ const InteractiveMap: React.FC<Props> = (props) => {
     updatePinMutation,
     createPinMutation,
     deletePinMutation,
-  } = usePins({
+  } = useVibes({
     mapInstance,
     isMobile,
-    backendPins,
+    backendVibes: backendPins,
     currentUser,
     onViewUserProfile,
-    onPinSelected,
+    onVibeSelected: onPinSelected,
     userLocation,
-    selectedPin,
+    selectedVibe: selectedPin,
     onMapReady,
     fromProfile,
     isLoadingTransition,
-    onDeletePin: (pin) => {
-      setPinToDelete(pin);
+    onDeleteVibe: (vibe) => {
+      setPinToDelete(vibe);
       setShowDeleteModal(true);
       setPopupOpen(true);
     },
@@ -163,8 +163,8 @@ const InteractiveMap: React.FC<Props> = (props) => {
   return (
     <div className="relative w-full h-full">
       {/* Pin Detail Modal for mobile */}
-      <PinDetailModal
-        pin={selectedPinDetail}
+      <VibeDetailModal
+        vibe={selectedPinDetail}
         isOpen={pinDetailModalOpen}
         onClose={() => {
           setPinDetailModalOpen(false);
@@ -221,9 +221,9 @@ const InteractiveMap: React.FC<Props> = (props) => {
       />
 
       {/* Pin Edit Modal */}
-      <PinEditModal
+      <VibeEditModal
         isOpen={!!pinToEdit}
-        pin={
+        vibe={
           pinToEdit
             ? {
                 id: pinToEdit.id.toString(),
@@ -241,7 +241,7 @@ const InteractiveMap: React.FC<Props> = (props) => {
         }}
         isSubmitting={updatePinMutation.isPending}
       />
-      <PinCreateModal
+      <VibeCreateModal
         isOpen={pinCreateModalOpen}
         location={newPinLocation}
         onSubmit={async (...args) => {

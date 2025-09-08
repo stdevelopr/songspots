@@ -1,10 +1,10 @@
 {
-  "name": "music-memories-frontend",
+  "name": "vybers-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "setup": "npm i && dfx canister create music-memories-backend && dfx generate music-memories-backend && dfx deploy",
+    "setup": "npm i && dfx canister create vybers-backend && dfx generate vybers-backend && dfx deploy",
     "start": "vite --port 3000",
     "prebuild": "dfx generate",
     "build": "sh -c 'if [ -n \"$SKIP_WORKSPACE_BUILD\" ]; then echo Skipping frontend build; else tsc && vite build; fi'",

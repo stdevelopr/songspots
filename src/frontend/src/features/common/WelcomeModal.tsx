@@ -16,7 +16,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, onLogin })
         {/* Header */}
         <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 px-4 py-6 sm:px-8 sm:py-8 text-white text-center">
           <div className="text-4xl sm:text-6xl mb-2 sm:mb-4">🎵</div>
-          <h1 className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2">Welcome to Vibe Spots</h1>
+          <h1 className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2">Welcome to Vybers</h1>
           <p className="text-indigo-100 text-sm sm:text-lg">Where music meets memories</p>
         </div>
 

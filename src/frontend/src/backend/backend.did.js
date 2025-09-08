@@ -9,7 +9,7 @@ export const idlFactory = ({ IDL }) => {
     'size' : IDL.Nat,
     'mimeType' : IDL.Text,
   });
-  const Pin = IDL.Record({
+  const Vibe = IDL.Record({
     'id' : IDL.Nat,
     'latitude' : IDL.Text,
     'owner' : IDL.Principal,
@@ -78,12 +78,12 @@ export const idlFactory = ({ IDL }) => {
   });
   return IDL.Service({
     'assignRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-    'createPin' : IDL.Func(
+    'createVibe' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Bool],
         [],
         [],
       ),
-    'deletePin' : IDL.Func([IDL.Nat], [], []),
+    'deleteVibe' : IDL.Func([IDL.Nat], [], []),
     'fileDelete' : IDL.Func([IDL.Text], [], []),
     'fileList' : IDL.Func([], [IDL.Vec(FileMetadata)], ['query']),
     'fileUpload' : IDL.Func(
@@ -91,7 +91,7 @@ export const idlFactory = ({ IDL }) => {
         [],
         [],
       ),
-    'getAllPins' : IDL.Func([], [IDL.Vec(Pin)], ['query']),
+    'getAllVibes' : IDL.Func([], [IDL.Vec(Vibe)], ['query']),
     'getApprovalStatus' : IDL.Func(
         [IDL.Principal],
         [ApprovalStatus],
@@ -99,14 +99,14 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getCurrentUserApprovalStatus' : IDL.Func([], [ApprovalStatus], ['query']),
     'getCurrentUserRole' : IDL.Func([], [UserRole], ['query']),
-    'getPin' : IDL.Func([IDL.Nat], [IDL.Opt(Pin)], ['query']),
-    'getPinsByOwner' : IDL.Func([IDL.Principal], [IDL.Vec(Pin)], ['query']),
     'getProfileByPrincipal' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
     'getUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
+    'getVibe' : IDL.Func([IDL.Nat], [IDL.Opt(Vibe)], ['query']),
+    'getVibesByOwner' : IDL.Func([IDL.Principal], [IDL.Vec(Vibe)], ['query']),
     'httpStreamingCallback' : IDL.Func(
         [StreamingToken],
         [StreamingCallbackHttpResponse],
@@ -118,7 +118,7 @@ export const idlFactory = ({ IDL }) => {
     'listUsers' : IDL.Func([], [IDL.Vec(UserInfo)], ['query']),
     'saveUserProfile' : IDL.Func([UserProfile], [], []),
     'setApproval' : IDL.Func([IDL.Principal, ApprovalStatus], [], []),
-    'updatePin' : IDL.Func(
+    'updateVibe' : IDL.Func(
         [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Bool],
         [],
         [],

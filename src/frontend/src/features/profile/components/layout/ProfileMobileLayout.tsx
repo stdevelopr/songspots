@@ -4,7 +4,7 @@ import ProfileAbout from '../shared/ProfileAbout';
 import ProfileStats from '../shared/ProfileStats';
 import SocialMediaManager, { SocialMediaLink, getPlatformMeta } from '../shared/SocialMediaManager';
 import { ProfileMap, ProfileMapRef } from '../../map/components/ProfileMap';
-import ProfileSpotList from '../pins/ProfileSpotList';
+import ProfileSpotList from '../vibes/ProfileSpotList';
 import { useActor } from '../../../common/useActor';
 import { useGetUserProfile, useGetUserProfileByPrincipal } from '../../../common/useQueries';
 import type { UserProfile } from '../../../../backend/backend.did';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useActor } from '../common/useActor';
-import type { UserInfo, Pin } from '../../backend/backend.did';
+import type { UserInfo, Vibe } from '../../backend/backend.did';
 
 function useAdminData() {
   const { actor, isFetching } = useActor();
@@ -24,16 +24,16 @@ function useAdminData() {
     enabled: !!actor && !isFetching && !!isAdminQ.data,
   });
 
-  const pinsQ = useQuery<Pin[]>({
-    queryKey: ['admin:getAllPins'],
+  const vibesQ = useQuery<Vibe[]>({
+    queryKey: ['admin:getAllVibes'],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getAllPins();
+      return actor.getAllVibes();
     },
     enabled: !!actor && !isFetching && !!isAdminQ.data,
   });
 
-  return { isAdminQ, usersQ, pinsQ };
+  return { isAdminQ, usersQ, vibesQ };
 }
 
 const StatPill: React.FC<{ label: string; value: number | string }> = ({ label, value }) => (
@@ -44,7 +44,7 @@ const StatPill: React.FC<{ label: string; value: number | string }> = ({ label, 
 );
 
 const AdminPage: React.FC = () => {
-  const { isAdminQ, usersQ, pinsQ } = useAdminData();
+  const { isAdminQ, usersQ, vibesQ } = useAdminData();
 
   if (isAdminQ.isLoading) {
     return <div className="p-6">Checking permissions…</div>;
@@ -60,7 +60,7 @@ const AdminPage: React.FC = () => {
   }
 
   const users = usersQ.data || [];
-  const pins = pinsQ.data || [];
+  const vibes = vibesQ.data || [];
 
   // User stats
   const totalUsers = users.length;
@@ -82,9 +82,9 @@ const AdminPage: React.FC = () => {
   );
 
   // Pin stats
-  const totalPins = pins.length;
-  const publicPins = pins.filter((p) => !p.isPrivate).length;
-  const privatePins = totalPins - publicPins;
+  const totalVibes = vibes.length;
+  const publicVibes = vibes.filter((v) => !v.isPrivate).length;
+  const privateVibes = totalVibes - publicVibes;
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -95,7 +95,7 @@ const AdminPage: React.FC = () => {
             className="px-3 py-2 rounded-md bg-white border border-gray-200 shadow-sm text-sm cursor-pointer hover:bg-gray-50"
             onClick={() => {
               usersQ.refetch();
-              pinsQ.refetch();
+              vibesQ.refetch();
             }}
           >
             Refresh
@@ -119,11 +119,11 @@ const AdminPage: React.FC = () => {
         </div>
 
         <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-          <h2 className="text-lg font-semibold mb-3">Pins</h2>
+          <h2 className="text-lg font-semibold mb-3">Vibes</h2>
           <div className="flex flex-wrap gap-3">
-            <StatPill label="Total" value={totalPins} />
-            <StatPill label="Public" value={publicPins} />
-            <StatPill label="Private" value={privatePins} />
+            <StatPill label="Total" value={totalVibes} />
+            <StatPill label="Public" value={publicVibes} />
+            <StatPill label="Private" value={privateVibes} />
           </div>
         </div>
       </div>
@@ -153,22 +153,22 @@ const AdminPage: React.FC = () => {
         </div>
 
         <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-          <h3 className="text-base font-semibold mb-3">Recent Pins</h3>
+          <h3 className="text-base font-semibold mb-3">Recent Vibes</h3>
           <div className="divide-y divide-gray-100">
-            {pins.slice(-10).reverse().map((p) => (
-              <div key={p.id.toString()} className="py-2 text-sm flex items-center justify-between">
+            {vibes.slice(-10).reverse().map((v) => (
+              <div key={v.id.toString()} className="py-2 text-sm flex items-center justify-between">
                 <div className="truncate mr-2">
-                  <span className="font-medium text-gray-800">{p.name || 'Untitled'}</span>
-                  {p.description && (
-                    <span className="ml-2 text-gray-500 truncate inline-block max-w-[280px] align-middle">{p.description}</span>
+                  <span className="font-medium text-gray-800">{v.name || 'Untitled'}</span>
+                  {v.description && (
+                    <span className="ml-2 text-gray-500 truncate inline-block max-w-[280px] align-middle">{v.description}</span>
                   )}
                 </div>
-                <span className={`px-2 py-0.5 rounded-full text-xs border ${p.isPrivate ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`}>
-                  {p.isPrivate ? 'Private' : 'Public'}
+                <span className={`px-2 py-0.5 rounded-full text-xs border ${v.isPrivate ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`}>
+                  {v.isPrivate ? 'Private' : 'Public'}
                 </span>
               </div>
             ))}
-            {pins.length === 0 && <div className="text-sm text-gray-500 py-2">No pins</div>}
+            {vibes.length === 0 && <div className="text-sm text-gray-500 py-2">No vibes</div>}
           </div>
         </div>
       </div>
@@ -177,4 +177,3 @@ const AdminPage: React.FC = () => {
 };
 
 export default AdminPage;
-

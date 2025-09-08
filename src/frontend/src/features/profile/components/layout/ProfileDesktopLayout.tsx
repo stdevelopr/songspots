@@ -7,7 +7,7 @@ import SocialMediaManager, { SocialMediaLink, getPlatformMeta } from '../shared/
 import { ProfileMap, ProfileMapRef } from '../../map/components/ProfileMap';
 import LoadingState from '../shared/LoadingState';
 import EmptyState from '../shared/EmptyState';
-import PinGrid from '../pins/PinGrid';
+import VibeGrid from '../vibes/VibeGrid';
 import { useActor } from '../../../common/useActor';
 import { useGetUserProfile, useGetUserProfileByPrincipal } from '../../../common/useQueries';
 import type { UserProfile } from '../../../../backend/backend.did';
@@ -287,7 +287,7 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
                 ) : (
                   <div className="space-y-4">
                     {visiblePins.map((pin, index) => (
-                      <PinGrid
+                      <VibeGrid
                         key={pin.id.toString()}
                         pin={pin}
                         index={index}

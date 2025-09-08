@@ -113,7 +113,7 @@ persistent actor {
   // ** Start of application specific logic, TODO: adapt to your needs **
   // This is an example to how to protect data creation, update and deletion
 
-  type Pin = {
+  type Vibe = {
     id : Nat;
     name : Text;
     description : Text;
@@ -124,18 +124,18 @@ persistent actor {
     isPrivate : Bool;
   };
 
-  transient let pinMap = Map.Make<Nat>(Nat.compare);
-  var pinsStable : [(Nat, Pin)] = [];
-  var nextPinIdStable : Nat = 0;
-  transient var pins : Map.Map<Nat, Pin> = pinMap.empty<Pin>();
-  transient var nextPinId : Nat = 0;
+  transient let vibeMap = Map.Make<Nat>(Nat.compare);
+  var vibesStable : [(Nat, Vibe)] = [];
+  var nextVibeIdStable : Nat = 0;
+  transient var vibes : Map.Map<Nat, Vibe> = vibeMap.empty<Vibe>();
+  transient var nextVibeId : Nat = 0;
 
-  public shared ({ caller }) func createPin(name : Text, description : Text, musicLink : Text, latitude : Text, longitude : Text, isPrivate : Bool) : async () {
+  public shared ({ caller }) func createVibe(name : Text, description : Text, musicLink : Text, latitude : Text, longitude : Text, isPrivate : Bool) : async () {
     if (not (MultiUserSystem.hasPermission(multiUserState, caller, #user, false))) {
-      Debug.trap("Unauthorized: Only authenticated users can create pins");
+      Debug.trap("Unauthorized: Only authenticated users can create vibes");
     };
-    let newPin : Pin = {
-      id = nextPinId;
+    let newVibe : Vibe = {
+      id = nextVibeId;
       name;
       description;
       musicLink;
@@ -144,15 +144,15 @@ persistent actor {
       owner = caller;
       isPrivate;
     };
-    pins := pinMap.put(pins, nextPinId, newPin);
-    nextPinId += 1;
+    vibes := vibeMap.put(vibes, nextVibeId, newVibe);
+    nextVibeId += 1;
   };
 
-  public shared ({ caller }) func updatePin(id : Nat, name : Text, description : Text, musicLink : Text, latitude : Text, longitude : Text, isPrivate : Bool) : async () {
+  public shared ({ caller }) func updateVibe(id : Nat, name : Text, description : Text, musicLink : Text, latitude : Text, longitude : Text, isPrivate : Bool) : async () {
     if (not (MultiUserSystem.hasPermission(multiUserState, caller, #user, false))) {
-      Debug.trap("Unauthorized: Only authenticated users can update pins");
+      Debug.trap("Unauthorized: Only authenticated users can update vibes");
     };
-    let updatedPin : Pin = {
+    let updatedVibe : Vibe = {
       id;
       name;
       description;
@@ -162,56 +162,56 @@ persistent actor {
       owner = caller;
       isPrivate;
     };
-    pins := pinMap.put(pins, id, updatedPin);
+    vibes := vibeMap.put(vibes, id, updatedVibe);
   };
 
-  public shared ({ caller }) func deletePin(id : Nat) : async () {
+  public shared ({ caller }) func deleteVibe(id : Nat) : async () {
     if (not (MultiUserSystem.hasPermission(multiUserState, caller, #user, false))) {
-      Debug.trap("Unauthorized: Only authenticated users can delete pins");
+      Debug.trap("Unauthorized: Only authenticated users can delete vibes");
     };
-    switch (pinMap.get(pins, id)) {
+    switch (vibeMap.get(vibes, id)) {
       case null {
-        Debug.trap("Pin not found");
+        Debug.trap("Vibe not found");
       };
-      case (?pin) {
-        if (pin.owner != caller) {
-          Debug.trap("Unauthorized: Only the pin owner can delete the pin");
+      case (?vibe) {
+        if (vibe.owner != caller) {
+          Debug.trap("Unauthorized: Only the vibe owner can delete the vibe");
         };
-        pins := pinMap.delete(pins, id);
+        vibes := vibeMap.delete(vibes, id);
       };
     };
   };
 
-  public query ({ caller }) func getPin(id : Nat) : async ?Pin {
-    switch (pinMap.get(pins, id)) {
+  public query ({ caller }) func getVibe(id : Nat) : async ?Vibe {
+    switch (vibeMap.get(vibes, id)) {
       case null { null };
-      case (?pin) {
-        if (pin.isPrivate and pin.owner != caller) {
+      case (?vibe) {
+        if (vibe.isPrivate and vibe.owner != caller) {
           null;
         } else {
-          ?pin;
+          ?vibe;
         };
       };
     };
   };
 
-  public query ({ caller }) func getAllPins() : async [Pin] {
+  public query ({ caller }) func getAllVibes() : async [Vibe] {
     Iter.toArray(
       Iter.filter(
-        pinMap.vals(pins),
-        func(pin : Pin) : Bool {
-          not pin.isPrivate or pin.owner == caller;
+        vibeMap.vals(vibes),
+        func(vibe : Vibe) : Bool {
+          not vibe.isPrivate or vibe.owner == caller;
         },
       )
     );
   };
 
-  public query ({ caller }) func getPinsByOwner(owner : Principal) : async [Pin] {
+  public query ({ caller }) func getVibesByOwner(owner : Principal) : async [Vibe] {
     Iter.toArray(
       Iter.filter(
-        pinMap.vals(pins),
-        func(pin : Pin) : Bool {
-          pin.owner == owner and (not pin.isPrivate or caller == owner);
+        vibeMap.vals(vibes),
+        func(vibe : Vibe) : Bool {
+          vibe.owner == owner and (not vibe.isPrivate or caller == owner);
         },
       )
     );
@@ -219,17 +219,17 @@ persistent actor {
 
   system func preupgrade() {
     userProfilesStable := Iter.toArray(principalMap.entries(userProfiles));
-    pinsStable := Iter.toArray(pinMap.entries(pins));
-    nextPinIdStable := nextPinId;
+    vibesStable := Iter.toArray(vibeMap.entries(vibes));
+    nextVibeIdStable := nextVibeId;
   };
 
   system func postupgrade() {
     userProfiles := principalMap.fromIter(userProfilesStable.vals());
-    pins := pinMap.fromIter(pinsStable.vals());
-    nextPinId := nextPinIdStable;
+    vibes := vibeMap.fromIter(vibesStable.vals());
+    nextVibeId := nextVibeIdStable;
     
     // Clear stable arrays to save memory
     userProfilesStable := [];
-    pinsStable := [];
+    vibesStable := [];
   };
 };

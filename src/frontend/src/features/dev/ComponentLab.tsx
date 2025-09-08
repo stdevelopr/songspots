@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useResponsive } from '../common/ResponsiveProvider';
-import { PinInfoPopup } from '../pins';
+import { VibeInfoPopup } from '../vibes';
 import type { Pin } from '../map/types/map';
 
 function makeMockPin(opts?: Partial<Pin>): Pin {
@@ -31,7 +31,7 @@ const ComponentLab: React.FC = () => {
   const [showControls, setShowControls] = useState(true);
   const [canReopenControls, setCanReopenControls] = useState(true);
 
-  // Controls for the PinInfoPopup demo
+  // Controls for the VibeInfoPopup demo
   const [hasMedia, setHasMedia] = useState(true);
   const [hasDescription, setHasDescription] = useState(true);
   const [isOwner, setIsOwner] = useState(true);
@@ -78,7 +78,7 @@ const ComponentLab: React.FC = () => {
                 setShowPinPopup(true);
               }}
             >
-              Open PinInfoPopup
+              Open VibeInfoPopup
             </button>
           </div>
         </div>
@@ -87,7 +87,7 @@ const ComponentLab: React.FC = () => {
       {/* Controls */}
       <div className="max-w-[1400px] mx-auto w-full px-3 py-3">
         <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
-          <div className="text-sm font-semibold mb-2">PinInfoPopup Controls</div>
+          <div className="text-sm font-semibold mb-2">VibeInfoPopup Controls</div>
           <div className="flex flex-wrap gap-4 text-sm">
             <label className="inline-flex items-center gap-2">
               <input type="checkbox" checked={hasMedia} onChange={(e) => setHasMedia(e.target.checked)} />
@@ -111,7 +111,7 @@ const ComponentLab: React.FC = () => {
 
       {/* Playground area */}
       <div className="flex-1 min-h-0 p-4 grid place-items-center">
-        <div className="text-gray-600 text-sm">Resize the window to see the current layout above. Click the button to open the PinInfoPopup demo.</div>
+        <div className="text-gray-600 text-sm">Resize the window to see the current layout above. Click the button to open the VibeInfoPopup demo.</div>
       </div>
 
       {/* Overlay for the component under test */}
@@ -121,8 +121,8 @@ const ComponentLab: React.FC = () => {
           onClick={() => setShowPinPopup(false)}
         >
           <div onClick={(e) => e.stopPropagation()}>
-            <PinInfoPopup
-              pin={demoPin}
+            <VibeInfoPopup
+              vibe={demoPin}
               onViewProfile={() => alert('View profile')}
               onEdit={() => alert('Edit')}
               onDelete={() => alert('Delete')}
@@ -270,7 +270,7 @@ const FloatingControls: React.FC<{
           }}
         >
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-gray-900">PinInfoPopup Controls</span>
+            <span className="text-sm font-semibold text-gray-900">VibeInfoPopup Controls</span>
             <span className={`text-[10px] px-2 py-0.5 rounded-full border ${isOpen ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-50 text-slate-700 border-slate-200'}`}>{isOpen ? 'OPEN' : 'CLOSED'}</span>
           </div>
           <div className="flex items-center gap-1">

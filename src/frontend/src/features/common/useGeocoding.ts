@@ -47,7 +47,7 @@ export function useReverseGeocode(latitude: string | number, longitude: string |
           `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
           {
             headers: {
-              'User-Agent': 'Music Memories App'
+              'User-Agent': 'Vybers App'
             }
           }
         );

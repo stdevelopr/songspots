@@ -1,26 +1,26 @@
 // Main hooks
-export { usePinOperations } from './usePinOperations';
+export { useVibeOperations } from './useVibeOperations';
 export { useProfileState } from './useProfileState';
 export { useProfilePicture } from './useProfilePicture';
 export { useProfileActions } from './useProfileActions';
 export { useAuth } from './useAuth';
 export { useProfileHeight } from './useProfileHeight';
 
-// Specialized pin operation hooks
-export { usePinModals } from './usePinModals';
-export { usePinSelection } from './usePinSelection';
-export { usePinKeyboardNavigation } from './usePinKeyboardNavigation';
-export { usePinErrorHandler } from './usePinErrorHandler';
+// Specialized vibe operation hooks
+export { useVibeModals } from './useVibeModals';
+export { useVibeSelection } from './useVibeSelection';
+export { useVibeKeyboardNavigation } from './useVibeKeyboardNavigation';
+export { useVibeErrorHandler } from './useVibeErrorHandler';
 
 // Types
 export type {
-  Pin,
-  PinUpdateData,
-  UsePinOperationsProps,
-  PinHighlightConfig
-} from './usePinOperations.types';
+  Vibe,
+  VibeUpdateData,
+  UseVibeOperationsProps,
+  VibeHighlightConfig
+} from './useVibeOperations.types';
 
-export type { ErrorState } from './usePinErrorHandler';
+export type { ErrorState } from './useVibeErrorHandler';
 
 // Constants
-export { PIN_OPERATION_CONSTANTS, PIN_HIGHLIGHT_STYLES } from './usePinOperations.types';
+export { VIBE_OPERATION_CONSTANTS, VIBE_HIGHLIGHT_STYLES } from './useVibeOperations.types';
