@@ -1,5 +1,8 @@
+import React from 'react';
 import { MoodType, getMoodById } from '../types/moods';
 import type { Pin, Vibe } from '../../map/types/map';
+import ClusterMarker from '../components/ClusterMarker';
+import { renderComponentToHTMLSync, renderComponentToHTML } from './renderToHTML';
 
 export interface ClusterData {
   lat: number;
@@ -224,8 +227,28 @@ export function getMoodDistributionGradient(distribution: Record<MoodType | 'non
   return `conic-gradient(${segments.join(', ')})`;
 }
 
-// Create cluster marker HTML
-export function createClusterHTML(cluster: ClusterData): string {
+// HTML element creation helper (fallback for when React rendering fails)
+function createHTMLElement(tag: string, props: Record<string, any>, children?: string): string {
+  const attributes = Object.entries(props)
+    .map(([key, value]) => {
+      if (key === 'style' && typeof value === 'object') {
+        const styleStr = Object.entries(value)
+          .map(([prop, val]) => `${prop.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${val}`)
+          .join('; ');
+        return `style="${styleStr}"`;
+      }
+      if (key === 'className') {
+        return `class="${value}"`;
+      }
+      return `${key}="${value}"`;
+    })
+    .join(' ');
+  
+  return `<${tag} ${attributes}>${children || ''}</${tag}>`;
+}
+
+// Fallback HTML generation function
+function createClusterHTMLFallback(cluster: ClusterData): string {
   const sizeClass = cluster.count < 10 ? 'small' : cluster.count < 50 ? 'medium' : 'large';
   
   // Check if cluster is homogeneous (single mood type, excluding 'none')
@@ -254,38 +277,61 @@ export function createClusterHTML(cluster: ClusterData): string {
   const tooltipText = isHomogeneous 
     ? `${cluster.count} ${getMoodById(cluster.clusterMood as MoodType).name} vibes`
     : `${cluster.count} vibes:\n${moodBreakdown.join('\n')}`;
-  
-  // Add mood name for simple display
-  const moodName = cluster.clusterMood !== 'none' 
-    ? getMoodById(cluster.clusterMood as MoodType).name 
-    : 'Mixed';
+
+  const commonProps = {
+    'data-cluster-count': cluster.count,
+    'data-mood': cluster.clusterMood,
+    'data-breakdown': moodBreakdown.join(' | '),
+    'data-tooltip': tooltipText,
+    style: {
+      background: cluster.moodBlend,
+      opacity: confidenceAlpha,
+      borderStyle: borderStyle,
+    }
+  };
 
   if (isHomogeneous) {
     // Homogeneous cluster - show mood emoji with count
     const moodData = getMoodById(cluster.clusterMood as MoodType);
     
-    return `
-<div class="mood-cluster mood-cluster-${sizeClass} mood-cluster-emoji" 
-     style="background: ${cluster.moodBlend}; opacity: ${confidenceAlpha}; border-style: ${borderStyle};"
-     data-cluster-count="${cluster.count}"
-     data-mood="${cluster.clusterMood}"
-     data-breakdown="${moodBreakdown.join(' | ')}"
-     data-tooltip="${tooltipText}">
-  <div class="mood-cluster-emoji-main">${moodData.emoji}</div>
-  <div class="mood-cluster-count-badge">${cluster.count}</div>
-</div>
-`;
+    const emojiMain = createHTMLElement('div', { className: 'mood-cluster-emoji-main' }, moodData.emoji);
+    const countBadge = createHTMLElement('div', { className: 'mood-cluster-count-badge' }, cluster.count.toString());
+    
+    return createHTMLElement('div', {
+      className: `mood-cluster mood-cluster-${sizeClass} mood-cluster-emoji`,
+      ...commonProps
+    }, emojiMain + countBadge);
   } else {
     // Mixed cluster - use blended background with number
-    return `
-<div class="mood-cluster mood-cluster-${sizeClass} mood-cluster-mixed" 
-     style="background: ${cluster.moodBlend}; opacity: ${confidenceAlpha}; border-style: ${borderStyle};"
-     data-cluster-count="${cluster.count}"
-     data-mood="${cluster.clusterMood}"
-     data-breakdown="${moodBreakdown.join(' | ')}"
-     data-tooltip="${tooltipText}">
-  <div class="mood-cluster-count">${cluster.count}</div>
-</div>
-`;
+    const countElement = createHTMLElement('div', { className: 'mood-cluster-count' }, cluster.count.toString());
+    
+    return createHTMLElement('div', {
+      className: `mood-cluster mood-cluster-${sizeClass} mood-cluster-mixed`,
+      ...commonProps
+    }, countElement);
   }
+}
+
+// Create cluster marker HTML using TSX component with fallback
+export function createClusterHTML(cluster: ClusterData): string {
+  try {
+    const component = React.createElement(ClusterMarker, { cluster });
+    const html = renderComponentToHTMLSync(component);
+    
+    // If React rendering worked and produced HTML, use it
+    if (html && html.trim().length > 0) {
+      return html;
+    }
+  } catch (error) {
+    console.warn('React rendering failed, using fallback:', error);
+  }
+  
+  // Fallback to direct HTML generation
+  return createClusterHTMLFallback(cluster);
+}
+
+// Async version for cases where we can wait for rendering
+export async function createClusterHTMLAsync(cluster: ClusterData): Promise<string> {
+  const component = React.createElement(ClusterMarker, { cluster });
+  return renderComponentToHTML(component);
 }
