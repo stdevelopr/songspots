@@ -1,29 +1,28 @@
 import L from 'leaflet';
 import { MoodType, getMoodById } from '../types/moods';
 
-const div = (html: string) =>
+const div = (html: string, isMoodPin: boolean = false) =>
   L.divIcon({
-    className: 'custom-pin',
+    className: isMoodPin ? 'mood-marker' : 'custom-pin',
     html,
-    iconSize: [24, 32],
-    iconAnchor: [12, 32],
-    popupAnchor: [0, -32],
+    iconSize: isMoodPin ? [32, 32] : [24, 32],
+    iconAnchor: isMoodPin ? [16, 16] : [12, 32],
+    popupAnchor: isMoodPin ? [0, -16] : [0, -32],
   });
 
 const createMoodPinHTML = (mood: MoodType, hasMusic: boolean, isPrivate: boolean) => {
   const moodData = getMoodById(mood);
-  const lockIcon = isPrivate ? '<div class="lock-icon-small">🔒</div>' : '';
-  const musicNote = hasMusic ? '<div class="music-note">♪</div>' : '';
-  const moodEmoji = `<div class="mood-emoji">${moodData.emoji}</div>`;
+  const lockIcon = isPrivate ? '<div class="mood-lock-icon">🔒</div>' : '';
+  const musicNote = hasMusic ? '<div class="mood-music-note">♪</div>' : '';
+  const moodEmoji = `<div class="mood-emoji-main">${moodData.emoji}</div>`;
   
   return `
-<div class="pin-marker mood-pin" data-mood="${mood}">
-<div class="pin-head mood-pin-head" style="background: ${moodData.colors.gradient};">
-${moodEmoji}
-${musicNote}
-${lockIcon}
-</div>
-<div class="pin-point"></div>
+<div class="mood-vibe-marker" data-mood="${mood}" style="background: ${moodData.colors.gradient};">
+  <div class="mood-content">
+    ${moodEmoji}
+    ${musicNote}
+    ${lockIcon}
+  </div>
 </div>
 `;
 };
@@ -63,10 +62,10 @@ const moodIcons: Record<string, L.DivIcon> = {};
 const moods: MoodType[] = ['energetic', 'chill', 'creative', 'romantic', 'peaceful', 'party', 'mysterious'];
 
 moods.forEach(mood => {
-  moodIcons[`${mood}_public`] = div(createMoodPinHTML(mood, false, false));
-  moodIcons[`${mood}_publicMusic`] = div(createMoodPinHTML(mood, true, false));
-  moodIcons[`${mood}_private`] = div(createMoodPinHTML(mood, false, true));
-  moodIcons[`${mood}_privateMusic`] = div(createMoodPinHTML(mood, true, true));
+  moodIcons[`${mood}_public`] = div(createMoodPinHTML(mood, false, false), true);
+  moodIcons[`${mood}_publicMusic`] = div(createMoodPinHTML(mood, true, false), true);
+  moodIcons[`${mood}_private`] = div(createMoodPinHTML(mood, false, true), true);
+  moodIcons[`${mood}_privateMusic`] = div(createMoodPinHTML(mood, true, true), true);
 });
 
 export const pinIcons = {
