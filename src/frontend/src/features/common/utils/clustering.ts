@@ -3,6 +3,7 @@ import { MoodType, getMoodById } from '../types/moods';
 import type { Pin, Vibe } from '../../map/types/map';
 import ClusterMarker from '../components/ClusterMarker';
 import { renderComponentToHTMLSync, renderComponentToHTML } from './renderToHTML';
+import clusterStyles from '../components/ClusterMarker.module.css';
 
 export interface ClusterData {
   lat: number;
@@ -294,19 +295,19 @@ function createClusterHTMLFallback(cluster: ClusterData): string {
     // Homogeneous cluster - show mood emoji with count
     const moodData = getMoodById(cluster.clusterMood as MoodType);
     
-    const emojiMain = createHTMLElement('div', { className: 'mood-cluster-emoji-main' }, moodData.emoji);
-    const countBadge = createHTMLElement('div', { className: 'mood-cluster-count-badge' }, cluster.count.toString());
+    const emojiMain = createHTMLElement('div', { className: clusterStyles['mood-cluster-emoji-main'] }, moodData.emoji);
+    const countBadge = createHTMLElement('div', { className: clusterStyles['mood-cluster-count-badge'] }, cluster.count.toString());
     
     return createHTMLElement('div', {
-      className: `mood-cluster mood-cluster-${sizeClass} mood-cluster-emoji`,
+      className: `${clusterStyles['mood-cluster']} ${clusterStyles[`mood-cluster-${sizeClass}`]} ${clusterStyles['mood-cluster-emoji']}`,
       ...commonProps
     }, emojiMain + countBadge);
   } else {
     // Mixed cluster - use blended background with number
-    const countElement = createHTMLElement('div', { className: 'mood-cluster-count' }, cluster.count.toString());
+    const countElement = createHTMLElement('div', { className: clusterStyles['mood-cluster-count'] }, cluster.count.toString());
     
     return createHTMLElement('div', {
-      className: `mood-cluster mood-cluster-${sizeClass} mood-cluster-mixed`,
+      className: `${clusterStyles['mood-cluster']} ${clusterStyles[`mood-cluster-${sizeClass}`]} ${clusterStyles['mood-cluster-mixed']}`,
       ...commonProps
     }, countElement);
   }

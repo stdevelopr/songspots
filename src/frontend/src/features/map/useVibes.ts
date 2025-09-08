@@ -7,6 +7,7 @@ import { IOnViewUserProfile } from './interactive-map/interactiveMapTypes';
 import { useCreateVibe, useDeleteVibe, useUpdateVibe } from '../common';
 import { toNat } from '../common/utils/nat';
 import { MoodType } from '../common/types/moods';
+import markerStyles from '../common/components/MarkerIcons.module.css';
 
 export const useVibes = ({
   mapInstance,
@@ -82,8 +83,8 @@ export const useVibes = ({
     if (!mapInstance || !userLocation) return;
     if (userMarkerRef.current) mapInstance.removeLayer(userMarkerRef.current);
     const icon = L.divIcon({
-      className: 'user-location-marker',
-      html: `<div class="user-location-pin"><div class="user-location-pulse"></div><div class="user-location-dot"></div></div>`,
+      className: markerStyles['user-location-marker'],
+      html: `<div class="${markerStyles['user-location-pin']}"><div class="${markerStyles['user-location-pulse']}"></div><div class="${markerStyles['user-location-dot']}"></div></div>`,
       iconSize: [24, 24],
       iconAnchor: [12, 12],
     });

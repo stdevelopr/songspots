@@ -4,6 +4,7 @@ import type { Pin, Vibe } from '../../map/types/map';
 
 import { getMoodIcon } from '../../common/utils/icons';
 import { clusterPins, createClusterHTML } from '../../common/utils/clustering';
+import clusterStyles from '../../common/components/ClusterMarker.module.css';
 
 interface Options {
   map: L.Map | null;
@@ -66,7 +67,7 @@ export function useVibeLayer({
         } else {
           // Multiple items - show as cluster
           const clusterIcon = L.divIcon({
-            className: 'mood-cluster-marker',
+            className: clusterStyles['mood-cluster-marker'],
             html: createClusterHTML(cluster),
             iconSize: [cluster.count < 10 ? 32 : cluster.count < 50 ? 44 : 56, cluster.count < 10 ? 32 : cluster.count < 50 ? 44 : 56],
             iconAnchor: [cluster.count < 10 ? 16 : cluster.count < 50 ? 22 : 28, cluster.count < 10 ? 16 : cluster.count < 50 ? 22 : 28],

@@ -2,6 +2,7 @@ import React from 'react';
 import { getMoodById } from '../types/moods';
 import type { ClusterData } from '../utils/clustering';
 import type { MoodType } from '../types/moods';
+import styles from './ClusterMarker.module.css';
 
 interface ClusterMarkerProps {
   cluster: ClusterData;
@@ -54,22 +55,22 @@ const ClusterMarker: React.FC<ClusterMarkerProps> = ({ cluster }) => {
     const moodData = getMoodById(cluster.clusterMood as MoodType);
     
     return (
-      <div 
-        className={`mood-cluster mood-cluster-${sizeClass} mood-cluster-emoji`}
+      <div
+        className={`${styles['mood-cluster']} ${styles[`mood-cluster-${sizeClass}`]} ${styles['mood-cluster-emoji']}`}
         {...commonProps}
       >
-        <div className="mood-cluster-emoji-main">{moodData.emoji}</div>
-        <div className="mood-cluster-count-badge">{cluster.count}</div>
+        <div className={styles['mood-cluster-emoji-main']}>{moodData.emoji}</div>
+        <div className={styles['mood-cluster-count-badge']}>{cluster.count}</div>
       </div>
     );
   } else {
     // Mixed cluster - use blended background with number
     return (
-      <div 
-        className={`mood-cluster mood-cluster-${sizeClass} mood-cluster-mixed`}
+      <div
+        className={`${styles['mood-cluster']} ${styles[`mood-cluster-${sizeClass}`]} ${styles['mood-cluster-mixed']}`}
         {...commonProps}
       >
-        <div className="mood-cluster-count">{cluster.count}</div>
+        <div className={styles['mood-cluster-count']}>{cluster.count}</div>
       </div>
     );
   }

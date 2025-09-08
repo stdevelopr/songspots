@@ -1,9 +1,10 @@
 import L from 'leaflet';
 import { MoodType, getMoodById } from '../types/moods';
+import styles from '../components/MarkerIcons.module.css';
 
 const div = (html: string, isMoodPin: boolean = false) =>
   L.divIcon({
-    className: isMoodPin ? 'mood-marker' : 'custom-pin',
+    className: isMoodPin ? styles['mood-marker'] : styles['custom-pin'],
     html,
     iconSize: isMoodPin ? [32, 32] : [24, 32],
     iconAnchor: isMoodPin ? [16, 16] : [12, 32],
@@ -12,22 +13,22 @@ const div = (html: string, isMoodPin: boolean = false) =>
 
 const createMoodPinHTML = (mood: MoodType, hasMusic: boolean, isPrivate: boolean, zoomLevel?: number) => {
   const moodData = getMoodById(mood);
-  const lockIcon = isPrivate ? '<div class="mood-lock-icon">🔒</div>' : '';
-  const musicNote = hasMusic ? '<div class="mood-music-note">♪</div>' : '';
-  const moodEmoji = `<div class="mood-emoji-main">${moodData.emoji}</div>`;
+  const lockIcon = isPrivate ? `<div class="${styles['mood-lock-icon']}">🔒</div>` : '';
+  const musicNote = hasMusic ? `<div class="${styles['mood-music-note']}">♪</div>` : '';
+  const moodEmoji = `<div class="${styles['mood-emoji-main']}">${moodData.emoji}</div>`;
   
   // Determine zoom class based on zoom level
-  let zoomClass = 'zoom-high'; // default
+  let zoomClass = styles['zoom-high']; // default
   if (zoomLevel !== undefined) {
-    if (zoomLevel <= 5) zoomClass = 'zoom-very-low';
-    else if (zoomLevel <= 10) zoomClass = 'zoom-low';
-    else if (zoomLevel <= 14) zoomClass = 'zoom-medium';
-    else zoomClass = 'zoom-high';
+    if (zoomLevel <= 5) zoomClass = styles['zoom-very-low'];
+    else if (zoomLevel <= 10) zoomClass = styles['zoom-low'];
+    else if (zoomLevel <= 14) zoomClass = styles['zoom-medium'];
+    else zoomClass = styles['zoom-high'];
   }
   
   return `
-<div class="mood-vibe-marker ${zoomClass}" data-mood="${mood}" style="background: ${moodData.colors.gradient};">
-  <div class="mood-content">
+<div class="${styles['mood-vibe-marker']} ${zoomClass}" data-mood="${mood}" style="background: ${moodData.colors.gradient};">
+  <div class="${styles['mood-content']}">
     ${moodEmoji}
     ${musicNote}
     ${lockIcon}
@@ -38,30 +39,30 @@ const createMoodPinHTML = (mood: MoodType, hasMusic: boolean, isPrivate: boolean
 
 const HTML = {
   public: `
-<div class="pin-marker">
-<div class="pin-head"></div>
-<div class="pin-point"></div>
+<div class="${styles['pin-marker']}">
+<div class="${styles['pin-head']}"></div>
+<div class="${styles['pin-point']}"></div>
 </div>
 `,
   publicMusic: `
-<div class="pin-marker music-pin">
-<div class="pin-head music-pin-head"><div class="music-note">♪</div></div>
-<div class="pin-point"></div>
+<div class="${styles['pin-marker']} music-pin">
+<div class="${styles['pin-head']} ${styles['music-pin-head']}"><div class="${styles['music-note']}">♪</div></div>
+<div class="${styles['pin-point']}"></div>
 </div>
 `,
   private: `
-<div class="pin-marker private-pin">
-<div class="pin-head private-pin-head"><div class="lock-icon">🔒</div></div>
-<div class="pin-point"></div>
+<div class="${styles['pin-marker']} private-pin">
+<div class="${styles['pin-head']} ${styles['private-pin-head']}"><div class="${styles['lock-icon']}">🔒</div></div>
+<div class="${styles['pin-point']}"></div>
 </div>
 `,
   privateMusic: `
-<div class="pin-marker private-pin music-pin">
-<div class="pin-head private-pin-head music-pin-head">
-<div class="music-note">♪</div>
-<div class="lock-icon-small">🔒</div>
+<div class="${styles['pin-marker']} private-pin music-pin">
+<div class="${styles['pin-head']} ${styles['private-pin-head']} ${styles['music-pin-head']}">
+<div class="${styles['music-note']}">♪</div>
+<div class="${styles['lock-icon-small']}">🔒</div>
 </div>
-<div class="pin-point"></div>
+<div class="${styles['pin-point']}"></div>
 </div>
 `,
 };

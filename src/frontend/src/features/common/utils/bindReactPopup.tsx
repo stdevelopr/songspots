@@ -1,6 +1,7 @@
 import React, { ReactElement } from 'react';
 import L from 'leaflet';
 import { createRoot, Root } from 'react-dom/client';
+import popupStyles from '../components/PopupWrapper.module.css';
 
 /**
  * Use a factory so props are always fresh when the popup opens.
@@ -15,7 +16,7 @@ export function bindReactPopup(
     closeOnEscapeKey: true,
     closeOnClick: false,
     maxWidth: window.innerWidth < 600 ? window.innerWidth * 0.95 : 320,
-    className: 'enhanced-popup',
+    className: popupStyles['enhanced-popup'],
   },
   onClose?: () => void
 ) {
