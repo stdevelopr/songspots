@@ -10,14 +10,23 @@ const div = (html: string, isMoodPin: boolean = false) =>
     popupAnchor: isMoodPin ? [0, -16] : [0, -32],
   });
 
-const createMoodPinHTML = (mood: MoodType, hasMusic: boolean, isPrivate: boolean) => {
+const createMoodPinHTML = (mood: MoodType, hasMusic: boolean, isPrivate: boolean, zoomLevel?: number) => {
   const moodData = getMoodById(mood);
   const lockIcon = isPrivate ? '<div class="mood-lock-icon">🔒</div>' : '';
   const musicNote = hasMusic ? '<div class="mood-music-note">♪</div>' : '';
   const moodEmoji = `<div class="mood-emoji-main">${moodData.emoji}</div>`;
   
+  // Determine zoom class based on zoom level
+  let zoomClass = 'zoom-high'; // default
+  if (zoomLevel !== undefined) {
+    if (zoomLevel <= 5) zoomClass = 'zoom-very-low';
+    else if (zoomLevel <= 10) zoomClass = 'zoom-low';
+    else if (zoomLevel <= 14) zoomClass = 'zoom-medium';
+    else zoomClass = 'zoom-high';
+  }
+  
   return `
-<div class="mood-vibe-marker" data-mood="${mood}" style="background: ${moodData.colors.gradient};">
+<div class="mood-vibe-marker ${zoomClass}" data-mood="${mood}" style="background: ${moodData.colors.gradient};">
   <div class="mood-content">
     ${moodEmoji}
     ${musicNote}
@@ -77,7 +86,7 @@ export const pinIcons = {
 };
 
 // Helper function to get mood-based icon
-export const getMoodIcon = (mood: MoodType | undefined, isPrivate: boolean, hasMusic: boolean): L.DivIcon => {
+export const getMoodIcon = (mood: MoodType | undefined, isPrivate: boolean, hasMusic: boolean, zoomLevel?: number): L.DivIcon => {
   if (!mood) {
     // Fallback to original icons if no mood is set
     if (isPrivate) {
@@ -87,6 +96,13 @@ export const getMoodIcon = (mood: MoodType | undefined, isPrivate: boolean, hasM
     }
   }
 
+  // For zoom-responsive mood icons, create them dynamically
+  if (zoomLevel !== undefined) {
+    const html = createMoodPinHTML(mood, hasMusic, isPrivate, zoomLevel);
+    return div(html, true);
+  }
+
+  // Fallback to pre-generated icons
   const iconKey = `${mood}_${isPrivate ? 'private' : 'public'}${hasMusic ? 'Music' : ''}`;
   return pinIcons[iconKey as keyof typeof pinIcons] || pinIcons.public;
 };

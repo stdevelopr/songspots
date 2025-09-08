@@ -373,6 +373,31 @@
   transition: all 0.2s ease;
 }
 
+/* Zoom-based sizing for mood markers */
+.mood-vibe-marker.zoom-very-low {
+  width: 12px;
+  height: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.mood-vibe-marker.zoom-low {
+  width: 16px;
+  height: 16px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.18);
+}
+
+.mood-vibe-marker.zoom-medium {
+  width: 24px;
+  height: 24px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.mood-vibe-marker.zoom-high {
+  width: 32px;
+  height: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
 .mood-vibe-marker:hover {
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
@@ -393,6 +418,23 @@
   line-height: 1;
   position: relative;
   z-index: 2;
+}
+
+/* Adaptive emoji sizing for different zoom levels */
+.zoom-very-low .mood-emoji-main {
+  font-size: 8px;
+}
+
+.zoom-low .mood-emoji-main {
+  font-size: 10px;
+}
+
+.zoom-medium .mood-emoji-main {
+  font-size: 14px;
+}
+
+.zoom-high .mood-emoji-main {
+  font-size: 18px;
 }
 
 .mood-music-note {
@@ -427,6 +469,92 @@
   font-size: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   z-index: 3;
+}
+
+/* Hide indicators at very low zoom levels */
+.zoom-very-low .mood-music-note,
+.zoom-very-low .mood-lock-icon {
+  display: none;
+}
+
+/* Smaller indicators at low zoom */
+.zoom-low .mood-music-note,
+.zoom-low .mood-lock-icon {
+  width: 10px;
+  height: 10px;
+  font-size: 6px;
+}
+
+/* Cluster marker styles for global zoom levels */
+.mood-cluster-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+.mood-cluster {
+  position: relative;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  border: 3px solid rgba(255, 255, 255, 0.9);
+}
+
+.mood-cluster:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.mood-cluster-small {
+  width: 32px;
+  height: 32px;
+}
+
+.mood-cluster-medium {
+  width: 44px;
+  height: 44px;
+}
+
+.mood-cluster-large {
+  width: 56px;
+  height: 56px;
+}
+
+.mood-cluster-count {
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 2;
+}
+
+.mood-cluster-medium .mood-cluster-count {
+  font-size: 14px;
+}
+
+.mood-cluster-large .mood-cluster-count {
+  font-size: 16px;
+}
+
+/* Pie chart style cluster for mood distribution */
+.mood-cluster-pie {
+  position: relative;
+  overflow: hidden;
+}
+
+.mood-cluster-pie::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+  background: conic-gradient(var(--mood-distribution));
 }
 
 /* User location marker styles */
