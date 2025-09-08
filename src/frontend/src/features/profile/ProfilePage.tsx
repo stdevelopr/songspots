@@ -159,6 +159,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onBackToMap }) => {
                 description: vibeOperations.vibeToEdit.description,
                 musicLink: vibeOperations.vibeToEdit.musicLink,
                 isPrivate: vibeOperations.vibeToEdit.isPrivate,
+                mood: vibeOperations.vibeToEdit.mood,
               }
             : null
         }

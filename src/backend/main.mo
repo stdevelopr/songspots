@@ -122,6 +122,7 @@ persistent actor {
     longitude : Text;
     owner : Principal;
     isPrivate : Bool;
+    mood : ?Text; // Optional mood field (energetic, chill, creative, etc.)
   };
 
   transient let vibeMap = Map.Make<Nat>(Nat.compare);
@@ -130,7 +131,7 @@ persistent actor {
   transient var vibes : Map.Map<Nat, Vibe> = vibeMap.empty<Vibe>();
   transient var nextVibeId : Nat = 0;
 
-  public shared ({ caller }) func createVibe(name : Text, description : Text, musicLink : Text, latitude : Text, longitude : Text, isPrivate : Bool) : async () {
+  public shared ({ caller }) func createVibe(name : Text, description : Text, musicLink : Text, latitude : Text, longitude : Text, isPrivate : Bool, mood : ?Text) : async () {
     if (not (MultiUserSystem.hasPermission(multiUserState, caller, #user, false))) {
       Debug.trap("Unauthorized: Only authenticated users can create vibes");
     };
@@ -143,12 +144,13 @@ persistent actor {
       longitude;
       owner = caller;
       isPrivate;
+      mood;
     };
     vibes := vibeMap.put(vibes, nextVibeId, newVibe);
     nextVibeId += 1;
   };
 
-  public shared ({ caller }) func updateVibe(id : Nat, name : Text, description : Text, musicLink : Text, latitude : Text, longitude : Text, isPrivate : Bool) : async () {
+  public shared ({ caller }) func updateVibe(id : Nat, name : Text, description : Text, musicLink : Text, latitude : Text, longitude : Text, isPrivate : Bool, mood : ?Text) : async () {
     if (not (MultiUserSystem.hasPermission(multiUserState, caller, #user, false))) {
       Debug.trap("Unauthorized: Only authenticated users can update vibes");
     };
@@ -161,6 +163,7 @@ persistent actor {
       longitude;
       owner = caller;
       isPrivate;
+      mood;
     };
     vibes := vibeMap.put(vibes, id, updatedVibe);
   };

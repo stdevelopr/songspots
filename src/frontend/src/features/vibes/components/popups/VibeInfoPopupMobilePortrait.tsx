@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pin } from '../../../map/types/map';
 import { useVibeDisplay } from '../../hooks';
-import { Header, MusicBlock, DescriptionBlock, ProfileButton, TimestampBadge, ActionButton } from '../shared';
+import { Header, MusicBlock, DescriptionBlock, MoodTag, ProfileButton, TimestampBadge, ActionButton } from '../shared';
 
 interface VibeInfoPopupMobilePortraitProps {
   vibe: Pin;
@@ -25,6 +25,11 @@ const VibeInfoPopupMobilePortrait: React.FC<VibeInfoPopupMobilePortraitProps> = 
   return (
     <div className="w-[95vw] max-w-sm rounded-2xl bg-white/20 shadow-xl backdrop-blur-md border border-white/20 flex flex-col max-h-[85vh] overflow-hidden animate-fade-in">
       <Header title={display.title} onClose={onClose} size="sm" />
+
+      {/* Always visible mood banner */}
+      {display.hasMood && (
+        <MoodTag mood={display.mood} variant="banner" size="sm" />
+      )}
 
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto">

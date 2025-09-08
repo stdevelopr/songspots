@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import type { Pin, Vibe } from '../../map/types/map';
 
-import { pinIcons } from '../../common';
+import { getMoodIcon } from '../../common/utils/icons';
 
 interface Options {
   map: L.Map | null;
@@ -43,13 +43,7 @@ export function useVibeLayer({
     const itemsToRender = vibes || pins || [];
     
     itemsToRender.forEach((item) => {
-      const icon = item.isPrivate
-        ? item.musicLink
-          ? pinIcons.privateMusic
-          : pinIcons.private
-        : item.musicLink
-          ? pinIcons.publicMusic
-          : pinIcons.public;
+      const icon = getMoodIcon(item.mood, !!item.isPrivate, !!item.musicLink);
 
       const m = L.marker([item.lat, item.lng], { icon });
 

@@ -6,6 +6,7 @@ import type { Vibe as BackendVibe } from '../../backend/backend.did';
 import { IOnViewUserProfile } from './interactive-map/interactiveMapTypes';
 import { useCreateVibe, useDeleteVibe, useUpdateVibe } from '../common';
 import { toNat } from '../common/utils/nat';
+import { MoodType } from '../common/types/moods';
 
 export const useVibes = ({
   mapInstance,
@@ -91,12 +92,14 @@ export const useVibes = ({
     );
   }, [mapInstance, userLocation]);
 
+  console.log('backendVibes:', backendVibes);
   useEffect(() => {
     if (!backendVibes?.length) return;
     setVibes(
       backendVibes.map((v) => {
+        const vibeId = v.id.toString();
         const vibeObj = {
-          id: v.id.toString(),
+          id: vibeId,
           lat: parseFloat(v.latitude),
           lng: parseFloat(v.longitude),
           timestamp: Date.now(),
@@ -106,6 +109,7 @@ export const useVibes = ({
           isPrivate: v.isPrivate,
           isOwner: currentUser ? v.owner.toString() === currentUser : false,
           owner: v.owner,
+          mood: v.mood?.[0] as MoodType | undefined, // Backend stores mood as opt text (optional)
         };
         return vibeObj;
       })
@@ -161,6 +165,7 @@ export const useVibes = ({
     description: string;
     musicLink: string;
     isPrivate: boolean;
+    mood?: MoodType;
   }) => {
     if (!vibeToEdit) return;
     try {
@@ -172,7 +177,9 @@ export const useVibes = ({
         latitude: String(vibeToEdit.lat), // text
         longitude: String(vibeToEdit.lng), // text
         isPrivate: !!vibeData.isPrivate, // bool
+        mood: vibeData.mood ? [vibeData.mood] : [], // Backend expects ?Text (optional array)
       });
+
       // Update selectedVibeDetail so popup refreshes
       setSelectedVibeDetail((prev) =>
         prev && prev.id === vibeToEdit.id
@@ -182,6 +189,7 @@ export const useVibes = ({
               description: vibeData.description,
               musicLink: vibeData.musicLink,
               isPrivate: vibeData.isPrivate,
+              mood: vibeData.mood,
             }
           : prev
       );
@@ -198,6 +206,7 @@ export const useVibes = ({
       description: string;
       musicLink: string;
       isPrivate: boolean;
+      mood?: MoodType;
     },
     location?: { lat: number; lng: number } | null
   ) => {
@@ -211,7 +220,9 @@ export const useVibes = ({
           latitude: '',
           longitude: '',
           isPrivate: !!vibeData.isPrivate,
+          mood: vibeData.mood ? [vibeData.mood] : [], // Backend expects ?Text (optional array)
         });
+
         setVibeCreateModalOpen(false);
         setVibeToEdit(null);
         return;
@@ -226,7 +237,9 @@ export const useVibes = ({
         latitude: String(lat),
         longitude: String(lng),
         isPrivate: !!vibeData.isPrivate,
+        mood: vibeData.mood ? [vibeData.mood] : [], // Backend expects ?Text (optional array)
       });
+
       setVibeCreateModalOpen(false);
       setVibeToEdit(null); // Clear edit state after creating
       // Fly to the new vibe location using the coordinates from the modal, not from state

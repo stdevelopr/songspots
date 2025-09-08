@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { isValidMusicLink } from '../../../common/validateLinks';
 import VibeModal from './VibeModal';
 import { VibeData } from '../../types';
+import { MoodType } from '../../../common/types/moods';
+import MoodSelector from '../MoodSelector';
 
 interface VibeCreateModalProps {
   isOpen: boolean;
@@ -22,6 +24,7 @@ const VibeCreateModal: React.FC<VibeCreateModalProps> = ({
   const [description, setDescription] = useState('');
   const [musicLink, setMusicLink] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
+  const [mood, setMood] = useState<MoodType | undefined>(undefined);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -30,6 +33,7 @@ const VibeCreateModal: React.FC<VibeCreateModalProps> = ({
       setDescription('');
       setMusicLink('');
       setIsPrivate(false);
+      setMood(undefined);
       setError('');
     }
   }, [isOpen]);
@@ -48,6 +52,7 @@ const VibeCreateModal: React.FC<VibeCreateModalProps> = ({
         description: description.trim(),
         musicLink: validMusicLink,
         isPrivate,
+        mood,
       },
       location
     );
@@ -82,7 +87,11 @@ const VibeCreateModal: React.FC<VibeCreateModalProps> = ({
       onCancel={onCancel}
       onSubmit={handleSubmit}
       submitText={isSubmitting ? 'Creating...' : 'Create Vibe'}
-    />
+    >
+      <div className="mt-4 pt-4 border-t border-gray-200">
+        <MoodSelector selectedMood={mood} onMoodSelect={setMood} />
+      </div>
+    </VibeModal>
   );
 };
 

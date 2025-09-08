@@ -1,9 +1,12 @@
+import { MoodType } from '../../common/types/moods';
+
 // Common vibe data interface used in modals
 export interface VibeData {
   name: string;
   description: string;
   musicLink: string;
   isPrivate: boolean;
+  mood?: MoodType;
 }
 
 // Modal props interfaces

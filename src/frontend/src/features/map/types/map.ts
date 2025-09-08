@@ -1,3 +1,5 @@
+import { MoodType } from '../../common/types/moods';
+
 export interface SelectedPin {
   id: string;
   lat: number;
@@ -17,6 +19,7 @@ export interface UserLocation {
 export type LocationStatus = 'requesting' | 'granted' | 'denied' | 'unavailable';
 
 // Keep this local Pin type minimal; extend as needed
+
 export interface Pin {
   id: string;
   lat: number;
@@ -28,6 +31,7 @@ export interface Pin {
   isPrivate?: boolean;
   isOwner?: boolean;
   owner: { toString(): string };
+  mood?: MoodType;
 }
 
 // Vibe type (updated from Pin)
@@ -42,4 +46,5 @@ export interface Vibe {
   isPrivate?: boolean;
   isOwner?: boolean;
   owner: { toString(): string };
+  mood?: MoodType;
 }

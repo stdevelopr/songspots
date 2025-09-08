@@ -5,6 +5,7 @@ type Vibe =
    isPrivate: bool;
    latitude: text;
    longitude: text;
+   mood: opt text;
    musicLink: text;
    name: text;
    owner: principal;
@@ -90,7 +91,7 @@ type ApprovalStatus =
 service : {
   assignRole: (user: principal, newRole: UserRole) -> ();
   createVibe: (name: text, description: text, musicLink: text, latitude:
-   text, longitude: text, isPrivate: bool) -> ();
+   text, longitude: text, isPrivate: bool, mood: opt text) -> ();
   deleteVibe: (id: nat) -> ();
   fileDelete: (path: text) -> ();
   fileList: () -> (vec FileMetadata) query;
@@ -112,5 +113,5 @@ service : {
   saveUserProfile: (profile: UserProfile) -> ();
   setApproval: (user: principal, approval: ApprovalStatus) -> ();
   updateVibe: (id: nat, name: text, description: text, musicLink: text,
-   latitude: text, longitude: text, isPrivate: bool) -> ();
+   latitude: text, longitude: text, isPrivate: bool, mood: opt text) -> ();
 }

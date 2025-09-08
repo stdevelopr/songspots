@@ -62,6 +62,7 @@ export interface Vibe {
   'id' : bigint,
   'latitude' : string,
   'owner' : Principal,
+  'mood' : [] | [string],
   'name' : string,
   'description' : string,
   'isPrivate' : boolean,
@@ -71,7 +72,7 @@ export interface Vibe {
 export interface _SERVICE {
   'assignRole' : ActorMethod<[Principal, UserRole], undefined>,
   'createVibe' : ActorMethod<
-    [string, string, string, string, string, boolean],
+    [string, string, string, string, string, boolean, [] | [string]],
     undefined
   >,
   'deleteVibe' : ActorMethod<[bigint], undefined>,
@@ -100,7 +101,7 @@ export interface _SERVICE {
   'saveUserProfile' : ActorMethod<[UserProfile], undefined>,
   'setApproval' : ActorMethod<[Principal, ApprovalStatus], undefined>,
   'updateVibe' : ActorMethod<
-    [bigint, string, string, string, string, string, boolean],
+    [bigint, string, string, string, string, string, boolean, [] | [string]],
     undefined
   >,
 }

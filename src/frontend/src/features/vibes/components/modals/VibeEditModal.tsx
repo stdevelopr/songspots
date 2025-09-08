@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { isValidMusicLink } from '../../../common/validateLinks';
 import VibeModal from './VibeModal';
+import { MoodType } from '../../../common/types/moods';
+import MoodSelector from '../MoodSelector';
 
 interface Vibe {
   id: string;
@@ -8,6 +10,7 @@ interface Vibe {
   description?: string;
   musicLink?: string;
   isPrivate?: boolean;
+  mood?: MoodType;
 }
 
 interface VibeData {
@@ -15,6 +18,7 @@ interface VibeData {
   description: string;
   musicLink: string;
   isPrivate: boolean;
+  mood?: MoodType;
 }
 
 interface VibeEditModalProps {
@@ -36,6 +40,7 @@ const VibeEditModal: React.FC<VibeEditModalProps> = ({
   const [description, setDescription] = useState('');
   const [musicLink, setMusicLink] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
+  const [mood, setMood] = useState<MoodType | undefined>(undefined);
   const [error, setError] = useState('');
 
   // Only reset fields when modal opens for a new vibe
@@ -46,6 +51,7 @@ const VibeEditModal: React.FC<VibeEditModalProps> = ({
       setDescription(vibe.description || '');
       setMusicLink(vibe.musicLink || '');
       setIsPrivate(vibe.isPrivate || false);
+      setMood(vibe.mood);
       setError('');
       prevVibeIdRef.current = vibe.id;
     }
@@ -68,6 +74,7 @@ const VibeEditModal: React.FC<VibeEditModalProps> = ({
       description: description.trim(),
       musicLink: validMusicLink,
       isPrivate,
+      mood,
     });
   };
 
@@ -102,7 +109,11 @@ const VibeEditModal: React.FC<VibeEditModalProps> = ({
       onCancel={onCancel}
       onSubmit={handleSubmit}
       submitText={isSubmitting ? 'Saving...' : 'Save Changes'}
-    />
+    >
+      <div className="mt-4 pt-4 border-t border-gray-200">
+        <MoodSelector selectedMood={mood} onMoodSelect={setMood} />
+      </div>
+    </VibeModal>
   );
 };
 

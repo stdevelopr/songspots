@@ -165,6 +165,7 @@ export function useCreateVibe() {
       latitude,
       longitude,
       isPrivate,
+      mood,
     }: {
       name: string;
       description: string;
@@ -172,9 +173,10 @@ export function useCreateVibe() {
       latitude: string;
       longitude: string;
       isPrivate: boolean;
+      mood?: string[] | null;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.createVibe(name, description, musicLink, latitude, longitude, isPrivate);
+      return actor.createVibe(name, description, musicLink, latitude, longitude, isPrivate, mood);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vibes'] });
@@ -196,6 +198,7 @@ export function useUpdateVibe() {
       latitude,
       longitude,
       isPrivate,
+      mood,
     }: {
       id: bigint;
       name: string;
@@ -204,9 +207,10 @@ export function useUpdateVibe() {
       latitude: string;
       longitude: string;
       isPrivate: boolean;
+      mood?: string[] | null;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.updateVibe(id, name, description, musicLink, latitude, longitude, isPrivate);
+      return actor.updateVibe(id, name, description, musicLink, latitude, longitude, isPrivate, mood);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vibes'] });

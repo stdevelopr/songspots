@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pin } from '../../../map/types/map';
 import { useVibeDisplay } from '../../hooks';
-import { Header, MusicBlock, DescriptionBlock, ProfileButton, ActionButton } from '../shared';
+import { Header, MusicBlock, DescriptionBlock, MoodTag, ProfileButton, ActionButton } from '../shared';
 
 interface VibeInfoPopupMobileLandscapeProps {
   vibe: Pin;
@@ -25,6 +25,11 @@ const VibeInfoPopupMobileLandscape: React.FC<VibeInfoPopupMobileLandscapeProps> 
   return (
     <div className="w-screen h-screen bg-white/20 backdrop-blur-md flex flex-col animate-fade-in overflow-hidden">
       <Header title={display.title} onClose={onClose} size="md" />
+
+      {/* Always visible mood banner */}
+      {display.hasMood && (
+        <MoodTag mood={display.mood} variant="banner" size="md" />
+      )}
 
       {/* Main Content Area - 2-column layout */}
       <div className="flex-1 flex min-h-0">

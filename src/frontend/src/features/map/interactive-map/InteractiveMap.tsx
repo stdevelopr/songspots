@@ -231,6 +231,7 @@ const InteractiveMap: React.FC<Props> = (props) => {
                 description: pinToEdit.description,
                 musicLink: pinToEdit.musicLink,
                 isPrivate: pinToEdit.isPrivate,
+                mood: pinToEdit.mood,
               }
             : null
         }

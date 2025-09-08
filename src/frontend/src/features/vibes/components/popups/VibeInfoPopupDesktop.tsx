@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pin } from '../../../map/types/map';
 import { useVibeDisplay } from '../../hooks';
-import { Header, MusicBlock, DescriptionBlock, ProfileButton, TimestampRow, ActionButton } from '../shared';
+import { Header, MusicBlock, DescriptionBlock, MoodTag, ProfileButton, TimestampRow, ActionButton } from '../shared';
 
 interface VibeInfoPopupDesktopProps {
   vibe: Pin;
@@ -26,8 +26,13 @@ const VibeInfoPopupDesktop: React.FC<VibeInfoPopupDesktopProps> = ({
     <div className={display.hasMedia ? 'w-[92vw] max-w-4xl rounded-2xl bg-white/20 shadow-2xl backdrop-blur-md border border-white/20 flex flex-col animate-fade-in' : 'w-auto max-w-2xl rounded-2xl bg-white/20 shadow-2xl backdrop-blur-md border border-white/20 flex flex-col animate-fade-in'}>
       <Header title={display.title} onClose={onClose} size="md" />
 
+      {/* Always visible mood banner */}
+      {display.hasMood && (
+        <MoodTag mood={display.mood} variant="banner" size="md" />
+      )}
+
       {/* Content */}
-      {(display.hasMedia || display.hasDescription) && (
+      {(display.hasMedia || display.hasDescription) ? (
         <div className="p-8">
           {display.hasMedia ? (
             <div className={`grid ${display.hasDescription ? 'grid-cols-2' : 'grid-cols-1'} gap-8`}>
@@ -42,7 +47,13 @@ const VibeInfoPopupDesktop: React.FC<VibeInfoPopupDesktopProps> = ({
             display.hasDescription && <DescriptionBlock className="max-w-2xl mx-auto" text={display.description} />
           )}
         </div>
-      )}
+      ) : display.hasMood ? (
+        <div className="p-8">
+          <div className="text-center text-gray-500 text-sm">
+            <p>This vibe doesn't have any additional details</p>
+          </div>
+        </div>
+      ) : null}
 
       {/* Actions Footer */}
       <div className="px-8 pb-8 pt-4 border-t border-white/20 bg-white/5 backdrop-blur-sm rounded-b-2xl">

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Pin } from '../../map/types/map';
+import { MoodType } from '../../common/types/moods';
 
 export interface PinDisplayOptions {
   showTimestamp?: boolean;
@@ -11,6 +12,9 @@ export interface PinDisplayModel {
   hasDescription: boolean;
   musicLink?: string;
   hasMedia: boolean;
+  // Mood display
+  mood?: MoodType;
+  hasMood: boolean;
   // Profile button logic
   showProfileButton: boolean;
   profileButton: {
@@ -35,6 +39,9 @@ export function useVibeDisplay(pin: Pin, options: PinDisplayOptions = {}): PinDi
     const musicLink = pin.musicLink;
     const hasMedia = Boolean(musicLink);
 
+    const mood = pin.mood;
+    const hasMood = Boolean(mood);
+
     const isOwner = Boolean(pin.isOwner);
     const showProfileButton = !pin.isOwner;
     const profileButton = {
@@ -54,6 +61,8 @@ export function useVibeDisplay(pin: Pin, options: PinDisplayOptions = {}): PinDi
       hasDescription,
       musicLink,
       hasMedia,
+      mood,
+      hasMood,
       showProfileButton,
       profileButton,
       canEdit,

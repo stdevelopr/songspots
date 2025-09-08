@@ -13,6 +13,7 @@ export const idlFactory = ({ IDL }) => {
     'id' : IDL.Nat,
     'latitude' : IDL.Text,
     'owner' : IDL.Principal,
+    'mood' : IDL.Opt(IDL.Text),
     'name' : IDL.Text,
     'description' : IDL.Text,
     'isPrivate' : IDL.Bool,
@@ -79,7 +80,15 @@ export const idlFactory = ({ IDL }) => {
   return IDL.Service({
     'assignRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'createVibe' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Bool],
+        [
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Bool,
+          IDL.Opt(IDL.Text),
+        ],
         [],
         [],
       ),
@@ -119,7 +128,16 @@ export const idlFactory = ({ IDL }) => {
     'saveUserProfile' : IDL.Func([UserProfile], [], []),
     'setApproval' : IDL.Func([IDL.Principal, ApprovalStatus], [], []),
     'updateVibe' : IDL.Func(
-        [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Bool],
+        [
+          IDL.Nat,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Bool,
+          IDL.Opt(IDL.Text),
+        ],
         [],
         [],
       ),
