@@ -8,6 +8,9 @@ export interface ClusterData {
   items: (Pin | Vibe)[];
   moodDistribution: Record<MoodType | 'none', number>;
   dominantMood: MoodType | 'none';
+  clusterMood: MoodType | 'none'; // The overall "feeling" of the cluster
+  moodConfidence: number; // How confident we are about the cluster mood (0-1)
+  moodBlend: string; // CSS gradient representing the cluster feeling
   radius: number;
 }
 
@@ -33,6 +36,79 @@ function getClusterRadius(zoomLevel: number): number {
   return 0; // No clustering for zoom > 9
 }
 
+// Calculate the overall "feeling" of a cluster based on mood distribution
+function calculateClusterMood(distribution: Record<MoodType | 'none', number>): {
+  clusterMood: MoodType | 'none';
+  confidence: number;
+  blend: string;
+} {
+  const total = Object.values(distribution).reduce((sum, count) => sum + count, 0);
+  const moodsWithCount = Object.entries(distribution).filter(([mood, count]) => count > 0 && mood !== 'none') as [MoodType, number][];
+  
+  if (moodsWithCount.length === 0) {
+    return { clusterMood: 'none', confidence: 0, blend: '#cccccc' };
+  }
+
+  // Calculate percentages
+  const moodPercentages = moodsWithCount.map(([mood, count]) => ({
+    mood,
+    percentage: count / total,
+    count
+  }));
+
+  // Sort by percentage (highest first)
+  moodPercentages.sort((a, b) => b.percentage - a.percentage);
+
+  // Calculate confidence based on how dominant the top mood is
+  const topMood = moodPercentages[0];
+  const confidence = topMood.percentage;
+
+  // If one mood is very dominant (>60%), use it as cluster mood
+  if (confidence > 0.6) {
+    const moodData = getMoodById(topMood.mood);
+    return {
+      clusterMood: topMood.mood,
+      confidence,
+      blend: moodData.colors.gradient
+    };
+  }
+
+  // If there are multiple significant moods, blend the top 2-3
+  const significantMoods = moodPercentages.filter(m => m.percentage >= 0.15);
+  
+  if (significantMoods.length === 1) {
+    const moodData = getMoodById(significantMoods[0].mood);
+    return {
+      clusterMood: significantMoods[0].mood,
+      confidence: significantMoods[0].percentage,
+      blend: moodData.colors.gradient
+    };
+  }
+
+  // Create a blended mood representation
+  const primaryMood = significantMoods[0];
+  const secondaryMood = significantMoods[1];
+  
+  const primaryData = getMoodById(primaryMood.mood);
+  const secondaryData = getMoodById(secondaryMood.mood);
+  
+  // Create a gradient blend weighted by the percentages
+  const primaryWeight = primaryMood.percentage / (primaryMood.percentage + secondaryMood.percentage);
+  const secondaryWeight = 1 - primaryWeight;
+  
+  const blendGradient = `linear-gradient(135deg, 
+    ${primaryData.colors.primary} 0%, 
+    ${primaryData.colors.secondary} ${primaryWeight * 50}%, 
+    ${secondaryData.colors.primary} ${50 + secondaryWeight * 25}%, 
+    ${secondaryData.colors.secondary} 100%)`;
+
+  return {
+    clusterMood: primaryMood.mood,
+    confidence: confidence,
+    blend: blendGradient
+  };
+}
+
 // Cluster pins based on proximity and zoom level
 export function clusterPins(items: (Pin | Vibe)[], zoomLevel: number): ClusterData[] {
   const clusterRadius = getClusterRadius(zoomLevel);
@@ -53,8 +129,20 @@ export function clusterPins(items: (Pin | Vibe)[], zoomLevel: number): ClusterDa
       lng: item.lng,
       count: 1,
       items: [item],
-      moodDistribution: {},
+      moodDistribution: {
+        energetic: 0,
+        chill: 0,
+        creative: 0,
+        romantic: 0,
+        peaceful: 0,
+        party: 0,
+        mysterious: 0,
+        none: 0
+      },
       dominantMood: 'none',
+      clusterMood: 'none',
+      moodConfidence: 0,
+      moodBlend: '#cccccc',
       radius: clusterRadius
     };
 
@@ -97,6 +185,13 @@ export function clusterPins(items: (Pin | Vibe)[], zoomLevel: number): ClusterDa
     });
     
     cluster.dominantMood = dominantMood;
+    
+    // Calculate the overall cluster mood and visual representation
+    const moodAnalysis = calculateClusterMood(cluster.moodDistribution);
+    cluster.clusterMood = moodAnalysis.clusterMood;
+    cluster.moodConfidence = moodAnalysis.confidence;
+    cluster.moodBlend = moodAnalysis.blend;
+    
     clusters.push(cluster);
   });
 
@@ -132,20 +227,65 @@ export function getMoodDistributionGradient(distribution: Record<MoodType | 'non
 // Create cluster marker HTML
 export function createClusterHTML(cluster: ClusterData): string {
   const sizeClass = cluster.count < 10 ? 'small' : cluster.count < 50 ? 'medium' : 'large';
-  const gradient = getMoodDistributionGradient(cluster.moodDistribution);
   
-  // Use dominant mood color as fallback if no mood distribution
-  let backgroundColor = '#6b7280'; // gray fallback
-  if (cluster.dominantMood !== 'none') {
-    const moodData = getMoodById(cluster.dominantMood as MoodType);
-    backgroundColor = moodData.colors.gradient;
+  // Check if cluster is homogeneous (single mood type, excluding 'none')
+  const moodsWithCount = Object.entries(cluster.moodDistribution).filter(([mood, count]) => count > 0 && mood !== 'none');
+  const isHomogeneous = moodsWithCount.length === 1 && cluster.clusterMood !== 'none';
+  
+  // Add confidence indicator through opacity/border
+  const confidenceAlpha = Math.max(0.7, cluster.moodConfidence); // Minimum 70% opacity
+  const borderStyle = cluster.moodConfidence > 0.6 ? 'solid' : cluster.moodConfidence > 0.3 ? 'dashed' : 'dotted';
+  
+  // Create compact mood breakdown for tooltip - each mood on its own line
+  const moodBreakdown = moodsWithCount
+    .sort(([, a], [, b]) => b - a) // Sort by count descending
+    .map(([mood, count]) => {
+      const moodData = getMoodById(mood as MoodType);
+      const percentage = Math.round((count / cluster.count) * 100);
+      return `${moodData.emoji} ${moodData.name} ${percentage}% (${count})`;
+    });
+  
+  // Add 'none' moods if any
+  if (cluster.moodDistribution.none > 0) {
+    const percentage = Math.round((cluster.moodDistribution.none / cluster.count) * 100);
+    moodBreakdown.push(`🎯 ${percentage}% (${cluster.moodDistribution.none})`);
   }
+  
+  const tooltipText = isHomogeneous 
+    ? `${cluster.count} ${getMoodById(cluster.clusterMood as MoodType).name} vibes`
+    : `${cluster.count} vibes:\n${moodBreakdown.join('\n')}`;
+  
+  // Add mood name for simple display
+  const moodName = cluster.clusterMood !== 'none' 
+    ? getMoodById(cluster.clusterMood as MoodType).name 
+    : 'Mixed';
 
-  return `
-<div class="mood-cluster mood-cluster-${sizeClass} mood-cluster-pie" 
-     style="--mood-distribution: ${gradient}; background: ${backgroundColor};"
-     data-cluster-count="${cluster.count}">
+  if (isHomogeneous) {
+    // Homogeneous cluster - show mood emoji with count
+    const moodData = getMoodById(cluster.clusterMood as MoodType);
+    
+    return `
+<div class="mood-cluster mood-cluster-${sizeClass} mood-cluster-emoji" 
+     style="background: ${cluster.moodBlend}; opacity: ${confidenceAlpha}; border-style: ${borderStyle};"
+     data-cluster-count="${cluster.count}"
+     data-mood="${cluster.clusterMood}"
+     data-breakdown="${moodBreakdown.join(' | ')}"
+     data-tooltip="${tooltipText}">
+  <div class="mood-cluster-emoji-main">${moodData.emoji}</div>
+  <div class="mood-cluster-count-badge">${cluster.count}</div>
+</div>
+`;
+  } else {
+    // Mixed cluster - use blended background with number
+    return `
+<div class="mood-cluster mood-cluster-${sizeClass} mood-cluster-mixed" 
+     style="background: ${cluster.moodBlend}; opacity: ${confidenceAlpha}; border-style: ${borderStyle};"
+     data-cluster-count="${cluster.count}"
+     data-mood="${cluster.clusterMood}"
+     data-breakdown="${moodBreakdown.join(' | ')}"
+     data-tooltip="${tooltipText}">
   <div class="mood-cluster-count">${cluster.count}</div>
 </div>
 `;
+  }
 }
