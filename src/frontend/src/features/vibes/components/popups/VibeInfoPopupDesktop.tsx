@@ -27,7 +27,7 @@ const VibeInfoPopupDesktop: React.FC<VibeInfoPopupDesktopProps> = ({
       <Header title={display.title} onClose={onClose} size="md" />
 
       {/* Always visible mood banner */}
-      {display.hasMood && (
+      {display.hasMood && display.mood && (
         <MoodTag mood={display.mood} variant="banner" size="md" />
       )}
 

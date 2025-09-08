@@ -8,7 +8,7 @@
     "start": "vite --port 3000",
     "prebuild": "dfx generate",
     "build": "sh -c 'if [ -n \"$SKIP_WORKSPACE_BUILD\" ]; then echo Skipping frontend build; else tsc && vite build; fi'",
-    "postbuild": "cp ../../.ic-assets.json5 ./dist/.ic-assets.json5 || true",
+    "postbuild": "cp ./src/.ic-assets.json5 ./dist/.ic-assets.json5 && cp -r ./src/.well-known ./dist/.well-known || true",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "format": "prettier . --write"
   },

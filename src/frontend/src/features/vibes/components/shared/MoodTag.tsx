@@ -8,25 +8,25 @@ interface MoodTagProps {
   className?: string;
 }
 
-const MoodTag: React.FC<MoodTagProps> = ({ 
-  mood, 
-  size = 'md', 
+const MoodTag: React.FC<MoodTagProps> = ({
+  mood,
+  size = 'md',
   variant = 'banner',
-  className = '' 
+  className = '',
 }) => {
   const moodData = getMoodById(mood);
   const isSmall = size === 'sm';
 
   if (variant === 'banner') {
     return (
-      <div 
+      <div
         className={`w-full flex items-center justify-center px-4 py-2 bg-white/10 border-b border-white/20 ${className}`}
-        style={{ 
-          background: `linear-gradient(90deg, ${moodData.colors.primary}15 0%, ${moodData.colors.secondary}15 100%)` 
+        style={{
+          background: `linear-gradient(90deg, ${moodData.colors.primary}15 0%, ${moodData.colors.secondary}15 100%)`,
         }}
       >
         <div className="flex items-center gap-2">
-          <div 
+          <div
             className={`rounded-full flex items-center justify-center flex-shrink-0 ${isSmall ? 'w-5 h-5 text-xs' : 'w-6 h-6 text-sm'}`}
             style={{ background: moodData.colors.gradient }}
           >
@@ -45,8 +45,10 @@ const MoodTag: React.FC<MoodTagProps> = ({
 
   // Inline variant (original design)
   return (
-    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 border border-white/30 shadow-sm ${className}`}>
-      <div 
+    <div
+      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 border border-white/30 shadow-sm ${className}`}
+    >
+      <div
         className="w-4 h-4 rounded-full flex items-center justify-center text-xs flex-shrink-0"
         style={{ background: moodData.colors.gradient }}
       >

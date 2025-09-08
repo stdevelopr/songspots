@@ -1,8 +1,0 @@
-[
-  {
-    match: "**/*",
-    headers: {
-      "Content-Security-Policy": "default-src 'self'; img-src 'self' data: https://*.tile.openstreetmap.org https://*.raw.icp0.io; connect-src 'self' http://localhost:4943 https://localhost:4943 http://127.0.0.1:4943 https://127.0.0.1:4943 https://nominatim.openstreetmap.org https://icp0.io https://icp-api.io https://*.icp0.io https://*.raw.icp0.io https://identity.ic0.app; style-src 'self' 'unsafe-inline'; frame-src 'self' https://www.youtube.com https://open.spotify.com https://identity.ic0.app;"
-    }
-  }
-]

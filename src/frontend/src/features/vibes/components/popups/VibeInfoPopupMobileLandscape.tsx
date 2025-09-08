@@ -1,7 +1,14 @@
 import React from 'react';
 import { Pin } from '../../../map/types/map';
 import { useVibeDisplay } from '../../hooks';
-import { Header, MusicBlock, DescriptionBlock, MoodTag, ProfileButton, ActionButton } from '../shared';
+import {
+  Header,
+  MusicBlock,
+  DescriptionBlock,
+  MoodTag,
+  ProfileButton,
+  ActionButton,
+} from '../shared';
 
 interface VibeInfoPopupMobileLandscapeProps {
   vibe: Pin;
@@ -27,7 +34,7 @@ const VibeInfoPopupMobileLandscape: React.FC<VibeInfoPopupMobileLandscapeProps> 
       <Header title={display.title} onClose={onClose} size="md" />
 
       {/* Always visible mood banner */}
-      {display.hasMood && (
+      {display.hasMood && display.mood && (
         <MoodTag mood={display.mood} variant="banner" size="md" />
       )}
 
@@ -41,8 +48,18 @@ const VibeInfoPopupMobileLandscape: React.FC<VibeInfoPopupMobileLandscapeProps> 
             </div>
           ) : (
             <div className="text-center text-gray-500">
-              <svg className="w-10 h-10 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              <svg
+                className="w-10 h-10 mx-auto mb-3 opacity-50"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                />
               </svg>
               <p className="text-sm">This memory doesn't have any additional content</p>
             </div>
@@ -76,7 +93,11 @@ const VibeInfoPopupMobileLandscape: React.FC<VibeInfoPopupMobileLandscapeProps> 
           <div className="p-4 border-t border-white/20 flex-shrink-0 space-y-3">
             {/* Primary Action - View Profile */}
             {display.showProfileButton && (
-              <ProfileButton fullWidth label={display.profileButton.label} onClick={() => onViewProfile(display.profileButton.userId)} />
+              <ProfileButton
+                fullWidth
+                label={display.profileButton.label}
+                onClick={() => onViewProfile(display.profileButton.userId)}
+              />
             )}
 
             {/* Owner Actions */}

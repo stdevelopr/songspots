@@ -6,6 +6,7 @@ export interface Vibe {
   latitude: string;
   longitude: string;
   isPrivate: boolean;
+  mood?: string[] | null;
 }
 
 export interface VibeUpdateData {

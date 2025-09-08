@@ -10,6 +10,7 @@ import ProfileMobileEditForm from './components/forms/ProfileMobileEditForm';
 import DeleteConfirmationModal from '../common/DeleteConfirmationModal';
 import { VibeEditModal } from '../vibes';
 import { PIN_HIGHLIGHT_STYLES } from './styles/profileStyles';
+import { MoodType } from '../common/types/moods';
 
 interface ProfilePageProps {
   userId?: string | null;
@@ -159,7 +160,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onBackToMap }) => {
                 description: vibeOperations.vibeToEdit.description,
                 musicLink: vibeOperations.vibeToEdit.musicLink,
                 isPrivate: vibeOperations.vibeToEdit.isPrivate,
-                mood: vibeOperations.vibeToEdit.mood,
+                mood: vibeOperations.vibeToEdit.mood && vibeOperations.vibeToEdit.mood.length > 0 
+                  ? vibeOperations.vibeToEdit.mood[0] as MoodType 
+                  : undefined,
               }
             : null
         }

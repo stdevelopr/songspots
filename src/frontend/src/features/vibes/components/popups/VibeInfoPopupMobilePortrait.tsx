@@ -1,7 +1,15 @@
 import React from 'react';
 import { Pin } from '../../../map/types/map';
 import { useVibeDisplay } from '../../hooks';
-import { Header, MusicBlock, DescriptionBlock, MoodTag, ProfileButton, TimestampBadge, ActionButton } from '../shared';
+import {
+  Header,
+  MusicBlock,
+  DescriptionBlock,
+  MoodTag,
+  ProfileButton,
+  TimestampBadge,
+  ActionButton,
+} from '../shared';
 
 interface VibeInfoPopupMobilePortraitProps {
   vibe: Pin;
@@ -27,7 +35,7 @@ const VibeInfoPopupMobilePortrait: React.FC<VibeInfoPopupMobilePortraitProps> = 
       <Header title={display.title} onClose={onClose} size="sm" />
 
       {/* Always visible mood banner */}
-      {display.hasMood && (
+      {display.hasMood && display.mood && (
         <MoodTag mood={display.mood} variant="banner" size="sm" />
       )}
 
@@ -72,7 +80,12 @@ const VibeInfoPopupMobilePortrait: React.FC<VibeInfoPopupMobilePortraitProps> = 
       <div className="px-4 py-4 bg-white/10 backdrop-blur-sm rounded-b-2xl border-t border-white/20 flex-shrink-0">
         {/* Primary Action - View Profile */}
         {display.showProfileButton && (
-          <ProfileButton className="mb-3" fullWidth label={display.profileButton.label} onClick={() => onViewProfile(display.profileButton.userId)} />
+          <ProfileButton
+            className="mb-3"
+            fullWidth
+            label={display.profileButton.label}
+            onClick={() => onViewProfile(display.profileButton.userId)}
+          />
         )}
 
         {/* Owner Actions */}

@@ -76,7 +76,7 @@ export function useGetVibesByOwner(principalId: string) {
 }
 
 export function useSaveUserProfile() {
-  const { actor, isFetching } = useActor();
+  const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -176,7 +176,8 @@ export function useCreateVibe() {
       mood?: string[] | null;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.createVibe(name, description, musicLink, latitude, longitude, isPrivate, mood);
+      const convertedMood: [] | [string] = mood && mood.length > 0 ? [mood[0]] : [];
+      return actor.createVibe(name, description, musicLink, latitude, longitude, isPrivate, convertedMood);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vibes'] });
@@ -210,7 +211,17 @@ export function useUpdateVibe() {
       mood?: string[] | null;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.updateVibe(id, name, description, musicLink, latitude, longitude, isPrivate, mood);
+      const convertedMood: [] | [string] = mood && mood.length > 0 ? [mood[0]] : [];
+      return actor.updateVibe(
+        id,
+        name,
+        description,
+        musicLink,
+        latitude,
+        longitude,
+        isPrivate,
+        convertedMood
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vibes'] });
@@ -252,7 +263,6 @@ export function useGetAllData() {
 
 export function useCreateData() {
   const { actor } = useActor();
-  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({ content, metadata }: { content: string; metadata: string }) => {
@@ -260,15 +270,11 @@ export function useCreateData() {
       // This would need to be implemented in the backend if needed
       throw new Error('createData not implemented');
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['data'] });
-    },
   });
 }
 
 export function useUpdateData() {
   const { actor } = useActor();
-  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({
@@ -284,24 +290,17 @@ export function useUpdateData() {
       // This would need to be implemented in the backend if needed
       throw new Error('updateData not implemented');
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['data'] });
-    },
   });
 }
 
 export function useDeleteData() {
   const { actor } = useActor();
-  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (id: bigint) => {
       if (!actor) throw new Error('Actor not available');
       // This would need to be implemented in the backend if needed
       throw new Error('deleteData not implemented');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['data'] });
     },
   });
 }
