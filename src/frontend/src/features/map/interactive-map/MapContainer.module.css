@@ -1,0 +1,21 @@
+/* Scoped Leaflet styles for the interactive map */
+
+.mapRoot {
+  width: 100%;
+  height: 100%;
+}
+
+/* Scope Leaflet container font */
+.mapRoot :global(.leaflet-container) {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Scope zoom control colors */
+.mapRoot :global(.leaflet-control-zoom a) {
+  color: #374151 !important;
+}
+
+.mapRoot :global(.leaflet-control-zoom a:hover) {
+  color: #111827 !important;
+}
+

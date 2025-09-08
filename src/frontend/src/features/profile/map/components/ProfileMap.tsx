@@ -9,6 +9,7 @@ import { useMapMarkers } from '../hooks/MapMarkers';
 import { useMapContainerMonitor } from '../hooks/MapContainerMonitor';
 import { useMapFocusHandler } from '../hooks/MapFocusHandler';
 import { MAP_CONFIG, UI_CONFIG } from '../utils/map-constants';
+import mapStyles from '../../../map/interactive-map/MapContainer.module.css';
 
 interface ProfileMapProps {
   backendPins: BackendPin[];
@@ -178,7 +179,7 @@ export const ProfileMap = React.forwardRef<ProfileMapRef, ProfileMapProps>(({
         {isCollapsed ? (
           <MapCollapsedView onToggleCollapse={toggleCollapse} />
         ) : (
-          <div className="relative w-full h-full">
+          <div className={`${mapStyles.mapRoot} relative w-full h-full`}>
             <div
               key={`map-${isCollapsed}`}
               ref={mapRef}

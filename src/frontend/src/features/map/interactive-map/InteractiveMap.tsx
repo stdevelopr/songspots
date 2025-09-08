@@ -12,6 +12,7 @@ import { useMap } from '../useMap';
 import { VibeDetailModal, VibeEditModal, VibeCreateModal } from '../../vibes';
 import { useIsMobile } from '../../common/useIsMobile';
 import { useVibes } from '../useVibes';
+import mapStyles from './MapContainer.module.css';
 
 const DEFAULT_CENTER: [number, number] = [40.7128, -74.006];
 const DEFAULT_ZOOM = 10;
@@ -154,14 +155,14 @@ const InteractiveMap: React.FC<Props> = (props) => {
 
   if (profileMode) {
     // Profile mode: just show the map with pins, no HUD, no modals, no location, no editing
-    return <div ref={mapRef} className="w-full h-full z-0" />;
+    return <div ref={mapRef} className={`${mapStyles.mapRoot} w-full h-full z-0`} />;
   }
 
   const publicCount = useMemo(() => pins.filter((p) => !p.isPrivate).length, [pins]);
   const privateCount = useMemo(() => pins.filter((p) => p.isPrivate && p.isOwner).length, [pins]);
 
   return (
-    <div className="relative w-full h-full">
+    <div className={`${mapStyles.mapRoot} relative w-full h-full`}>
       {/* Pin Detail Modal for mobile */}
       <VibeDetailModal
         vibe={selectedPinDetail}
