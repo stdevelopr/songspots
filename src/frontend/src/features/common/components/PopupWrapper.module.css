@@ -1,5 +1,5 @@
 /* Leaflet popup customization scoped to the popup via the wrapper class */
-.enhanced-popup .leaflet-popup-content-wrapper {
+.enhanced-popup :global(.leaflet-popup-content-wrapper) {
   border-radius: 12px;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   padding: 0;
@@ -7,7 +7,7 @@
   border: 1px solid #e5e7eb;
 }
 
-.enhanced-popup .leaflet-popup-content {
+.enhanced-popup :global(.leaflet-popup-content) {
   margin: 0;
   padding: 0;
   border-radius: 12px;
@@ -20,7 +20,7 @@
 }
 
 /* Base close button styling (moved from global) */
-.enhanced-popup .leaflet-popup-close-button {
+.enhanced-popup :global(.leaflet-popup-close-button) {
   background-color: white;
   color: #9ca3af;
   font-size: 20px;
@@ -37,13 +37,13 @@
   justify-self: anchor-center;
 }
 
-.enhanced-popup .leaflet-popup-close-button:hover {
+.enhanced-popup :global(.leaflet-popup-close-button:hover) {
   background: #f3f4f6;
   color: #374151;
   transform: scale(1.05);
 }
 
-.enhanced-popup .leaflet-popup-tip {
+.enhanced-popup :global(.leaflet-popup-tip) {
   background: #ffffff;
   border: 1px solid #e5e7eb;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -54,7 +54,7 @@
     max-width: 95vw !important;
     margin: 0 !important;
   }
-  .enhanced-popup .leaflet-popup-content-wrapper {
+  .enhanced-popup :global(.leaflet-popup-content-wrapper) {
     max-width: 95vw !important;
     margin: 0 !important;
   }

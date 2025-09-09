@@ -33,3 +33,19 @@
   --transition-medium: 0.3s ease;
 }
 
+/* Dark mode token overrides */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Cluster */
+    --cluster-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+    --cluster-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.6);
+    --cluster-border-color: rgba(255, 255, 255, 0.9);
+    --cluster-border-color-strong: rgba(255, 255, 255, 0.9);
+    --cluster-border-color-medium: rgba(255, 255, 255, 0.7);
+    --cluster-border-color-light: rgba(255, 255, 255, 0.5);
+
+    /* Tooltip */
+    --color-tooltip-bg: rgba(0, 0, 0, 1);
+    --color-tooltip-text: #ffffff;
+  }
+}

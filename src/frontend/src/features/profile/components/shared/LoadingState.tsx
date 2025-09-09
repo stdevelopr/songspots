@@ -5,7 +5,7 @@ const LoadingState: React.FC = () => {
     <div className="space-y-6">
       <div className="text-center py-8">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full mb-4">
-          <div className="w-8 h-8 border-3 border-indigo-300 border-t-indigo-600 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-[3px] border-indigo-300 border-t-indigo-600 rounded-full animate-spin" />
         </div>
         <h3 className="text-lg font-semibold text-gray-800 mb-2">
           Loading memories...

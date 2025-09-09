@@ -29,6 +29,8 @@ html {
   -webkit-text-size-adjust: 100%;
   /* Smooth scrolling for better UX */
   scroll-behavior: smooth;
+  /* Advertise supported color schemes for built-in UI */
+  color-scheme: light dark;
 }
 
 body {

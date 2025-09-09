@@ -1,44 +1,6 @@
-/* CSS Custom Properties for theming */
+/* Uses shared design tokens from styles/tokens.css */
 :root {
-  /* Light theme (default) */
-  --cluster-shadow-light: 0 2px 12px rgba(0, 0, 0, 0.2);
-  --cluster-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.3);
-  --cluster-border-solid: rgba(255, 255, 255, 0.95);
-  --cluster-border-dashed: rgba(255, 255, 255, 0.8);
-  --cluster-border-dotted: rgba(255, 255, 255, 0.6);
   --cluster-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --cluster-tooltip-bg: rgba(0, 0, 0, 1);
-  --cluster-tooltip-text: white;
-  --cluster-badge-bg: rgba(0, 0, 0, 0.8);
-  --cluster-badge-text: white;
-}
-
-/* Dark theme support */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --cluster-shadow-light: 0 2px 12px rgba(0, 0, 0, 0.4);
-    --cluster-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.6);
-    --cluster-border-solid: rgba(255, 255, 255, 0.9);
-    --cluster-border-dashed: rgba(255, 255, 255, 0.7);
-    --cluster-border-dotted: rgba(255, 255, 255, 0.5);
-    --cluster-tooltip-bg: rgba(0, 0, 0, 1);
-    --cluster-tooltip-text: white;
-    --cluster-badge-bg: rgba(255, 255, 255, 0.9);
-    --cluster-badge-text: #1a1a1a;
-  }
-}
-
-/* Manual dark theme class for explicit control */
-.darkTheme {
-  --cluster-shadow-light: 0 2px 12px rgba(0, 0, 0, 0.4);
-  --cluster-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.6);
-  --cluster-border-solid: rgba(255, 255, 255, 0.9);
-  --cluster-border-dashed: rgba(255, 255, 255, 0.7);
-  --cluster-border-dotted: rgba(255, 255, 255, 0.5);
-  --cluster-tooltip-bg: rgba(0, 0, 0, 1);
-  --cluster-tooltip-text: white;
-  --cluster-badge-bg: rgba(255, 255, 255, 0.9);
-  --cluster-badge-text: #1a1a1a;
 }
 
 /* Leaflet marker container */
@@ -56,8 +18,8 @@
   justify-content: center;
   cursor: pointer;
   transition: var(--cluster-transition);
-  box-shadow: var(--cluster-shadow-light);
-  border: 3px solid var(--cluster-border-solid);
+  box-shadow: var(--cluster-shadow);
+  border: 3px solid var(--cluster-border-color-strong);
   
   /* Add entrance animation */
   animation: clusterFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -82,7 +44,7 @@
 
 @keyframes pulseGlow {
   0%, 100% {
-    box-shadow: var(--cluster-shadow-light);
+    box-shadow: var(--cluster-shadow);
   }
   50% {
     box-shadow: var(--cluster-shadow-hover);
@@ -91,16 +53,16 @@
 
 /* Confidence indicators through border styles */
 .cluster[style*="border-style: solid"] {
-  border-color: var(--cluster-border-solid);
+  border-color: var(--cluster-border-color-strong);
 }
 
 .cluster[style*="border-style: dashed"] {
-  border-color: var(--cluster-border-dashed);
+  border-color: var(--cluster-border-color-medium);
   border-width: 2px;
 }
 
 .cluster[style*="border-style: dotted"] {
-  border-color: var(--cluster-border-dotted);
+  border-color: var(--cluster-border-color-light);
   border-width: 2px;
 }
 
@@ -136,9 +98,9 @@
   bottom: 100%;
   left: 50%;
   transform: translateX(-50%) translateY(-8px);
-  background: var(--cluster-tooltip-bg);
+  background: var(--color-tooltip-bg);
   backdrop-filter: blur(8px);
-  color: var(--cluster-tooltip-text);
+  color: var(--color-tooltip-text);
   padding: 6px 10px;
   border-radius: 6px;
   font-size: 11px;
@@ -173,7 +135,7 @@
   height: 0;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
-  border-top: 6px solid var(--cluster-tooltip-bg);
+  border-top: 6px solid var(--color-tooltip-bg);
   opacity: 0;
   transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
               transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -855,4 +817,3 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   z-index: 10;
 }
-

@@ -80,7 +80,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
         </label>
         <div className="flex items-start gap-6">
           <div className="relative">
-            <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 border-3 border-white shadow-lg ring-1 ring-gray-200/50 group hover:shadow-xl transition-all duration-300">
+            <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 border-[3px] border-white shadow-lg ring-1 ring-gray-200/50 group hover:shadow-xl transition-all duration-300">
               {profilePicturePreview ? (
                 <img
                   src={profilePicturePreview}
@@ -109,7 +109,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
             </div>
             {isUploading && (
               <div className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center">
-                <div className="w-7 h-7 border-3 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-7 h-7 border-[3px] border-white border-t-transparent rounded-full animate-spin" />
               </div>
             )}
           </div>
