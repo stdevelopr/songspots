@@ -1,6 +1,11 @@
+// Backend and Authentication
 export * from './useActor';
-export * from './useDeviceDetection';
-export * from './useGeocoding';
-export * from './useIsMobile';
-export * from './useLocation';
 export * from './useQueries';
+
+// Device and UI Detection
+export * from './useDeviceDetection';
+export * from './useIsMobile';
+
+// Location Services
+export * from './useGeocoding';
+export * from './useLocation';
