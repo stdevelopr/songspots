@@ -1,5 +1,5 @@
 import React from 'react';
-import { ResponsiveComponent } from '../common/ResponsiveComponent';
+import { ResponsiveComponent } from '../common';
 import { useProfileState } from './hooks/useProfileState';
 import { useProfilePicture } from './hooks/useProfilePicture';
 import { useVibeOperations } from './hooks/useVibeOperations';
@@ -7,7 +7,7 @@ import { useProfileActions } from './hooks/useProfileActions';
 import ProfileDesktopLayout from './components/layout/ProfileDesktopLayout';
 import ProfileMobileLayout from './components/layout/ProfileMobileLayout';
 import ProfileMobileEditForm from './components/forms/ProfileMobileEditForm';
-import DeleteConfirmationModal from '../common/DeleteConfirmationModal';
+import { DeleteConfirmationModal } from '../common';
 import { VibeEditModal } from '../vibes';
 import { PIN_HIGHLIGHT_STYLES } from './styles/profileStyles';
 import { MoodType } from '../common/types/moods';

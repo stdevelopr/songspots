@@ -8,8 +8,7 @@ import { ProfileMap, ProfileMapRef } from '../../map/components/ProfileMap';
 import LoadingState from '../shared/LoadingState';
 import EmptyState from '../shared/EmptyState';
 import VibeGrid from '../vibes/VibeGrid';
-import { useActor } from '../../../common/useActor';
-import { useGetUserProfile, useGetUserProfileByPrincipal } from '../../../common/useQueries';
+import { useActor, useGetUserProfile, useGetUserProfileByPrincipal } from '../../../common';
 import type { UserProfile } from '../../../../backend/backend.did';
 
 interface ProfileDesktopLayoutProps {

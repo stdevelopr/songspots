@@ -1,5 +1,5 @@
 import React, { createContext, useContext, ReactNode } from 'react';
-import { useDeviceDetection, DeviceInfo } from './useDeviceDetection';
+import { useDeviceDetection, DeviceInfo } from '../hooks/useDeviceDetection';
 
 interface ResponsiveContextType extends DeviceInfo {
   // Helper functions for common responsive patterns

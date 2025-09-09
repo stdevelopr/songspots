@@ -1,5 +1,5 @@
 import React from 'react';
-import MusicEmbed from '../../../common/MusicEmbed';
+import { MusicEmbed } from '../../../common';
 import StatusIndicator from './components/StatusIndicator';
 import PrivacyBadge from './components/PrivacyBadge';
 import SpotActions from './components/SpotActions';

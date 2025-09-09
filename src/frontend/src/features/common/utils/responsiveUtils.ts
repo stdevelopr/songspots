@@ -1,4 +1,4 @@
-import { DeviceInfo } from '../useDeviceDetection';
+import { DeviceInfo } from '../hooks/useDeviceDetection';
 
 // Conditional class names based on device type
 export const responsiveClasses = {

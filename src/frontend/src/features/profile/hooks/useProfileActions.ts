@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { useSaveUserProfile } from '../../common/useQueries';
+import { useSaveUserProfile, useActor } from '../../common';
 import { useInternetIdentity } from 'ic-use-internet-identity';
-import { useActor } from '../../common/useActor';
 
 interface UseProfileActionsProps {
   userProfile?: any;

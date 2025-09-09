@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { useResponsive } from '../common/ResponsiveProvider';
+import { useResponsive } from '../common';
 import { VibeInfoPopup } from '../vibes';
 import type { Pin } from '../map/types/map';
 

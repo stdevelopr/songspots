@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import { Principal } from '@dfinity/principal';
-import type { UserProfile, Vibe } from '../../backend/backend.did';
+import type { UserProfile, Vibe } from '../../../backend/backend.did';
 
 // User profile queries
 export function useGetUserProfile() {

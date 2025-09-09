@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom/client';
 import { InternetIdentityProvider } from 'ic-use-internet-identity';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ResponsiveProvider } from './features/common/ResponsiveProvider';
+import { ResponsiveProvider } from './features/common';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import './index.css';

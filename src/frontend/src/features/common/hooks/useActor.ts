@@ -1,8 +1,8 @@
 import { useInternetIdentity } from 'ic-use-internet-identity';
-import { createActor, canisterId } from '../../backend';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ActorSubclass, Identity } from '@dfinity/agent';
-import { _SERVICE } from '../../backend/backend.did';
+import { createActor, canisterId } from '../../../backend';
+import { _SERVICE } from '../../../backend/backend.did';
 import { useEffect } from 'react';
 
 const ACTOR_QUERY_KEY = 'actor';

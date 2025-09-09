@@ -1,6 +1,6 @@
 import React from 'react';
 import { useResponsive } from './ResponsiveProvider';
-import { getResponsiveClasses, useResponsiveStyles } from './utils/responsiveUtils';
+import { getResponsiveClasses, useResponsiveStyles } from '../utils/responsiveUtils';
 
 interface ResponsiveComponentProps {
   children?: React.ReactNode;

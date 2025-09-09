@@ -1,5 +1,5 @@
 import React from 'react';
-import { useReverseGeocode } from './useGeocoding';
+import { useReverseGeocode } from '../hooks/useGeocoding';
 
 interface LocationDisplayProps {
   latitude: string;

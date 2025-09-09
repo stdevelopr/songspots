@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { LocationStatus, UserLocation } from '../map/types/map';
+import { LocationStatus, UserLocation } from '../../map/types/map';
 
 export function useLocation() {
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);

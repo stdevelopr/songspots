@@ -1,5 +1,5 @@
 import React from 'react';
-import { ResponsiveComponent } from '../../../common/ResponsiveComponent';
+import { ResponsiveComponent } from '../../../common';
 import VibeInfoPopupDesktop from './VibeInfoPopupDesktop';
 import VibeInfoPopupMobilePortrait from './VibeInfoPopupMobilePortrait';
 import VibeInfoPopupMobileLandscape from './VibeInfoPopupMobileLandscape';

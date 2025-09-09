@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { isValidMusicLink } from '../../../common/validateLinks';
+import { isValidMusicLink } from '../../../common/utils/validateLinks';
 import VibeModal from './VibeModal';
 import { VibeData } from '../../types';
 import { MoodType } from '../../../common/types/moods';

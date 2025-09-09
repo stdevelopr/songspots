@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, useLocation, useNavigate, useParams, Navigate } from 'react-router-dom';
 
-import LoginButton from './features/common/LoginButton';
-import AppHeader from './features/common/AppHeader';
+import { 
+  LoginButton,
+  AppHeader,
+  WelcomeModal,
+  LoginPromptModal,
+  DeviceInfoDisplay,
+  ThreeLayoutExample,
+  useGetAllPins,
+  Loader
+} from './features/common';
 import ProfilePage from './features/profile/ProfilePage';
-import WelcomeModal from './features/common/WelcomeModal';
-import LoginPromptModal from './features/common/LoginPromptModal';
-import { DeviceInfoDisplay } from './features/common/DeviceInfoDisplay';
-import { ThreeLayoutExample } from './features/common/ThreeLayoutExample';
 import { useInternetIdentity } from 'ic-use-internet-identity';
-import { useGetAllPins } from './features/common/useQueries';
 import { useQueryClient } from '@tanstack/react-query';
 import InteractiveMap from './features/map/interactive-map';
-import { Loader } from './features/common/Loader';
 import VibeInfoPopupDemo from './features/vibes/demo/VibeInfoPopupDemo';
 import ComponentLab from './features/dev/ComponentLab';
 import AdminPage from './features/admin/AdminPage';

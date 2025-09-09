@@ -1,4 +1,4 @@
-import { useActor } from '../common/useActor';
+import { useActor } from '../common';
 import { canisterId } from '../../backend';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 

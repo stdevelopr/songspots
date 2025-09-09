@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { isValidMusicLink } from './validateLinks';
+import { isValidMusicLink } from '../utils/validateLinks';
 
 interface PinData {
   name: string;

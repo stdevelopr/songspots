@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useDeleteVibe, useUpdateVibe } from '../../common/useQueries';
+import { useDeleteVibe, useUpdateVibe } from '../../common';
 import type { Vibe, VibeUpdateData } from './useVibeOperations.types';
 
 export const useVibeModals = () => {

@@ -1,5 +1,4 @@
 declare const styles: {
-  readonly "darkTheme": string;
   readonly "clusterMarker": string;
   readonly "cluster": string;
   readonly "clusterFadeIn": string;
