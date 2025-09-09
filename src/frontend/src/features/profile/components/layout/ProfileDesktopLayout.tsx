@@ -2,7 +2,6 @@ import React, { useRef, useState } from 'react';
 import ProfileCard from '../shared/ProfileCard';
 import ProfileEditForm from '../forms/ProfileEditForm';
 import ProfileAbout from '../shared/ProfileAbout';
-import ProfileQuickActions from '../shared/ProfileQuickActions';
 import SocialMediaManager, { SocialMediaLink, getPlatformMeta } from '../shared/SocialMediaManager';
 import { ProfileMap, ProfileMapRef } from '../../map/components/ProfileMap';
 import LoadingState from '../shared/LoadingState';
@@ -48,8 +47,6 @@ interface ProfileDesktopLayoutProps {
 
   // Actions
   onEdit: () => void;
-  onCopyPrincipal: () => void;
-  copied: boolean;
 
   // Pin operations
   onPinClick: (pinId: string, onRestoreBounds?: () => void) => void; // list item click
@@ -98,8 +95,6 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
   onCancel,
   onSave,
   onEdit,
-  onCopyPrincipal,
-  copied,
   onPinClick,
   onMapPinClick,
   onEditPin,
@@ -202,10 +197,34 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
   };
 
   return (
-    <div className="hidden lg:flex h-full min-h-0 px-4 lg:px-8 py-6">
-      <div className="w-full max-w-7xl mx-auto h-full min-h-0 flex gap-6">
+    <>
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background-color: #d1d5db;
+          border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background-color: #9ca3af;
+        }
+      `}</style>
+      <div className="flex px-4 lg:px-8 py-6" style={{ height: 'calc(100vh - 3rem)' }}>
+      <div className="w-full max-w-7xl mx-auto flex gap-6" style={{ height: 'calc(100vh - 6rem)' }}>
         {/* Left Column - Profile Card and Info */}
-        <div className="w-full lg:w-80 xl:w-96 flex-shrink-0 min-h-0 overflow-y-auto">
+        <div 
+          className="w-full lg:w-80 xl:w-96 flex-shrink-0 overflow-y-auto pr-2 custom-scrollbar" 
+          style={{ 
+            height: '100%',
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#d1d5db transparent',
+            paddingBottom: '1rem'
+          }}
+        >
           <ProfileCard
             name={displayName}
             principalId={userPrincipalId}
@@ -262,12 +281,12 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
         </div>
 
         {/* Right Column - Map and Pins */}
-        <div className="flex-1 min-h-0 flex flex-col">
+        <div className="flex-1 flex flex-col pl-2" style={{ height: '100%' }}>
           {/* Sticky ProfileMap above the scrollable list */}
           <ProfileMap
             ref={profileMapRef}
             backendPins={backendPinsForMap}
-            className="mb-4"
+            className="mb-4 flex-shrink-0"
             expandedHeight="270px"
             onPinClick={onMapPinClick}
             focusedPinId={focusedPinId || undefined}
@@ -276,7 +295,15 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
           />
 
           {/* Scrollable container for the spots list */}
-          <div className="flex-1 min-h-0 overflow-y-auto">
+          <div 
+            className="overflow-y-auto pr-2 custom-scrollbar" 
+            style={{ 
+              height: 'calc(100% - 270px - 1rem)',
+              scrollbarWidth: 'thin',
+              scrollbarColor: '#d1d5db transparent',
+              paddingBottom: '1rem'
+            }}
+          >
             <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-md bg-white/95 backdrop-blur-sm">
               <div className="p-6 lg:p-7">
                 {isLoading || isLoadingPins ? (
@@ -313,6 +340,7 @@ const ProfileDesktopLayout: React.FC<ProfileDesktopLayoutProps> = ({
         </div>
       </div>
     </div>
+    </>
   );
 };
 

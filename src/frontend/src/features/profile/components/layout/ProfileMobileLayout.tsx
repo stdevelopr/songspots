@@ -177,7 +177,31 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
   };
 
   return (
-    <div className="h-full min-h-0 overflow-y-auto">
+    <>
+      <style>{`
+        .mobile-custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .mobile-custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .mobile-custom-scrollbar::-webkit-scrollbar-thumb {
+          background-color: #d1d5db;
+          border-radius: 3px;
+        }
+        .mobile-custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background-color: #9ca3af;
+        }
+      `}</style>
+      <div 
+        className="overflow-y-auto mobile-custom-scrollbar" 
+        style={{ 
+          height: 'calc(100vh - 3rem)',
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#d1d5db transparent',
+          paddingBottom: '1rem'
+        }}
+      >
       <div className="w-full max-w-2xl mx-auto px-3 py-3">
         <ProfileCard
           name={displayName}
@@ -258,6 +282,7 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
         </div>
       </div>
     </div>
+    </>
   );
 };
 

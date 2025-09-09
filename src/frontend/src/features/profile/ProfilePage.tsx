@@ -66,7 +66,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onBackToMap }) => {
       <style>{PIN_HIGHLIGHT_STYLES}</style>
 
       {/* Desktop Layout */}
-      <ResponsiveComponent showOnDesktop showOnTablet hideOnMobile>
+      <ResponsiveComponent showOnDesktop hideOnTablet hideOnMobile>
         <ProfileDesktopLayout
           displayName={profileState.getDisplayName()}
           userPrincipalId={profileState.getUserPrincipalId()}
@@ -97,8 +97,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onBackToMap }) => {
           onCancel={profileActions.handleCancel}
           onSave={profileActions.handleSave}
           onEdit={() => profileState.setIsEditing(true)}
-          onCopyPrincipal={profileActions.handleCopyPrincipal}
-          copied={profileActions.copied}
           onPinClick={vibeOperations.handleVibeClick}
           onMapPinClick={vibeOperations.handleMapMarkerClick}
           onEditPin={vibeOperations.handleEditVibe}
@@ -113,7 +111,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ userId, onBackToMap }) => {
       </ResponsiveComponent>
 
       {/* Mobile Layout */}
-      <ResponsiveComponent showOnMobile hideOnTablet hideOnDesktop>
+      <ResponsiveComponent showOnMobile showOnTablet hideOnDesktop>
         <ProfileMobileLayout
           displayName={profileState.getDisplayName()}
           userPrincipalId={profileState.getUserPrincipalId()}
