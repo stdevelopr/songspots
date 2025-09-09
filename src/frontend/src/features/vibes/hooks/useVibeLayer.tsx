@@ -6,6 +6,9 @@ import { getMoodIcon } from '@common/utils/icons';
 import { clusterPins, createClusterHTML } from '@common/utils/clustering';
 import clusterStyles from '@common/components/ClusterMarker.module.css';
 
+/**
+ * Options for rendering vibe/pin markers on a Leaflet map with simple zoom-aware clustering.
+ */
 interface Options {
   map: L.Map | null;
   pins?: Pin[];
@@ -16,6 +19,14 @@ interface Options {
   onPinClick?: (pin: Pin) => void;
   onVibeClick?: (vibe: Vibe) => void;
   isMobile?: boolean;
+  /** Cluster when zoom is at or below this level (default: 9) */
+  clusterAtOrBelow?: number;
+  /** Zoom-in delta when clicking a cluster (default: 3) */
+  zoomInOnClusterBy?: number;
+  /** Maximum zoom level when zooming into a cluster (default: 15) */
+  maxDetailZoom?: number;
+  /** Optional hook when a cluster gets clicked */
+  onClusterClick?: (lat: number, lng: number, nextZoom: number) => void;
 }
 
 export function useVibeLayer({
@@ -28,6 +39,10 @@ export function useVibeLayer({
   onPinClick,
   onVibeClick,
   isMobile: _isMobile,
+  clusterAtOrBelow = 9,
+  zoomInOnClusterBy = 3,
+  maxDetailZoom = 15,
+  onClusterClick,
 }: Options) {
   const layerRef = useRef<L.LayerGroup | null>(null);
   const currentZoomRef = useRef<number>(10);
@@ -52,7 +67,7 @@ export function useVibeLayer({
     const isVibeMode = !!vibes;
 
     // Use clustering for very low zoom levels (global/continental view)
-    if (zoomLevel <= 9 && itemsToRender.length > 0) {
+    if (zoomLevel <= clusterAtOrBelow && itemsToRender.length > 0) {
       const clusters = clusterPins(itemsToRender, zoomLevel);
       
       clusters.forEach((cluster) => {
@@ -84,7 +99,8 @@ export function useVibeLayer({
           
           // Cluster click behavior - zoom in to show individual pins
           clusterMarker.on('click', () => {
-            const targetZoom = Math.min(zoomLevel + 3, 15); // Zoom in 3 levels or to max detail
+            const targetZoom = Math.min(zoomLevel + zoomInOnClusterBy, maxDetailZoom);
+            if (onClusterClick) onClusterClick(cluster.lat, cluster.lng, targetZoom);
             map.setView([cluster.lat, cluster.lng], targetZoom);
           });
           
