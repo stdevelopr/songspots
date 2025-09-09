@@ -14,8 +14,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       loginOptions={{
         identityProvider:
           process.env.DFX_NETWORK === 'local'
-            ? `http://umunu-kh777-77774-qaaca-cai.localhost:4943`
-            : 'https://identity.ic0.app',
+            ? `http://rdmx6-jaaaa-aaaaa-aaadq-cai.localhost:4943`
+            : 'https://id.ai',
+        // Internet Identity 2.0 features
+        maxTimeToLive: BigInt(7 * 24 * 60 * 60 * 1000 * 1000 * 1000), // 7 days in nanoseconds
+        windowOpenerFeatures: "toolbar=0,location=0,menubar=0,width=500,height=500,left=100,top=100"
       }}
     >
       <ResponsiveProvider>
