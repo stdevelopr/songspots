@@ -1,5 +1,5 @@
 import React from 'react';
-import VibeInfoPopup from '../popups/VibeInfoPopup';
+import VibeInfoPopup from '../VibeInfoPopup';
 import { Pin } from '../../../map';
 
 interface Props {

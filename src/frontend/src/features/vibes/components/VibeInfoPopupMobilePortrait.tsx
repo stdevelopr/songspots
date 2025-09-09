@@ -1,6 +1,6 @@
 import React from 'react';
-import { Pin } from '../../../map/types/map';
-import { useVibeDisplay } from '../../hooks';
+import { Pin } from '../../map/types/map';
+import { useVibeDisplay } from '../hooks';
 import {
   Header,
   MusicBlock,
@@ -9,7 +9,7 @@ import {
   ProfileButton,
   TimestampBadge,
   ActionButton,
-} from '../shared';
+} from './shared';
 
 interface VibeInfoPopupMobilePortraitProps {
   vibe: Pin;

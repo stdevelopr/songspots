@@ -82,3 +82,14 @@ body {
 }
 
 /* High DPI marker tweaks moved to MarkerIcons.module.css */
+
+/* Ensure input text is visible regardless of dark mode */
+input[type="text"],
+input[type="email"], 
+input[type="password"],
+input[type="url"],
+input[type="search"],
+textarea {
+  color: #000 !important;
+  background-color: #fff !important;
+}

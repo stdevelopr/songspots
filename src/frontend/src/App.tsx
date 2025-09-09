@@ -15,7 +15,7 @@ import ProfilePage from './features/profile/ProfilePage';
 import { useInternetIdentity } from 'ic-use-internet-identity';
 import { useQueryClient } from '@tanstack/react-query';
 import InteractiveMap from './features/map/interactive-map';
-import VibeInfoPopupDemo from './features/vibes/demo/VibeInfoPopupDemo';
+import VibeInfoPopupDemo from './features/dev/VibeInfoPopupDemo';
 import ComponentLab from './features/dev/ComponentLab';
 import AdminPage from './features/admin/AdminPage';
 
