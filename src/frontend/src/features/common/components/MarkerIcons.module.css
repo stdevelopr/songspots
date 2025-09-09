@@ -110,9 +110,9 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--marker-shadow);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-medium);
 }
 
 /* Zoom-based sizing for mood markers */
@@ -142,7 +142,7 @@
 
 .mood-vibe-marker:hover {
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--marker-shadow-strong);
 }
 
 .mood-content {
@@ -193,7 +193,7 @@
   font-size: 8px;
   font-weight: bold;
   color: #333;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--marker-badge-shadow);
   z-index: 3;
 }
 
@@ -267,7 +267,7 @@
   position: absolute;
   top: 6px;
   left: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--marker-dot-shadow);
 }
 
 @keyframes pulse-ring {

@@ -1,0 +1,35 @@
+/* Design tokens: colors, radii, shadows, spacing */
+
+:root {
+  /* Colors */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-tooltip-bg: rgba(0, 0, 0, 0.9);
+  --color-tooltip-text: #ffffff;
+
+  /* Cluster */
+  --cluster-border-color: rgba(255, 255, 255, 0.9);
+  --cluster-border-color-strong: rgba(255, 255, 255, 0.95);
+  --cluster-border-color-medium: rgba(255, 255, 255, 0.8);
+  --cluster-border-color-light: rgba(255, 255, 255, 0.6);
+  --cluster-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  --cluster-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.3);
+
+  /* Marker */
+  --marker-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --marker-shadow-strong: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --marker-dot-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --marker-badge-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.3s ease;
+}
+

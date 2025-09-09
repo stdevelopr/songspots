@@ -5,13 +5,14 @@
   "type": "module",
   "scripts": {
     "setup": "npm i && dfx canister create vybers-backend && dfx generate vybers-backend && dfx deploy",
-    "start": "vite --port 3000",
+    "start": "concurrently -n tcm,vite -c yellow,cyan \"npm:gen:css-types:watch\" \"vite --port 3000\"",
     "prebuild": "dfx generate",
     "build": "sh -c 'if [ -n \"$SKIP_WORKSPACE_BUILD\" ]; then echo Skipping frontend build; else tsc && vite build; fi'",
     "postbuild": "cp ./src/.ic-assets.json5 ./dist/.ic-assets.json5 && cp -r ./src/.well-known ./dist/.well-known || true",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "format": "prettier . --write",
-    "gen:css-types": "tcm 'src/**/*.module.css' --outDir . --camelCase"
+    "gen:css-types": "tcm -p 'src/**/*.module.css' --camelCase",
+    "gen:css-types:watch": "tcm -p 'src/**/*.module.css' --camelCase --watch"
   },
   "dependencies": {
     "@dfinity/agent": "^3.2.0",
@@ -36,6 +37,7 @@
     "typescript": "^5.1.3",
     "vite": "^5.0.0",
     "vite-plugin-environment": "^1.1.3",
-    "typed-css-modules": "^0.7.2"
+    "typed-css-modules": "^0.7.2",
+    "concurrently": "^9.1.2"
   }
 }

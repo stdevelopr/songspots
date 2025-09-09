@@ -1,0 +1,36 @@
+declare const styles: {
+  readonly "customPin": string;
+  readonly "pinMarker": string;
+  readonly "pinHead": string;
+  readonly "pinPoint": string;
+  readonly "musicPinHead": string;
+  readonly "musicNote": string;
+  readonly "musicPin": string;
+  readonly "privatePinHead": string;
+  readonly "lockIcon": string;
+  readonly "lockIconSmall": string;
+  readonly "privatePin": string;
+  readonly "moodMarker": string;
+  readonly "moodVibeMarker": string;
+  readonly "zoomVeryLow": string;
+  readonly "zoomLow": string;
+  readonly "zoomMedium": string;
+  readonly "zoomHigh": string;
+  readonly "moodContent": string;
+  readonly "moodEmojiMain": string;
+  readonly "moodMusicNote": string;
+  readonly "moodLockIcon": string;
+  readonly "userLocationPin": string;
+  readonly "userLocationMarker": string;
+  readonly "userLocationPulse": string;
+  readonly "pulseRing": string;
+  readonly "userLocationDot": string;
+  readonly "selectedPinMarker": string;
+  readonly "selectedPinHighlight": string;
+  readonly "selectedPinPulse": string;
+  readonly "selectedPulseRing": string;
+  readonly "selectedPinInner": string;
+  readonly "selectedPinIcon": string;
+};
+export = styles;
+

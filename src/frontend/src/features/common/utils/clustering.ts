@@ -295,19 +295,19 @@ function createClusterHTMLFallback(cluster: ClusterData): string {
     // Homogeneous cluster - show mood emoji with count
     const moodData = getMoodById(cluster.clusterMood as MoodType);
     
-    const emojiMain = createHTMLElement('div', { className: clusterStyles['mood-cluster-emoji-main'] }, moodData.emoji);
-    const countBadge = createHTMLElement('div', { className: clusterStyles['mood-cluster-count-badge'] }, cluster.count.toString());
+    const emojiMain = createHTMLElement('div', { className: clusterStyles.emojiMain }, moodData.emoji);
+    const countBadge = createHTMLElement('div', { className: clusterStyles.countBadge }, cluster.count.toString());
     
     return createHTMLElement('div', {
-      className: `${clusterStyles['mood-cluster']} ${clusterStyles[`mood-cluster-${sizeClass}`]} ${clusterStyles['mood-cluster-emoji']}`,
+      className: `${clusterStyles.cluster} ${clusterStyles[sizeClass]} ${clusterStyles.emoji}`,
       ...commonProps
     }, emojiMain + countBadge);
   } else {
     // Mixed cluster - use blended background with number
-    const countElement = createHTMLElement('div', { className: clusterStyles['mood-cluster-count'] }, cluster.count.toString());
+    const countElement = createHTMLElement('div', { className: clusterStyles.count }, cluster.count.toString());
     
     return createHTMLElement('div', {
-      className: `${clusterStyles['mood-cluster']} ${clusterStyles[`mood-cluster-${sizeClass}`]} ${clusterStyles['mood-cluster-mixed']}`,
+      className: `${clusterStyles.cluster} ${clusterStyles[sizeClass]}`,
       ...commonProps
     }, countElement);
   }

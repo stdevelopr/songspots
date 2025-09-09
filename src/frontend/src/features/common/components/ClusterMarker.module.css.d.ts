@@ -1,0 +1,34 @@
+declare const styles: {
+  readonly "darkTheme": string;
+  readonly "clusterMarker": string;
+  readonly "cluster": string;
+  readonly "clusterFadeIn": string;
+  readonly "pulseGlow": string;
+  readonly "small": string;
+  readonly "medium": string;
+  readonly "large": string;
+  readonly "count": string;
+  readonly "emoji": string;
+  readonly "emojiMain": string;
+  readonly "countBadge": string;
+  readonly "badgePop": string;
+  readonly "partyBounce": string;
+  readonly "loading": string;
+  readonly "loadingPulse": string;
+  readonly "selected": string;
+  readonly "pressed": string;
+  readonly "error": string;
+  readonly "errorShake": string;
+  readonly "srOnly": string;
+  readonly "energeticBreath": string;
+  readonly "emojiWiggle": string;
+  readonly "loadingRotate": string;
+  readonly "confidenceGlowShadow": string;
+  readonly "activityPulse": string;
+  readonly "success": string;
+  readonly "successPulse": string;
+  readonly "clusterEntranceStagger": string;
+  readonly "confidenceGlow": string;
+};
+export = styles;
+

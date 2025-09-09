@@ -22,12 +22,12 @@ export function useVibeLayer({
   map,
   pins,
   vibes,
-  onViewProfile,
-  onEdit,
-  onDelete,
+  onViewProfile: _onViewProfile,
+  onEdit: _onEdit,
+  onDelete: _onDelete,
   onPinClick,
   onVibeClick,
-  isMobile,
+  isMobile: _isMobile,
 }: Options) {
   const layerRef = useRef<L.LayerGroup | null>(null);
   const currentZoomRef = useRef<number>(10);
@@ -67,7 +67,7 @@ export function useVibeLayer({
         } else {
           // Multiple items - show as cluster
           const clusterIcon = L.divIcon({
-            className: clusterStyles['mood-cluster-marker'],
+            className: clusterStyles.clusterMarker,
             html: createClusterHTML(cluster),
             iconSize: [cluster.count < 10 ? 32 : cluster.count < 50 ? 44 : 56, cluster.count < 10 ? 32 : cluster.count < 50 ? 44 : 56],
             iconAnchor: [cluster.count < 10 ? 16 : cluster.count < 50 ? 22 : 28, cluster.count < 10 ? 16 : cluster.count < 50 ? 22 : 28],
@@ -125,5 +125,5 @@ export function useVibeLayer({
     return () => {
       map.off('zoomend', handleZoomEnd);
     };
-  }, [map, pins, vibes, isMobile]);
+  }, [map, pins, vibes, _isMobile]);
 }

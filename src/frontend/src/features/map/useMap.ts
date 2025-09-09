@@ -13,12 +13,16 @@ export const useMap = () => {
     let initialCenter: [number, number] = [40.7128, -74.006]; // Default to NYC
     let initialZoom = 10;
 
-    // Create map instance
-    const map = L.map(mapRef.current).setView(initialCenter, initialZoom);
+    // Create map instance with world bounds
+    const map = L.map(mapRef.current, {
+      maxBounds: [[-90, -180], [90, 180]],
+      maxBoundsViscosity: 1.0,
+    }).setView(initialCenter, initialZoom);
 
     // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
+      minZoom: 2,
     }).addTo(map);
 
     setMapInstance(map);

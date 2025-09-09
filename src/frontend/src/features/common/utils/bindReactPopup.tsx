@@ -16,7 +16,7 @@ export function bindReactPopup(
     closeOnEscapeKey: true,
     closeOnClick: false,
     maxWidth: window.innerWidth < 600 ? window.innerWidth * 0.95 : 320,
-    className: popupStyles['enhanced-popup'],
+    className: popupStyles.enhancedPopup,
   },
   onClose?: () => void
 ) {
