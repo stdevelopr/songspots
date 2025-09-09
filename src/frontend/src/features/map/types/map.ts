@@ -1,4 +1,4 @@
-import { MoodType } from '../../common/types/moods';
+import { MoodType } from '@common/types/moods';
 
 export interface SelectedPin {
   id: string;

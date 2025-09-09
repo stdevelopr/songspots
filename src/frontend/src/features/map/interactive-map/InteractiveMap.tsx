@@ -1,16 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { toNat } from '../../common/utils/nat';
-import { DeleteConfirmationModal } from '../../common';
+import { toNat } from '@common/utils/nat';
+import { DeleteConfirmationModal } from '@common';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Pin, SelectedPin } from '../types/map';
-import { useLocation } from '../../common';
+import { useLocation } from '@common';
 import { MapHUD } from '../MapHUD';
 import { useInternetIdentity } from 'ic-use-internet-identity';
-import type { Vibe as BackendVibe } from '../../../backend/backend.did';
+import type { Vibe as BackendVibe } from '@backend/backend.did';
 import { useMap } from '../useMap';
-import { VibeDetailModal, VibeEditModal, VibeCreateModal } from '../../vibes';
-import { useIsMobile } from '../../common';
+import { VibeDetailModal, VibeEditModal, VibeCreateModal } from '@features/vibes';
+import { useIsMobile } from '@common';
 import { useVibes } from '../useVibes';
 import mapStyles from './MapContainer.module.css';
 

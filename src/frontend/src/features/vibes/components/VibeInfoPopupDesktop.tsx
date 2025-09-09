@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pin } from '../../map/types/map';
+import { Pin } from '@features/map/types/map';
 import { useVibeDisplay } from '../hooks';
 import { Header, MusicBlock, DescriptionBlock, MoodTag, ProfileButton, TimestampRow, ActionButton } from './shared';
 

@@ -13,7 +13,13 @@
     "moduleResolution": "Node",
     "baseUrl": ".",
     "paths": {
-      "@dfinity/*": ["./node_modules/@dfinity/*"]
+      "@dfinity/*": ["./node_modules/@dfinity/*"],
+      "@features/*": ["./src/features/*"],
+      "@features": ["./src/features/index.ts"],
+      "@common/*": ["./src/features/common/*"],
+      "@common": ["./src/features/common/index.ts"],
+      "@backend/*": ["./src/backend/*"],
+      "@backend": ["./src/backend/index.d.ts"]
     },
     "resolveJsonModule": true,
     "isolatedModules": true,

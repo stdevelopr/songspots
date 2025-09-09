@@ -1,5 +1,5 @@
 import React from 'react';
-import { MoodType, getAllMoods } from '../../common/types/moods';
+import { MoodType, getAllMoods } from '@common/types/moods';
 
 interface MoodSelectorProps {
   selectedMood?: MoodType;

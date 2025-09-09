@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
-import { useVibeLayer } from '../vibes';
+import { useVibeLayer } from '@features/vibes';
 import { Vibe, SelectedVibe } from './types/map';
-import type { Vibe as BackendVibe } from '../../backend/backend.did';
+import type { Vibe as BackendVibe } from '@backend/backend.did';
 import { IOnViewUserProfile } from './interactive-map/interactiveMapTypes';
-import { useCreateVibe, useDeleteVibe, useUpdateVibe } from '../common';
-import { toNat } from '../common/utils/nat';
-import { MoodType } from '../common/types/moods';
-import markerStyles from '../common/components/MarkerIcons.module.css';
+import { useCreateVibe, useDeleteVibe, useUpdateVibe } from '@common';
+import { toNat } from '@common/utils/nat';
+import { MoodType } from '@common/types/moods';
+import markerStyles from '@common/components/MarkerIcons.module.css';
 
 export const useVibes = ({
   mapInstance,

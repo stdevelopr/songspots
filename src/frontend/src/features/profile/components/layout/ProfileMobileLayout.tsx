@@ -5,8 +5,8 @@ import ProfileStats from '../shared/ProfileStats';
 import SocialMediaManager, { SocialMediaLink, getPlatformMeta } from '../shared/SocialMediaManager';
 import { ProfileMap, ProfileMapRef } from '../../map/components/ProfileMap';
 import ProfileSpotList from '../vibes/ProfileSpotList';
-import { useActor, useGetUserProfile, useGetUserProfileByPrincipal } from '../../../common';
-import type { UserProfile } from '../../../../backend/backend.did';
+import { useActor, useGetUserProfile, useGetUserProfileByPrincipal } from '@common';
+import type { UserProfile } from '@backend/backend.did';
 
 interface ProfileMobileLayoutProps {
   // Profile data

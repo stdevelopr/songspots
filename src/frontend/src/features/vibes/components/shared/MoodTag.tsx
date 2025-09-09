@@ -1,5 +1,5 @@
 import React from 'react';
-import { MoodType, getMoodById } from '../../../common/types/moods';
+import { MoodType, getMoodById } from '@common/types/moods';
 
 interface MoodTagProps {
   mood: MoodType;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useImperativeHandle } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import type { Vibe as BackendPin } from '../../../../backend/backend.did';
+import type { Vibe as BackendPin } from '@backend/backend.did';
 import { useMapInstance } from '../hooks/useMapInstance';
 import { MapLoadingOverlay, CollapseButton, MapCollapsedView, ShowAllButton } from './MapComponents';
 import { useMapIcons, MapIconStyles } from './MapIcons';
@@ -9,7 +9,7 @@ import { useMapMarkers } from '../hooks/MapMarkers';
 import { useMapContainerMonitor } from '../hooks/MapContainerMonitor';
 import { useMapFocusHandler } from '../hooks/MapFocusHandler';
 import { MAP_CONFIG, UI_CONFIG } from '../utils/map-constants';
-import mapStyles from '../../../map/interactive-map/MapContainer.module.css';
+import mapStyles from '@features/map/interactive-map/MapContainer.module.css';
 
 interface ProfileMapProps {
   backendPins: BackendPin[];

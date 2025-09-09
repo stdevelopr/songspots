@@ -1,6 +1,6 @@
 import React from 'react';
 import VibeInfoPopup from './VibeInfoPopup';
-import { Pin } from '../../../map/types/map';
+import { Pin } from '@features/map/types/map';
 
 interface Props {
   vibe: Pin;

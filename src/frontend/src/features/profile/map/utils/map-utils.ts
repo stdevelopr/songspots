@@ -1,4 +1,4 @@
-import type { Vibe as BackendPin } from '../../../../backend/backend.did';
+import type { Vibe as BackendPin } from '@backend/backend.did';
 
 export interface ValidPin {
   lat: number;

@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
-import { useFileUpload } from '../../file-storage/FileUpload';
-import { useFileUrl, sanitizeUrl } from '../../file-storage/FileList';
+import { useFileUpload } from '@features/file-storage/FileUpload';
+import { useFileUrl, sanitizeUrl } from '@features/file-storage/FileList';
 import { useInternetIdentity } from 'ic-use-internet-identity';
 
 interface UseProfilePictureProps {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import VibeInfoPopup from '../vibes/components/VibeInfoPopup';
-import type { Pin } from '../../map/types/map';
+import { VibeInfoPopup } from '@features/vibes';
+import type { Pin } from '@features/map/types/map';
 
 const mockPin: Pin = {
   id: 'demo-1' as any,
@@ -48,4 +48,3 @@ const VibeInfoPopupDemo: React.FC = () => {
 };
 
 export default VibeInfoPopupDemo;
-

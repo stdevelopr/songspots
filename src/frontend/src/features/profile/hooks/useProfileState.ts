@@ -4,7 +4,7 @@ import {
   useGetUserProfile,
   useGetUserProfileByPrincipal,
   useGetPinsByOwner,
-} from '../../common';
+} from '@common';
 
 interface UseProfileStateProps {
   userId?: string | null;

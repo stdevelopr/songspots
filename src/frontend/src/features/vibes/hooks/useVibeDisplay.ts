@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { Pin } from '../../map/types/map';
-import { MoodType } from '../../common/types/moods';
+import { Pin } from '@features/map/types/map';
+import { MoodType } from '@common/types/moods';
 
 export interface PinDisplayOptions {
   showTimestamp?: boolean;

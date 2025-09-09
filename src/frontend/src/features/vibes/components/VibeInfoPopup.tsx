@@ -1,9 +1,9 @@
 import React from 'react';
-import { ResponsiveComponent } from '../../common';
+import { ResponsiveComponent } from '@common';
 import VibeInfoPopupDesktop from './VibeInfoPopupDesktop';
 import VibeInfoPopupMobilePortrait from './VibeInfoPopupMobilePortrait';
 import VibeInfoPopupMobileLandscape from './VibeInfoPopupMobileLandscape';
-import { Pin } from '../../map/types/map';
+import { Pin } from '@features/map/types/map';
 
 interface VibeInfoPopupProps {
   vibe: Pin;

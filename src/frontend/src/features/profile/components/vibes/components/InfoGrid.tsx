@@ -1,5 +1,5 @@
 import React from 'react';
-import { LocationDisplay } from '../../../../common';
+import { LocationDisplay } from '@common';
 
 interface InfoGridProps {
   latitude: string | number;

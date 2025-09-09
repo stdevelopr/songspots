@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
-import type { Vibe as BackendPin } from '../../../../backend/backend.did';
+import type { Vibe as BackendPin } from '@backend/backend.did';
 import { parseCoordinates } from '../utils/map-utils';
 import { UI_CONFIG } from '../utils/map-constants';
 

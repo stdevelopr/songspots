@@ -69,6 +69,19 @@ export default defineConfig({
         find: 'react-dom',
         replacement: fileURLToPath(new URL('../../node_modules/react-dom/index.js', import.meta.url)),
       },
+      // Feature and common aliases
+      {
+        find: '@features',
+        replacement: fileURLToPath(new URL('./src/features', import.meta.url)),
+      },
+      {
+        find: '@common',
+        replacement: fileURLToPath(new URL('./src/features/common', import.meta.url)),
+      },
+      {
+        find: '@backend',
+        replacement: fileURLToPath(new URL('./src/backend', import.meta.url)),
+      },
     ],
     dedupe: ['@dfinity/agent'],
   },

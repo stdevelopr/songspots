@@ -1,6 +1,6 @@
 import React from 'react';
 import { MoodType, getMoodById } from '../types/moods';
-import type { Pin, Vibe } from '../../map/types/map';
+import type { Pin, Vibe } from '@features/map/types/map';
 import ClusterMarker from '../components/ClusterMarker';
 import { renderComponentToHTMLSync, renderComponentToHTML } from './renderToHTML';
 import clusterStyles from '../components/ClusterMarker.module.css';

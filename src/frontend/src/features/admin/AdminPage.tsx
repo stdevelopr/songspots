@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useActor } from '../common';
-import type { UserInfo, Vibe } from '../../backend/backend.did';
+import { useActor } from '@common';
+import type { UserInfo, Vibe } from '@backend/backend.did';
 
 function useAdminData() {
   const { actor, isFetching } = useActor();

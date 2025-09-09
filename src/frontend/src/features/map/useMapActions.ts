@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
-import { useCreatePin, useDeletePin, useUpdatePin } from '../common';
+import { useCreatePin, useDeletePin, useUpdatePin } from '@common';
 import { Pin } from './types/map';
-import { toNat } from '../common/utils/nat';
+import { toNat } from '@common/utils/nat';
 
 export const useMapActions = () => {
   const createPinMutation = useCreatePin();

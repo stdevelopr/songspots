@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { isValidMusicLink } from '../../../common/utils/validateLinks';
+import { isValidMusicLink } from '@common/utils/validateLinks';
 import VibeModal from './VibeModal';
-import { MoodType } from '../../../common/types/moods';
+import { MoodType } from '@common/types/moods';
 import MoodSelector from '../MoodSelector';
 
 interface Vibe {

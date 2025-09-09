@@ -1,10 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import L from 'leaflet';
-import type { Pin, Vibe } from '../../map/types/map';
+import type { Pin, Vibe } from '@features/map/types/map';
 
-import { getMoodIcon } from '../../common/utils/icons';
-import { clusterPins, createClusterHTML } from '../../common/utils/clustering';
-import clusterStyles from '../../common/components/ClusterMarker.module.css';
+import { getMoodIcon } from '@common/utils/icons';
+import { clusterPins, createClusterHTML } from '@common/utils/clustering';
+import clusterStyles from '@common/components/ClusterMarker.module.css';
 
 interface Options {
   map: L.Map | null;
@@ -32,6 +32,12 @@ export function useVibeLayer({
   const layerRef = useRef<L.LayerGroup | null>(null);
   const currentZoomRef = useRef<number>(10);
 
+  const itemsToRender = useMemo<(Pin | Vibe)[]>(() => {
+    if (vibes && vibes.length) return vibes as (Pin | Vibe)[];
+    if (pins && pins.length) return pins as (Pin | Vibe)[];
+    return [];
+  }, [pins, vibes]);
+
   const createMarkersForZoom = (zoomLevel: number) => {
     if (!map) return;
 
@@ -43,8 +49,8 @@ export function useVibeLayer({
     const layer = L.layerGroup().addTo(map);
     layerRef.current = layer;
 
-    const itemsToRender = vibes || pins || [];
-    
+    const isVibeMode = !!vibes;
+
     // Use clustering for very low zoom levels (global/continental view)
     if (zoomLevel <= 9 && itemsToRender.length > 0) {
       const clusters = clusterPins(itemsToRender, zoomLevel);
@@ -57,9 +63,9 @@ export function useVibeLayer({
           const m = L.marker([item.lat, item.lng], { icon });
           
           m.on('click', () => {
-            if (vibes && onVibeClick) {
+            if (isVibeMode && onVibeClick) {
               onVibeClick(item as Vibe);
-            } else if (pins && onPinClick) {
+            } else if (!isVibeMode && onPinClick) {
               onPinClick(item as Pin);
             }
           });
@@ -93,9 +99,9 @@ export function useVibeLayer({
         const m = L.marker([item.lat, item.lng], { icon });
 
         m.on('click', () => {
-          if (vibes && onVibeClick) {
+          if (isVibeMode && onVibeClick) {
             onVibeClick(item as Vibe);
-          } else if (pins && onPinClick) {
+          } else if (!isVibeMode && onPinClick) {
             onPinClick(item as Pin);
           }
         });
@@ -124,6 +130,13 @@ export function useVibeLayer({
 
     return () => {
       map.off('zoomend', handleZoomEnd);
+      // Remove any remaining layer group on unmount/change
+      if (layerRef.current) {
+        try {
+          map.removeLayer(layerRef.current);
+        } catch {}
+        layerRef.current = null;
+      }
     };
-  }, [map, pins, vibes, _isMobile]);
+  }, [map, itemsToRender, _isMobile]);
 }

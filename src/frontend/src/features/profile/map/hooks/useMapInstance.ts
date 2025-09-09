@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import L from 'leaflet';
-import type { Vibe as BackendPin } from '../../../../backend/backend.did';
+import type { Vibe as BackendPin } from '@backend/backend.did';
 import { calculateMapCenter } from '../utils/map-utils';
 
 interface UseMapInstanceConfig {

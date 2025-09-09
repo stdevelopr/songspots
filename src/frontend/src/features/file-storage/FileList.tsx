@@ -1,5 +1,5 @@
-import { useActor } from '../common';
-import { canisterId } from '../../backend';
+import { useActor } from '@common';
+import { canisterId } from '@backend';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const network = process.env.DFX_NETWORK || (process.env.NODE_ENV === 'production' ? 'ic' : 'local');

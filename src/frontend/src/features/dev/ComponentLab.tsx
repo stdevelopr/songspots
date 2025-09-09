@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { useResponsive } from '../common';
-import { VibeInfoPopup } from '../vibes';
-import type { Pin } from '../map/types/map';
+import { useResponsive } from '@common';
+import { VibeInfoPopup } from '@features/vibes';
+import type { Pin } from '@features/map/types/map';
 
 function makeMockPin(opts?: Partial<Pin>): Pin {
   const base: Pin = {

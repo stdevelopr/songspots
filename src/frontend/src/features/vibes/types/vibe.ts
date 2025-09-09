@@ -1,4 +1,4 @@
-import { MoodType } from '../../common/types/moods';
+import { MoodType } from '@common/types/moods';
 
 // Common vibe data interface used in modals
 export interface VibeData {

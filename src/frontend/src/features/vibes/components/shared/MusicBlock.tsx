@@ -1,5 +1,5 @@
 import React from 'react';
-import { MusicEmbed } from '../../../common';
+import { MusicEmbed } from '@common';
 
 interface MusicBlockProps {
   musicLink?: string;
@@ -16,4 +16,3 @@ const MusicBlock: React.FC<MusicBlockProps> = ({ musicLink, className = '' }) =>
 };
 
 export default MusicBlock;
-
