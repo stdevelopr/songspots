@@ -1,4 +1,5 @@
 import React from 'react';
+import { haptics } from '../../utils/haptics';
 
 export interface FloatingActionButtonProps {
   icon: React.ReactNode;
@@ -47,6 +48,7 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
 
   const handleClick = () => {
     if (!disabled && !loading) {
+      haptics.buttonPress(); // Haptic feedback on button press
       onClick();
     }
   };

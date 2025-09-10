@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BottomSheet } from '../../../components/mobile/BottomSheet';
+import { useAccessibility } from '../../../utils/accessibility';
+import { haptics } from '../../../utils/haptics';
 import type { Pin } from '../../map/types/map';
 
 interface PinDetailSheetProps {
@@ -19,19 +21,30 @@ export const PinDetailSheet: React.FC<PinDetailSheetProps> = ({
   onEdit,
   onDelete,
 }) => {
+  const { announce, generateId } = useAccessibility();
+  
+  useEffect(() => {
+    if (isOpen && vibe) {
+      announce(`Viewing details for ${vibe.name}`, 'polite');
+    }
+  }, [isOpen, vibe, announce]);
+
   if (!vibe) return null;
 
   const handleViewProfile = () => {
+    haptics.tap();
     onViewProfile(vibe.creator);
     onClose();
   };
 
   const handleEdit = () => {
+    haptics.buttonPress();
     onEdit(vibe);
     onClose();
   };
 
   const handleDelete = () => {
+    haptics.buttonPress();
     onDelete(vibe);
     onClose();
   };
@@ -56,6 +69,7 @@ export const PinDetailSheet: React.FC<PinDetailSheetProps> = ({
               <button
                 onClick={handleViewProfile}
                 className="text-mobile-sm text-blue-600 hover:text-blue-800 font-medium mt-1"
+                aria-label={`View profile of ${vibe.creator}`}
               >
                 View Profile
               </button>

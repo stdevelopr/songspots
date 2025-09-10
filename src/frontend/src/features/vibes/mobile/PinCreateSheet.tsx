@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { BottomSheet } from '../../../components/mobile/BottomSheet';
 import { getAllMoods } from '@common/types/moods';
 
@@ -25,35 +25,29 @@ export const PinCreateSheet: React.FC<PinCreateSheetProps> = ({
   onCancel,
   isSubmitting,
 }) => {
+  const moods = useMemo(() => getAllMoods(), []); // Memoize moods array
+  const defaultMood = useMemo(() => moods[0]?.id || '', [moods]);
+  
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     musicLink: '',
     isPrivate: false,
-    mood: '',
+    mood: defaultMood,
   });
 
-  const moods = getAllMoods();
-
-  // Set default mood to first mood when opening
+  // Reset form when opening
   useEffect(() => {
-    if (isOpen && !formData.mood && moods.length > 0) {
-      setFormData(prev => ({ ...prev, mood: moods[0].id }));
-    }
-  }, [isOpen, formData.mood, moods]);
-
-  // Reset form when closing
-  useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) {
       setFormData({
         name: '',
         description: '',
         musicLink: '',
         isPrivate: false,
-        mood: moods[0]?.id || '',
+        mood: defaultMood,
       });
     }
-  }, [isOpen, moods]);
+  }, [isOpen, defaultMood]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

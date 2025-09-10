@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { haptics } from '../../utils/haptics';
 
 export interface BottomSheetProps {
   isOpen: boolean;
@@ -47,6 +48,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
     startPosRef.current = clientY;
     lastPosRef.current = clientY;
     document.body.style.userSelect = 'none';
+    haptics.tap(); // Light feedback on drag start
   }, [isDragEnabled]);
 
   // Handle drag move
@@ -75,12 +77,15 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
     if (dragOffset > threshold || velocity > 50) {
       if (currentSnapPoint < snapPoints.length - 1) {
         setCurrentSnapPoint(currentSnapPoint + 1);
+        haptics.snapToPosition(); // Feedback when snapping to point
       } else {
         onClose();
+        haptics.dismiss(); // Feedback when closing
       }
     } else if (dragOffset < -threshold || velocity < -50) {
       if (currentSnapPoint > 0) {
         setCurrentSnapPoint(currentSnapPoint - 1);
+        haptics.snapToPosition(); // Feedback when snapping to point
       }
     }
 
