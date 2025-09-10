@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef, useCallback, useImperativeHandle } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useImperativeHandle, useMemo } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Vibe as BackendPin } from '@backend/backend.did';
+import { MoodType } from '@common/types/moods';
 import { useMapInstance } from '../hooks/useMapInstance';
 import { MapLoadingOverlay, CollapseButton, MapCollapsedView, ShowAllButton } from './MapComponents';
 import { useMapIcons, MapIconStyles } from './MapIcons';
@@ -9,6 +10,8 @@ import { useMapMarkers } from '../hooks/MapMarkers';
 import { useMapContainerMonitor } from '../hooks/MapContainerMonitor';
 import { useMapFocusHandler } from '../hooks/MapFocusHandler';
 import { MAP_CONFIG, UI_CONFIG } from '../utils/map-constants';
+import { useMoodFilter } from '@features/map/hooks/useMoodFilter';
+import { MoodFilter } from '@features/map/components/MoodFilter';
 import mapStyles from '@features/map/interactive-map/MapContainer.module.css';
 
 interface ProfileMapProps {
@@ -43,6 +46,33 @@ export const ProfileMap = React.forwardRef<ProfileMapRef, ProfileMapProps>(({
 
   const { normalIcon, highlightedIcon, focusedIcon } = useMapIcons();
 
+  // Convert backend pins to mood filter compatible format
+  const pinsForMoodFilter = useMemo(() => {
+    return backendPins.map(pin => ({
+      ...pin, // spread the backend pin properties first
+      id: pin.id.toString(), // override with string id
+      mood: pin.mood?.[0] as MoodType | undefined, // override with extracted mood
+    }));
+  }, [backendPins]);
+
+  // Mood filtering logic
+  const {
+    selectedMoods,
+    toggleMood,
+    clearAllFilters,
+    showAllPins,
+    filteredPins,
+    hasActiveFilters
+  } = useMoodFilter(pinsForMoodFilter);
+
+  // Convert filtered pins back to backend format
+  const filteredBackendPins = useMemo(() => {
+    return filteredPins.map(filteredPin => {
+      const originalPin = backendPins.find(bp => bp.id.toString() === filteredPin.id);
+      return originalPin!; // We know it exists since we filtered from the original array
+    });
+  }, [filteredPins, backendPins]);
+
   const { mapInstance, isMapReady, containerReady, setContainerReady, cleanupMap, initializeMap } =
     useMapInstance(mapRef, isCollapsed, backendPins, {
       defaultCenter: MAP_CONFIG.DEFAULT_CENTER,
@@ -56,7 +86,7 @@ export const ProfileMap = React.forwardRef<ProfileMapRef, ProfileMapProps>(({
 
   const { markersRef } = useMapMarkers({
     mapInstance,
-    backendPins,
+    backendPins: filteredBackendPins,
     normalIcon,
     highlightedIcon,
     focusedIcon,
@@ -179,20 +209,34 @@ export const ProfileMap = React.forwardRef<ProfileMapRef, ProfileMapProps>(({
         {isCollapsed ? (
           <MapCollapsedView onToggleCollapse={toggleCollapse} />
         ) : (
-          <div className={`${mapStyles.mapRoot} relative w-full h-full`}>
-            <div
-              key={`map-${isCollapsed}`}
-              ref={mapRef}
-              className="w-full h-full rounded-2xl"
-              style={{
-                height: expandedHeight,
-                minHeight: UI_CONFIG.MIN_HEIGHT,
-              }}
-            />
+          <div className={`${mapStyles.mapRoot} relative w-full h-full flex flex-col`}>
+            {/* Mood Filter - placed above the map */}
+            {backendPins.length > 0 && (
+              <MoodFilter
+                selectedMoods={selectedMoods}
+                onMoodToggle={toggleMood}
+                onClearAll={clearAllFilters}
+                onShowAll={showAllPins}
+                className="rounded-t-2xl"
+              />
+            )}
+            
+            {/* Map container */}
+            <div className="relative flex-1">
+              <div
+                key={`map-${isCollapsed}`}
+                ref={mapRef}
+                className={`w-full h-full ${backendPins.length > 0 ? 'rounded-b-2xl' : 'rounded-2xl'}`}
+                style={{
+                  height: expandedHeight,
+                  minHeight: UI_CONFIG.MIN_HEIGHT,
+                }}
+              />
 
-            {!isMapReady && <MapLoadingOverlay />}
-            <ShowAllButton onClick={handleShowAll} />
-            <CollapseButton onClick={toggleCollapse} isCollapsed={isCollapsed} />
+              {!isMapReady && <MapLoadingOverlay />}
+              <ShowAllButton onClick={handleShowAll} />
+              <CollapseButton onClick={toggleCollapse} isCollapsed={isCollapsed} />
+            </div>
           </div>
         )}
       </div>

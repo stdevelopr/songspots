@@ -12,6 +12,9 @@ import { useMap } from '../useMap';
 import { VibeDetailModal, VibeEditModal, VibeCreateModal } from '@features/vibes';
 import { useIsMobile } from '@common';
 import { useVibes } from '../useVibes';
+import { useMoodFilter } from '../hooks/useMoodFilter';
+import { MoodFilter } from '../components/MoodFilter';
+import { useVibeLayer } from '@features/vibes';
 import mapStyles from './MapContainer.module.css';
 
 const DEFAULT_CENTER: [number, number] = [40.7128, -74.006];
@@ -53,7 +56,6 @@ const InteractiveMap: React.FC<Props> = (props) => {
     setSelectedPin,
     profileMode,
     onShowLoginPrompt,
-    isAuthenticated = false,
   } = props;
 
   const [newPinLocation, setNewPinLocation] = React.useState<{ lat: number; lng: number } | null>(
@@ -64,7 +66,7 @@ const InteractiveMap: React.FC<Props> = (props) => {
   const { identity } = useInternetIdentity();
   const isMobile = useIsMobile();
   const currentUser = identity?.getPrincipal().toString();
-  const { userLocation, status, complete, refreshing, request } = useLocation();
+  const { userLocation, status, refreshing, request } = useLocation();
   const { mapRef, mapInstance } = useMap();
 
   const [popupOpen, setPopupOpen] = useState(false);
@@ -74,6 +76,7 @@ const InteractiveMap: React.FC<Props> = (props) => {
     pinToEdit,
     setPinToEdit,
     selectedPinDetail,
+    setSelectedPinDetail,
     pinDetailModalOpen,
     setPinDetailModalOpen,
     pinCreateModalOpen,
@@ -100,6 +103,50 @@ const InteractiveMap: React.FC<Props> = (props) => {
       setShowDeleteModal(true);
       setPopupOpen(true);
     },
+    skipVibeLayer: !profileMode,
+  });
+
+  // Mood filtering logic (only for non-profile mode)
+  const moodFilter = useMoodFilter(profileMode ? [] : pins);
+  const {
+    selectedMoods,
+    toggleMood,
+    clearAllFilters,
+    showAllPins,
+    filteredPins,
+    hasActiveFilters
+  } = moodFilter;
+
+  // Handle vibe layer rendering for non-profile mode with filtering support
+  const vibesToRender = !profileMode ? (hasActiveFilters ? filteredPins : pins) : undefined;
+
+  useVibeLayer({
+    map: mapInstance,
+    vibes: vibesToRender,
+    onViewProfile: onViewUserProfile,
+    onEdit: (vibe) => {
+      setPinToEdit(vibe);
+    },
+    onDelete: (vibe) => {
+      setPinToDelete(vibe);
+      setShowDeleteModal(true);
+      setPopupOpen(true);
+    },
+    onVibeClick: (vibe) => {
+      if (mapInstance) {
+        mapInstance.panTo([vibe.lat, vibe.lng], { animate: true });
+        const handleMoveEnd = () => {
+          setSelectedPinDetail(vibe);
+          setPinDetailModalOpen(true);
+          mapInstance.off('moveend', handleMoveEnd);
+        };
+        mapInstance.on('moveend', handleMoveEnd);
+      } else {
+        setSelectedPinDetail(vibe);
+        setPinDetailModalOpen(true);
+      }
+    },
+    isMobile,
   });
 
   useEffect(() => {
@@ -162,7 +209,7 @@ const InteractiveMap: React.FC<Props> = (props) => {
   const privateCount = useMemo(() => pins.filter((p) => p.isPrivate && p.isOwner).length, [pins]);
 
   return (
-    <div className={`${mapStyles.mapRoot} relative w-full h-full`}>
+    <div className={`${mapStyles.mapRoot} relative w-full h-full flex flex-col`}>
       {/* Pin Detail Modal for mobile */}
       <VibeDetailModal
         vibe={selectedPinDetail}
@@ -182,22 +229,37 @@ const InteractiveMap: React.FC<Props> = (props) => {
           setPopupOpen(true);
         }}
       />
-      <MapHUD
-        status={status}
-        userLocation={userLocation}
-        showCounts={pins.length > 0}
-        publicCount={publicCount}
-        privateCount={privateCount}
-        hasIdentity={!!identity}
-        onMyLocation={() => {
-          setSelectedPin(null);
-          request(true);
-        }}
-        isRefreshing={refreshing}
-        isLoadingTransition={isLoadingTransition!}
-        isInitialLoading={isInitialLoading!}
-      />
-      <div ref={mapRef} className="w-full h-full z-0" />
+      
+      {/* Mood Filter - placed above the map */}
+      {!profileMode && pins.length > 0 && (
+        <MoodFilter
+          selectedMoods={selectedMoods}
+          onMoodToggle={toggleMood}
+          onClearAll={clearAllFilters}
+          onShowAll={showAllPins}
+        />
+      )}
+      
+      {/* Map container with HUD */}
+      <div className="relative flex-1">
+        <MapHUD
+          status={status}
+          userLocation={userLocation}
+          showCounts={pins.length > 0}
+          publicCount={publicCount}
+          privateCount={privateCount}
+          hasIdentity={!!identity}
+          onMyLocation={() => {
+            setSelectedPin(null);
+            request(true);
+          }}
+          isRefreshing={refreshing}
+          isLoadingTransition={isLoadingTransition!}
+          isInitialLoading={isInitialLoading!}
+        />
+        
+        <div ref={mapRef} className="w-full h-full z-0" />
+      </div>
 
       {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal

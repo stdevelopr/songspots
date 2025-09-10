@@ -22,6 +22,7 @@ export const useVibes = ({
   fromProfile,
   isLoadingTransition,
   onDeleteVibe,
+  skipVibeLayer,
 }: {
   mapInstance: L.Map | null;
   isMobile: boolean;
@@ -35,6 +36,7 @@ export const useVibes = ({
   fromProfile: boolean | undefined;
   isLoadingTransition: boolean | undefined;
   onDeleteVibe: (vibe: Vibe) => void;
+  skipVibeLayer?: boolean;
 }) => {
   const [vibes, setVibes] = useState<Vibe[]>([]);
   const [vibeToEdit, setVibeToEdit] = useState<any | null>(null);
@@ -46,10 +48,11 @@ export const useVibes = ({
   const deleteVibeMutation = useDeleteVibe();
   const updateVibeMutation = useUpdateVibe();
 
+  // Always call useVibeLayer but pass undefined vibes when skipped
   useVibeLayer({
     isMobile,
     map: mapInstance,
-    vibes,
+    vibes: skipVibeLayer ? undefined : vibes,
     onViewProfile: onViewUserProfile,
     onEdit: (vibe) => {
       setVibeToEdit(vibe);
