@@ -31,8 +31,9 @@ export const ActionSheet: React.FC<ActionSheetProps> = ({
   };
 
   const getButtonClass = (style?: string) => {
-    const baseClass = "w-full touch-target text-mobile-base font-medium transition-colors rounded-lg";
-    
+    const baseClass =
+      'w-full touch-target text-mobile-base font-medium transition-colors rounded-lg';
+
     switch (style) {
       case 'destructive':
         return `${baseClass} bg-red-50 text-red-600 border border-red-200 hover:bg-red-100`;
@@ -43,14 +44,14 @@ export const ActionSheet: React.FC<ActionSheetProps> = ({
     }
   };
 
-  const regularOptions = options.filter(option => option.style !== 'cancel');
-  const cancelOptions = options.filter(option => option.style === 'cancel');
+  const regularOptions = options.filter((option) => option.style !== 'cancel');
+  const cancelOptions = options.filter((option) => option.style === 'cancel');
 
   return (
     <BottomSheet
       isOpen={isOpen}
       onClose={onClose}
-      snapPoints={[0.4]}
+      snapPoints={[0.9]}
       initialSnapPoint={0}
       showHandle={true}
       closeOnOverlayClick={true}
@@ -59,16 +60,8 @@ export const ActionSheet: React.FC<ActionSheetProps> = ({
         {/* Header */}
         {(title || message) && (
           <div className="text-center space-y-2 px-4">
-            {title && (
-              <h2 className="text-mobile-lg font-bold text-gray-900">
-                {title}
-              </h2>
-            )}
-            {message && (
-              <p className="text-mobile-base text-gray-600 leading-relaxed">
-                {message}
-              </p>
-            )}
+            {title && <h2 className="text-mobile-lg font-bold text-gray-900">{title}</h2>}
+            {message && <p className="text-mobile-base text-gray-600 leading-relaxed">{message}</p>}
           </div>
         )}
 
