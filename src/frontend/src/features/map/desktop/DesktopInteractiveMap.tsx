@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { toNat } from '@common/utils/nat';
-import { DeleteConfirmationModal } from '@common';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Pin, SelectedPin } from '../types/map';
@@ -9,7 +8,10 @@ import { MapHUD } from '../MapHUD';
 import { useInternetIdentity } from 'ic-use-internet-identity';
 import type { Vibe as BackendVibe } from '@backend/backend.did';
 import { useMap } from '../useMap';
-import { VibeDetailModal, VibeEditModal, VibeCreateModal } from '@features/vibes';
+import { PinDetails } from '../../vibes/responsive/PinDetails';
+import { PinEdit } from '../../vibes/responsive/PinEdit';
+import { PinCreate } from '../../vibes/responsive/PinCreate';
+import { DeleteConfirmation } from '../../vibes/responsive/DeleteConfirmation';
 import { useIsMobile } from '@common';
 import { useVibes } from '../useVibes';
 import { useMoodFilter } from '../hooks/useMoodFilter';
@@ -210,8 +212,8 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
 
   return (
     <div className={`${mapStyles.mapRoot} relative w-full h-full flex flex-col`}>
-      {/* Pin Detail Modal for mobile */}
-      <VibeDetailModal
+      {/* Pin Detail Interface - Responsive */}
+      <PinDetails
         vibe={selectedPinDetail}
         isOpen={pinDetailModalOpen}
         onClose={() => {
@@ -261,8 +263,8 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
         <div ref={mapRef} className="w-full h-full z-0" />
       </div>
 
-      {/* Delete Confirmation Modal */}
-      <DeleteConfirmationModal
+      {/* Delete Confirmation Interface - Responsive */}
+      <DeleteConfirmation
         isOpen={showDeleteModal}
         onConfirm={async () => {
           if (!pinToDelete) return;
@@ -283,8 +285,8 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
         pinName={pinToDelete?.name || 'Unnamed Pin'}
       />
 
-      {/* Pin Edit Modal */}
-      <VibeEditModal
+      {/* Pin Edit Interface - Responsive */}
+      <PinEdit
         isOpen={!!pinToEdit}
         vibe={
           pinToEdit
@@ -305,7 +307,7 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
         }}
         isSubmitting={updatePinMutation.isPending}
       />
-      <VibeCreateModal
+      <PinCreate
         isOpen={pinCreateModalOpen}
         location={newPinLocation}
         onSubmit={async (...args) => {

@@ -18,9 +18,11 @@ import { FilterDrawer } from './FilterDrawer';
 import { MobileMapControls } from './MobileMapControls';
 import { BottomSheet } from '../../../components/mobile/BottomSheet';
 
-// Import existing modals for now (will be replaced with mobile sheets in Phase 3)
-import { VibeDetailModal, VibeEditModal, VibeCreateModal } from '@features/vibes';
-import { DeleteConfirmationModal } from '@common';
+// Import responsive components (automatically choose mobile sheets vs desktop modals)
+import { PinDetails } from '../../vibes/responsive/PinDetails';
+import { PinEdit } from '../../vibes/responsive/PinEdit';
+import { PinCreate } from '../../vibes/responsive/PinCreate';
+import { DeleteConfirmation } from '../../vibes/responsive/DeleteConfirmation';
 
 import mapStyles from '../interactive-map/MapContainer.module.css';
 
@@ -283,8 +285,8 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
         )}
       </div>
 
-      {/* Modals - TODO: Replace with mobile bottom sheets in Phase 3 */}
-      <VibeDetailModal
+      {/* Responsive Pin Interactions - Mobile uses bottom sheets, desktop uses modals */}
+      <PinDetails
         vibe={selectedPinDetail}
         isOpen={pinDetailModalOpen}
         onClose={() => {
@@ -303,7 +305,7 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
         }}
       />
 
-      <DeleteConfirmationModal
+      <DeleteConfirmation
         isOpen={showDeleteModal}
         onConfirm={async () => {
           if (!pinToDelete) return;
@@ -324,7 +326,7 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
         pinName={pinToDelete?.name || 'Unnamed Pin'}
       />
 
-      <VibeEditModal
+      <PinEdit
         isOpen={!!pinToEdit}
         vibe={
           pinToEdit
@@ -346,7 +348,7 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
         isSubmitting={updatePinMutation.isPending}
       />
 
-      <VibeCreateModal
+      <PinCreate
         isOpen={pinCreateModalOpen}
         location={newPinLocation}
         onSubmit={async (...args) => {
