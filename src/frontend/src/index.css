@@ -7,6 +7,7 @@
 /* Removed empty mobile block; component modules handle responsive sizing */
 @import "tailwindcss";
 @import './styles/tokens.css';
+@import './styles/mobile.css';
 
 
 

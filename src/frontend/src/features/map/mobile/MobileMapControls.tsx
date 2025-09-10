@@ -1,0 +1,180 @@
+import React from 'react';
+import { FloatingActionButton, FABGroup } from '../../../components/mobile/FloatingActionButton';
+import { LocationStatus, UserLocation } from '../types/map';
+
+interface MobileMapControlsProps {
+  // Location controls
+  status: LocationStatus;
+  userLocation: UserLocation | null;
+  onMyLocation: () => void;
+  isRefreshing: boolean;
+  
+  // Pin counts
+  showCounts?: boolean;
+  publicCount?: number;
+  privateCount?: number;
+  
+  // Identity
+  hasIdentity: boolean;
+  
+  // Loading states
+  isLoadingTransition?: boolean;
+  isInitialLoading?: boolean;
+}
+
+export const MobileMapControls: React.FC<MobileMapControlsProps> = ({
+  status,
+  userLocation,
+  onMyLocation,
+  isRefreshing,
+  showCounts = false,
+  publicCount = 0,
+  privateCount = 0,
+  hasIdentity,
+  isLoadingTransition = false,
+  isInitialLoading = false,
+}) => {
+  // Don't show controls during loading transitions
+  if (isLoadingTransition || isInitialLoading) {
+    return null;
+  }
+
+  const getLocationIcon = () => {
+    if (isRefreshing) {
+      return (
+        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
+      );
+    }
+
+    if (status === 'unavailable') {
+      return (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18 18M5.636 5.636L6 6" />
+        </svg>
+      );
+    }
+
+    if (status === 'denied') {
+      return (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
+        </svg>
+      );
+    }
+
+    if (userLocation && status === 'granted') {
+      return (
+        <div className="relative">
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          </svg>
+          <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-white" />
+        </div>
+      );
+    }
+
+    return (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    );
+  };
+
+  const getLocationLabel = () => {
+    if (isRefreshing) return 'Finding location...';
+    if (status === 'unavailable') return 'Location unavailable';
+    if (status === 'denied') return 'Location denied';
+    if (userLocation && status === 'granted') return 'Your location';
+    return 'Find my location';
+  };
+
+  const isLocationDisabled = isRefreshing || status === 'unavailable';
+
+  const totalPins = publicCount + privateCount;
+
+  return (
+    <FABGroup direction="up" className="bottom-4 right-4 bottom-safe right-safe">
+      {/* Pin count FAB (when there are pins) */}
+      {showCounts && totalPins > 0 && (
+        <FloatingActionButton
+          icon={
+            <div className="text-center">
+              <div className="text-mobile-sm font-bold">{totalPins}</div>
+              <div className="text-mobile-xs opacity-80">
+                {totalPins === 1 ? 'spot' : 'spots'}
+              </div>
+            </div>
+          }
+          onClick={() => {}} // Could open a spots list
+          label={`${totalPins} vibe ${totalPins === 1 ? 'spot' : 'spots'}`}
+          variant="secondary"
+          size="medium"
+          disabled={true} // Just informational for now
+        />
+      )}
+
+      {/* Location FAB */}
+      <FloatingActionButton
+        icon={getLocationIcon()}
+        onClick={onMyLocation}
+        label={getLocationLabel()}
+        variant="primary"
+        size="large"
+        disabled={isLocationDisabled}
+        loading={isRefreshing}
+      />
+    </FABGroup>
+  );
+};
+
+// Compact version for minimal space usage
+interface CompactMobileMapControlsProps {
+  onMyLocation: () => void;
+  status: LocationStatus;
+  isRefreshing: boolean;
+  pinCount?: number;
+}
+
+export const CompactMobileMapControls: React.FC<CompactMobileMapControlsProps> = ({
+  onMyLocation,
+  status,
+  isRefreshing,
+  pinCount,
+}) => {
+  const isLocationDisabled = isRefreshing || status === 'unavailable';
+
+  return (
+    <div className="fixed bottom-4 right-4 bottom-safe right-safe flex flex-col gap-2">
+      {/* Pin count badge */}
+      {typeof pinCount === 'number' && pinCount > 0 && (
+        <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg border border-gray-200">
+          <span className="text-mobile-sm font-medium text-gray-700">
+            {pinCount} {pinCount === 1 ? 'spot' : 'spots'}
+          </span>
+        </div>
+      )}
+
+      {/* Location button */}
+      <FloatingActionButton
+        icon={
+          isRefreshing ? (
+            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
+          ) : (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+          )
+        }
+        onClick={onMyLocation}
+        label="My Location"
+        variant="primary"
+        size="medium"
+        disabled={isLocationDisabled}
+        loading={isRefreshing}
+      />
+    </div>
+  );
+};
+
+export default MobileMapControls;
