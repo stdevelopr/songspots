@@ -9,6 +9,8 @@ interface InteractiveMapProps {
   onViewUserProfile: (userId: string | null) => void;
   selectedPin?: SelectedPin | null;
   onPinSelected?: (pin: Pin) => void;
+  onClearSelection?: () => void;
+  suppressAutoCenterOnLoad?: boolean;
   onMapReady?: () => void;
   onMapInitialized?: () => void;
   onLocationProcessed?: () => void;

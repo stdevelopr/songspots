@@ -34,6 +34,8 @@ interface MobileInteractiveMapProps {
   onViewUserProfile: (userId: string | null) => void;
   selectedPin?: SelectedPin | null;
   onPinSelected?: (pin: Pin) => void;
+  onClearSelection?: () => void;
+  suppressAutoCenterOnLoad?: boolean;
   onMapReady?: () => void;
   onMapInitialized?: () => void;
   onLocationProcessed?: () => void;
@@ -62,12 +64,16 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
   setSelectedPin,
   profileMode = false,
   onShowLoginPrompt,
+  onClearSelection,
+  suppressAutoCenterOnLoad,
 }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [pinToDelete, setPinToDelete] = useState<Pin | null>(null);
   const [newPinLocation, setNewPinLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [justCreatedPin, setJustCreatedPin] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
+  const skipNextAutoCenterRef = useRef(false);
+  const hasAutoCenteredRef = useRef(false);
   const { showToast } = useToast();
 
   const { identity } = useInternetIdentity();
@@ -75,6 +81,15 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
   const currentUser = identity?.getPrincipal().toString();
   const { userLocation, status, refreshing, request } = useLocation();
   const { mapRef, mapInstance } = useMap();
+  // If deep-linking, once map is created, jump directly to pin without animation
+  useEffect(() => {
+    if (!mapInstance) return;
+    if (suppressAutoCenterOnLoad && selectedPin) {
+      mapInstance.setView([selectedPin.lat, selectedPin.lng], 16, { animate: false });
+      onMapCentered?.();
+      hasAutoCenteredRef.current = true;
+    }
+  }, [mapInstance, suppressAutoCenterOnLoad, selectedPin]);
   const handleCreateAtCenter = () => {
     if (!mapInstance) return;
     if (!identity) {
@@ -162,6 +177,8 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
         setSelectedPinDetail(vibe);
         setPinDetailModalOpen(true);
       }
+      // Notify parent for URL sync
+      onPinSelected?.({ id: vibe.id, lat: vibe.lat, lng: vibe.lng });
     },
     isMobile,
   });
@@ -186,13 +203,18 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
     if (profileMode) return;
     if (!mapInstance || selectedPin) return;
     if (justCreatedPin) return;
+    if (skipNextAutoCenterRef.current) { skipNextAutoCenterRef.current = false; return; }
+    if (suppressAutoCenterOnLoad && !hasAutoCenteredRef.current) return;
+    if (hasAutoCenteredRef.current) return;
     
     if (status === 'granted' && userLocation) {
       mapInstance.setView([userLocation.lat, userLocation.lng], 15);
       setTimeout(() => onMapCentered?.(), 500);
+      hasAutoCenteredRef.current = true;
     } else if (status === 'unavailable' || status === 'denied') {
       mapInstance.setView(DEFAULT_CENTER, DEFAULT_ZOOM);
       onMapCentered?.();
+      hasAutoCenteredRef.current = true;
     }
   }, [profileMode, mapInstance, status, userLocation, selectedPin, onMapCentered, justCreatedPin]);
 
@@ -275,6 +297,7 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
           userLocation={userLocation}
           onMyLocation={() => {
             setSelectedPin(null);
+            hasAutoCenteredRef.current = false;
             request(true);
           }}
           onCreate={handleCreateAtCenter}
@@ -303,8 +326,12 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
         vibe={selectedPinDetail}
         isOpen={pinDetailModalOpen}
         onClose={() => {
+          // Set guard BEFORE clearing selection to avoid immediate auto-center
+          skipNextAutoCenterRef.current = true;
           setPinDetailModalOpen(false);
           setPopupOpen(false);
+          if (onClearSelection) onClearSelection();
+          else setSelectedPin(null);
         }}
         onViewProfile={onViewUserProfile}
         onEdit={(pin) => {

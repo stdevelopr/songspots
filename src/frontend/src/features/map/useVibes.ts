@@ -79,6 +79,8 @@ export const useVibes = ({
         setSelectedVibeDetail(vibe);
         setVibeDetailModalOpen(true);
       }
+      // Notify parent about selection (for URL sync, etc.)
+      onVibeSelected?.(vibe);
     },
   });
 

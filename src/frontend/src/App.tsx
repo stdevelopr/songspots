@@ -1,7 +1,15 @@
-import { useState, useEffect } from 'react';
-import { Routes, Route, useLocation, useNavigate, useParams, Navigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import {
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+  useParams,
+  Navigate,
+  useSearchParams,
+} from 'react-router-dom';
 
-import { 
+import {
   LoginButton,
   AppHeader,
   WelcomeModal,
@@ -9,7 +17,7 @@ import {
   DeviceInfoDisplay,
   ThreeLayoutExample,
   useGetAllPins,
-  Loader
+  Loader,
 } from './features/common';
 import ProfilePage from './features/profile/ProfilePage';
 import { useInternetIdentity } from 'ic-use-internet-identity';
@@ -39,7 +47,9 @@ function App() {
   const queryClient = useQueryClient();
   const isAuthenticated = !!identity;
 
-  const [currentView, setCurrentView] = useState<'map' | 'profile' | 'responsive-demo'>(() => 'map');
+  const [currentView, setCurrentView] = useState<'map' | 'profile' | 'responsive-demo'>(
+    () => 'map'
+  );
   const [profileUserId, setProfileUserId] = useState<string | null>(null);
   const [selectedVibe, setSelectedVibe] = useState<SelectedVibe | null>(null);
 
@@ -60,7 +70,49 @@ function App() {
   const [isMapCentered, setIsMapCentered] = useState(false);
 
   // Get vibes data to check if they're loaded
-  const { data: vibes = [], isLoading: isLoadingVibes, isFetching: isFetchingVibes } = useGetAllPins();
+  const {
+    data: vibes = [],
+    isLoading: isLoadingVibes,
+    isFetching: isFetchingVibes,
+  } = useGetAllPins();
+
+  // Query param sync for deep links to vibes
+  const [searchParams, setSearchParams] = useSearchParams();
+  // Prevent immediate re-open loop when closing a deep-linked vibe
+  const openedFromParamRef = useRef<string | null>(null);
+  useEffect(() => {
+    const vId = searchParams.get('v');
+    if (!vId || !vibes || vibes.length === 0) return;
+    if (selectedVibe?.id === vId) return;
+    // Only open if we haven't already handled this vId from the URL
+    if (openedFromParamRef.current === vId) return;
+    const match = (vibes as any[]).find((v: any) => v?.id?.toString?.() === vId);
+    if (match) {
+      openedFromParamRef.current = vId;
+      setSelectedVibe({ id: vId, lat: parseFloat(match.latitude), lng: parseFloat(match.longitude) });
+      if (location.pathname !== '/') navigate('/', { replace: true });
+    }
+  }, [searchParams, vibes, navigate, location.pathname, selectedVibe]);
+
+  useEffect(() => {
+    const current = searchParams.get('v');
+    if (selectedVibe?.id) {
+      if (current === selectedVibe.id) return;
+      const next = new URLSearchParams(searchParams);
+      next.set('v', selectedVibe.id);
+      // Mark that we've already handled this selection so the deep-link effect
+      // doesn't immediately re-open after a user-initiated open/close cycle.
+      openedFromParamRef.current = selectedVibe.id;
+      setSearchParams(next, { replace: true });
+    }
+  }, [selectedVibe, searchParams, setSearchParams]);
+
+  // When the URL no longer has ?v, allow future deep-link opens again
+  useEffect(() => {
+    if (!searchParams.get('v')) {
+      openedFromParamRef.current = null;
+    }
+  }, [searchParams]);
 
   // Track when vibes are loaded
   useEffect(() => {
@@ -265,7 +317,19 @@ function App() {
                 onViewUserProfile={handleViewUserProfile}
                 selectedPin={selectedVibe}
                 setSelectedPin={setSelectedVibe}
-                onPinSelected={(pin: { id: string; lat: number; lng: number }) => setSelectedVibe(pin)}
+                onPinSelected={(pin: { id: string; lat: number; lng: number }) =>
+                  setSelectedVibe(pin)
+                }
+                suppressAutoCenterOnLoad={!!searchParams.get('v')}
+                onClearSelection={() => {
+                  setSelectedVibe(null);
+                  const current = searchParams.get('v');
+                  if (current) {
+                    const next = new URLSearchParams(searchParams);
+                    next.delete('v');
+                    setSearchParams(next, { replace: true });
+                  }
+                }}
                 onMapReady={handleMapReady}
                 onMapInitialized={handleMapInitialized}
                 onLocationProcessed={handleLocationProcessed}
@@ -278,7 +342,10 @@ function App() {
               />
             }
           />
-          <Route path="/profile" element={<ProfilePage onBackToMap={handleBackToMap} userId={null} />} />
+          <Route
+            path="/profile"
+            element={<ProfilePage onBackToMap={handleBackToMap} userId={null} />}
+          />
           <Route path="/profile/:userId" element={<ProfileRoute onBackToMap={handleBackToMap} />} />
           <Route path="/dev/vibe-popup-demo" element={<VibeInfoPopupDemo />} />
           <Route path="/dev/lab" element={<ComponentLab />} />

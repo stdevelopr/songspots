@@ -9,9 +9,9 @@ export const useMap = () => {
   useEffect(() => {
     if (!mapRef.current) return;
 
-    // Determine initial map center and zoom
-    let initialCenter: [number, number] = [40.7128, -74.006]; // Default to NYC
-    let initialZoom = 10;
+    // Neutral initial view (avoids jumping from a specific city like NYC)
+    const initialCenter: [number, number] = [0, 0];
+    const initialZoom = 2;
 
     // Create map instance with world bounds
     const map = L.map(mapRef.current, {

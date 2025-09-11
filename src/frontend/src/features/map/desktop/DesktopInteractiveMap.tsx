@@ -12,7 +12,7 @@ import { PinDetails } from '../../vibes/responsive/PinDetails';
 import { PinEdit } from '../../vibes/responsive/PinEdit';
 import { PinCreate } from '../../vibes/responsive/PinCreate';
 import { DeleteConfirmation } from '../../vibes/responsive/DeleteConfirmation';
-import { useIsMobile } from '@common';
+import { useIsMobile, Loader } from '@common';
 import { useVibes } from '../useVibes';
 import { useMoodFilter } from '../hooks/useMoodFilter';
 import { MoodFilter } from '../components/MoodFilter';
@@ -28,6 +28,8 @@ interface DesktopInteractiveMapProps {
   onViewUserProfile: (userId: string | null) => void;
   selectedPin?: SelectedPin | null;
   onPinSelected?: (pin: Pin) => void;
+  onClearSelection?: () => void;
+  suppressAutoCenterOnLoad?: boolean;
   onMapReady?: () => void;
   onMapInitialized?: () => void;
   onLocationProcessed?: () => void;
@@ -45,6 +47,8 @@ interface DesktopInteractiveMapProps {
 export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (props) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [pinToDelete, setPinToDelete] = useState<Pin | null>(null);
+  const skipNextAutoCenterRef = React.useRef(false);
+  const hasAutoCenteredRef = React.useRef(false);
   const {
     onViewUserProfile,
     selectedPin,
@@ -60,6 +64,8 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
     setSelectedPin,
     profileMode,
     onShowLoginPrompt,
+    onClearSelection,
+    suppressAutoCenterOnLoad,
   } = props;
 
   const [newPinLocation, setNewPinLocation] = React.useState<{ lat: number; lng: number } | null>(
@@ -75,6 +81,15 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
 
   const [popupOpen, setPopupOpen] = useState(false);
   const { showToast } = useToast();
+  // If deep-linking, once map is created, jump directly to pin without animation
+  useEffect(() => {
+    if (!mapInstance) return;
+    if (suppressAutoCenterOnLoad && selectedPin) {
+      mapInstance.setView([selectedPin.lat, selectedPin.lng], 16, { animate: false });
+      onMapCentered?.();
+      hasAutoCenteredRef.current = true;
+    }
+  }, [mapInstance, suppressAutoCenterOnLoad, selectedPin]);
 
   const {
     pins,
@@ -150,6 +165,8 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
         setSelectedPinDetail(vibe);
         setPinDetailModalOpen(true);
       }
+      // Notify parent for URL sync
+      onPinSelected?.({ id: vibe.id, lat: vibe.lat, lng: vibe.lng });
     },
     isMobile,
   });
@@ -174,12 +191,17 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
     if (profileMode) return;
     if (!mapInstance || selectedPin) return;
     if (justCreatedPin) return; // Skip centering after pin creation
+    if (skipNextAutoCenterRef.current) { skipNextAutoCenterRef.current = false; return; }
+    if (suppressAutoCenterOnLoad && !hasAutoCenteredRef.current) return;
+    if (hasAutoCenteredRef.current) return;
     if (status === 'granted' && userLocation) {
       mapInstance.setView([userLocation.lat, userLocation.lng], 15);
       setTimeout(() => onMapCentered?.(), 500);
+      hasAutoCenteredRef.current = true;
     } else if (status === 'unavailable' || status === 'denied') {
       mapInstance.setView(DEFAULT_CENTER, DEFAULT_ZOOM);
       onMapCentered?.();
+      hasAutoCenteredRef.current = true;
     }
   }, [profileMode, mapInstance, status, userLocation, selectedPin, onMapCentered, justCreatedPin]);
 
@@ -230,8 +252,12 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
         vibe={selectedPinDetail}
         isOpen={pinDetailModalOpen}
         onClose={() => {
+          // Set guard BEFORE clearing selection to avoid immediate auto-center
+          skipNextAutoCenterRef.current = true;
           setPinDetailModalOpen(false);
           setPopupOpen(false);
+          if (onClearSelection) onClearSelection();
+          else setSelectedPin(null);
         }}
         onViewProfile={onViewUserProfile}
         onEdit={(pin) => {
@@ -266,6 +292,7 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
           hasIdentity={!!identity}
           onMyLocation={() => {
             setSelectedPin(null);
+            hasAutoCenteredRef.current = false;
             request(true);
           }}
           isRefreshing={refreshing}
