@@ -7,6 +7,7 @@ interface MobileMapControlsProps {
   status: LocationStatus;
   userLocation: UserLocation | null;
   onMyLocation: () => void;
+  onCreate?: () => void;
   isRefreshing: boolean;
   
   // Pin counts
@@ -26,6 +27,7 @@ export const MobileMapControls: React.FC<MobileMapControlsProps> = ({
   status,
   userLocation,
   onMyLocation,
+  onCreate,
   isRefreshing,
   showCounts = false,
   publicCount = 0,
@@ -111,6 +113,21 @@ export const MobileMapControls: React.FC<MobileMapControlsProps> = ({
           variant="secondary"
           size="medium"
           disabled={true} // Just informational for now
+        />
+      )}
+
+      {/* Create Vibe FAB */}
+      {onCreate && (
+        <FloatingActionButton
+          icon={
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          }
+          onClick={onCreate}
+          label="Add vibe at map center"
+          variant="secondary"
+          size="medium"
         />
       )}
 

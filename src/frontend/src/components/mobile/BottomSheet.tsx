@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useId } from 'react';
 import { createPortal } from 'react-dom';
 import { haptics } from '../../utils/haptics';
 
@@ -31,8 +31,12 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
   const sheetRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const startPosRef = useRef<number>(0);
   const lastPosRef = useRef<number>(0);
+  const prevFocusedRef = useRef<HTMLElement | null>(null);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const titleId = useId();
 
   // Calculate sheet height based on snap point
   const getSheetHeight = useCallback((snapIndex: number) => {
@@ -147,6 +151,44 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
     }
   }, [isOpen]);
 
+  // Detect prefers-reduced-motion
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const set = () => setPrefersReducedMotion(mq.matches);
+    set();
+    mq.addEventListener?.('change', set);
+    return () => mq.removeEventListener?.('change', set);
+  }, []);
+
+  // Focus management: save previous focus, move focus into sheet, restore on close
+  useEffect(() => {
+    if (isOpen) {
+      prevFocusedRef.current = document.activeElement as HTMLElement | null;
+      // Defer to after render
+      setTimeout(() => {
+        // Try first focusable inside content, else sheet itself
+        const container = contentRef.current || sheetRef.current;
+        if (!container) return;
+        const focusables = container.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length > 0) {
+          focusables[0].focus();
+        } else {
+          sheetRef.current?.setAttribute('tabindex', '-1');
+          (sheetRef.current as HTMLElement)?.focus();
+        }
+      }, 0);
+    }
+    return () => {
+      // Restore focus to the previously focused element
+      if (prevFocusedRef.current && typeof prevFocusedRef.current.focus === 'function') {
+        prevFocusedRef.current.focus();
+      }
+      prevFocusedRef.current = null;
+    };
+  }, [isOpen]);
+
   // Reset snap point when sheet opens
   useEffect(() => {
     if (isOpen) {
@@ -160,7 +202,9 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
   const sheetStyle: React.CSSProperties = {
     height: getSheetHeight(currentSnapPoint),
     transform: `translateY(${dragOffset}px)`,
-    transition: isDragging ? 'none' : 'transform var(--mobile-duration-normal) var(--mobile-easing-decelerate)',
+    transition: (isDragging || prefersReducedMotion)
+      ? 'none'
+      : 'transform var(--mobile-duration-normal) var(--mobile-easing-decelerate)',
   };
 
   return createPortal(
@@ -176,6 +220,39 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
         ref={sheetRef}
         className={`bottom-sheet ${isOpen ? 'open' : ''} ${className}`}
         style={sheetStyle}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title ? `bottom-sheet-title-${titleId}` : undefined}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') {
+            e.stopPropagation();
+            onClose();
+            return;
+          }
+          if (e.key === 'Tab') {
+            const container = contentRef.current || sheetRef.current;
+            if (!container) return;
+            const focusables = Array.from(
+              container.querySelectorAll<HTMLElement>(
+                'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+              )
+            ).filter(el => el.offsetParent !== null);
+            if (focusables.length === 0) return;
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+            if (e.shiftKey) {
+              if (document.activeElement === first) {
+                e.preventDefault();
+                (last as HTMLElement).focus();
+              }
+            } else {
+              if (document.activeElement === last) {
+                e.preventDefault();
+                (first as HTMLElement).focus();
+              }
+            }
+          }
+        }}
       >
         {/* Drag handle */}
         {showHandle && (
@@ -189,12 +266,12 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
         {/* Header */}
         {title && (
           <div className="bottom-sheet-header">
-            <h3 className="text-mobile-lg font-semibold text-center">{title}</h3>
+            <h3 id={`bottom-sheet-title-${titleId}`} className="text-mobile-lg font-semibold text-center">{title}</h3>
           </div>
         )}
 
         {/* Content */}
-        <div className="bottom-sheet-content">
+        <div ref={contentRef} className="bottom-sheet-content">
           {children}
         </div>
       </div>

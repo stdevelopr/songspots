@@ -5,6 +5,7 @@ import { Vibe, SelectedVibe } from './types/map';
 import type { Vibe as BackendVibe } from '@backend/backend.did';
 import { IOnViewUserProfile } from './interactive-map/interactiveMapTypes';
 import { useCreateVibe, useDeleteVibe, useUpdateVibe } from '@common';
+import { useToast } from '@common';
 import { toNat } from '@common/utils/nat';
 import { MoodType } from '@common/types/moods';
 import markerStyles from '@common/components/MarkerIcons.module.css';
@@ -47,6 +48,7 @@ export const useVibes = ({
   const createVibeMutation = useCreateVibe();
   const deleteVibeMutation = useDeleteVibe();
   const updateVibeMutation = useUpdateVibe();
+  const { showToast } = useToast();
 
   // Always call useVibeLayer but pass undefined vibes when skipped
   useVibeLayer({
@@ -96,7 +98,6 @@ export const useVibes = ({
     );
   }, [mapInstance, userLocation]);
 
-  console.log('backendVibes:', backendVibes);
   useEffect(() => {
     if (!backendVibes?.length) return;
     setVibes(
@@ -200,7 +201,7 @@ export const useVibes = ({
       setVibeToEdit(null);
     } catch (error) {
       console.error('Failed to update vibe:', error);
-      alert('Failed to update vibe. Please try again.');
+      showToast('Failed to update vibe. Please try again.', 'error');
     }
   };
 
@@ -215,25 +216,20 @@ export const useVibes = ({
     location?: { lat: number; lng: number } | null
   ) => {
     try {
-      if (!location) {
-        // If no location is provided, do not fly the map
-        await createVibeMutation.mutateAsync({
-          name: vibeData.name ?? '',
-          description: vibeData.description ?? '',
-          musicLink: vibeData.musicLink ?? '',
-          latitude: '',
-          longitude: '',
-          isPrivate: !!vibeData.isPrivate,
-          mood: vibeData.mood ? [vibeData.mood] : [], // Backend expects ?Text (optional array)
-        });
-
-        setVibeCreateModalOpen(false);
-        setVibeToEdit(null);
+      // Determine target coordinates
+      let lat: number | null = null;
+      let lng: number | null = null;
+      if (location) {
+        lat = location.lat;
+        lng = location.lng;
+      } else if (userLocation) {
+        lat = userLocation.lat;
+        lng = userLocation.lng;
+      } else {
+        showToast('No location available to create a vibe.', 'warning');
         return;
       }
-      // Always use the modal's location for the vibe
-      const lat = location.lat;
-      const lng = location.lng;
+      // Use determined coordinates for the vibe
       await createVibeMutation.mutateAsync({
         name: vibeData.name ?? '',
         description: vibeData.description ?? '',
@@ -254,7 +250,7 @@ export const useVibes = ({
       }
     } catch (error) {
       console.error('Failed to create vibe:', error);
-      alert('Failed to create vibe. Please try again.');
+      showToast('Failed to create vibe. Please try again.', 'error');
     }
   };
 

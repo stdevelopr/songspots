@@ -22,3 +22,5 @@ export { ResponsiveComponent } from './ResponsiveComponent';
 export { ResponsiveLayoutExample } from './ResponsiveLayoutExample';
 export { ResponsiveProvider, useResponsive } from './ResponsiveProvider';
 export { ThreeLayoutExample } from './ThreeLayoutExample';
+// Notifications
+export { ToastProvider, useToast } from './ToastProvider';

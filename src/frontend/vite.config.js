@@ -83,6 +83,6 @@ export default defineConfig({
         replacement: fileURLToPath(new URL('./src/backend', import.meta.url)),
       },
     ],
-    dedupe: ['@dfinity/agent'],
+    dedupe: ['react', 'react-dom', '@dfinity/agent'],
   },
 });

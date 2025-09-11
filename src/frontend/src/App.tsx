@@ -33,14 +33,7 @@ function ProfileRoute({ onBackToMap }: { onBackToMap: () => void }) {
 function App() {
   const location = useLocation();
   const navigate = useNavigate();
-  const isDevPopupDemo = typeof window !== 'undefined' && window.location.pathname === '/dev/vibe-popup-demo';
-  if (isDevPopupDemo) {
-    return (
-      <div className="h-screen w-screen flex items-center justify-center bg-gray-50">
-        <VibeInfoPopupDemo />
-      </div>
-    );
-  }
+  // Removed route-only short-circuit; rely on router for dev screens
   const { identity, status, clear, login } = useInternetIdentity();
 
   const queryClient = useQueryClient();
@@ -57,7 +50,6 @@ function App() {
     'start creating and tracking your vibes'
   );
 
-  console.log('selectedVibe in App.tsx:', selectedVibe);
   const [isLoadingMapTransition, setIsLoadingMapTransition] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
@@ -118,17 +110,7 @@ function App() {
     }
   }, [isAuthenticated]);
 
-  // Debug function to show welcome modal (remove in production)
-  useEffect(() => {
-    const showModal = () => {
-      if (window.location.hash === '#welcome') {
-        setShowWelcomeModal(true);
-      }
-    };
-    showModal();
-    window.addEventListener('hashchange', showModal);
-    return () => window.removeEventListener('hashchange', showModal);
-  }, []);
+  // Removed debug hash listener for welcome modal
 
   // Handle login from modals
   const handleLoginFromModal = async () => {

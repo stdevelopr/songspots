@@ -11,6 +11,7 @@ import { useIsMobile } from '@common';
 import { useVibes } from '../useVibes';
 import { useMoodFilter } from '../hooks/useMoodFilter';
 import { useVibeLayer } from '@features/vibes';
+import { useToast } from '@common';
 
 // Mobile components
 import { MobileHeader } from '../../../components/mobile/MobileHeader';
@@ -67,12 +68,25 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
   const [newPinLocation, setNewPinLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [justCreatedPin, setJustCreatedPin] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
+  const { showToast } = useToast();
 
   const { identity } = useInternetIdentity();
   const isMobile = useIsMobile();
   const currentUser = identity?.getPrincipal().toString();
   const { userLocation, status, refreshing, request } = useLocation();
   const { mapRef, mapInstance } = useMap();
+  const handleCreateAtCenter = () => {
+    if (!mapInstance) return;
+    if (!identity) {
+      onShowLoginPrompt?.('create your first vibe spot');
+      return;
+    }
+    const c = mapInstance.getCenter();
+    setPinToEdit(null);
+    setNewPinLocation({ lat: c.lat, lng: c.lng });
+    setPinCreateModalOpen(true);
+    setPopupOpen(true);
+  };
 
   const {
     pins,
@@ -235,9 +249,7 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
                 </span>
               </div>
             ),
-            onClick: () => {
-              // Navigate to profile or show user menu
-            },
+            onClick: () => onViewUserProfile(null),
             label: 'User Profile'
           } : {
             icon: (
@@ -265,6 +277,7 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
             setSelectedPin(null);
             request(true);
           }}
+          onCreate={handleCreateAtCenter}
           isRefreshing={refreshing}
           showCounts={pins.length > 0}
           publicCount={publicCount}
@@ -315,7 +328,8 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
             setPinToDelete(null);
             setPopupOpen(false);
           } catch (error) {
-            alert('Failed to delete pin.');
+            console.error('Failed to delete vibe:', error);
+            showToast('Failed to delete vibe. Please try again.', 'error');
           }
         }}
         onCancel={() => {

@@ -40,14 +40,27 @@ const VibeModal: React.FC<VibeModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-white/10 backdrop-blur-sm z-[2000] flex items-center justify-center p-2 sm:p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-sm sm:max-w-md mx-auto max-h-[95vh] sm:max-h-[90vh] overflow-y-auto flex flex-col">
+    <div
+      className="fixed inset-0 bg-white/10 backdrop-blur-sm z-[2000] flex items-center justify-center p-2 sm:p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="vibe-modal-title"
+    >
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-sm sm:max-w-md mx-auto max-h-[95vh] sm:max-h-[90vh] overflow-y-auto flex flex-col"
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') {
+            e.stopPropagation();
+            if (!isSubmitting) onCancel();
+          }
+        }}
+      >
         <div className="p-3 sm:p-4">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900">{title}</h2>
+            <h2 id="vibe-modal-title" className="text-lg sm:text-xl font-semibold text-gray-900">{title}</h2>
             <button
               onClick={onCancel}
               disabled={isSubmitting}
+              aria-label="Close"
               className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50 cursor-pointer"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,6 +86,7 @@ const VibeModal: React.FC<VibeModalProps> = ({
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter a name for this vibe"
                 disabled={isSubmitting}
+                autoFocus
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:bg-gray-50"
                 maxLength={100}
               />

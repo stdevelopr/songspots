@@ -17,6 +17,8 @@ import { useVibes } from '../useVibes';
 import { useMoodFilter } from '../hooks/useMoodFilter';
 import { MoodFilter } from '../components/MoodFilter';
 import { useVibeLayer } from '@features/vibes';
+import { useToast } from '@common';
+import { MoodType } from '@common/types/moods';
 import mapStyles from '../interactive-map/MapContainer.module.css';
 
 const DEFAULT_CENTER: [number, number] = [40.7128, -74.006];
@@ -72,6 +74,7 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
   const { mapRef, mapInstance } = useMap();
 
   const [popupOpen, setPopupOpen] = useState(false);
+  const { showToast } = useToast();
 
   const {
     pins,
@@ -116,7 +119,7 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
     clearAllFilters,
     showAllPins,
     filteredPins,
-    hasActiveFilters
+    hasActiveFilters,
   } = moodFilter;
 
   // Handle vibe layer rendering for non-profile mode with filtering support
@@ -200,7 +203,17 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
     return () => {
       mapInstance.off('click', onClick);
     };
-  }, [profileMode, mapInstance, identity, onMapInitialized, setPinToEdit, onShowLoginPrompt, setPinCreateModalOpen, setNewPinLocation, setPopupOpen]);
+  }, [
+    profileMode,
+    mapInstance,
+    identity,
+    onMapInitialized,
+    setPinToEdit,
+    onShowLoginPrompt,
+    setPinCreateModalOpen,
+    setNewPinLocation,
+    setPopupOpen,
+  ]);
 
   if (profileMode) {
     // Profile mode: just show the map with pins, no HUD, no modals, no location, no editing
@@ -231,7 +244,7 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
           setPopupOpen(true);
         }}
       />
-      
+
       {/* Mood Filter - placed above the map */}
       {!profileMode && pins.length > 0 && (
         <MoodFilter
@@ -241,7 +254,7 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
           onShowAll={showAllPins}
         />
       )}
-      
+
       {/* Map container with HUD */}
       <div className="relative flex-1">
         <MapHUD
@@ -259,7 +272,7 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
           isLoadingTransition={isLoadingTransition!}
           isInitialLoading={isInitialLoading!}
         />
-        
+
         <div ref={mapRef} className="w-full h-full z-0" />
       </div>
 
@@ -274,7 +287,8 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
             setPinToDelete(null);
             setPopupOpen(false);
           } catch (error) {
-            alert('Failed to delete pin.');
+            console.error('Failed to delete vibe:', error);
+            showToast('Failed to delete vibe. Please try again.', 'error');
           }
         }}
         onCancel={() => {
@@ -300,7 +314,16 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
               }
             : null
         }
-        onSubmit={handleEditSubmit}
+        onSubmit={async (data) => {
+          // Adapt PinEdit's data format to handleEditSubmit's expected format
+          await handleEditSubmit({
+            name: data.name,
+            description: data.description,
+            musicLink: data.musicLink,
+            isPrivate: data.isPrivate,
+            mood: data.mood as MoodType | undefined,
+          });
+        }}
         onCancel={() => {
           setPinToEdit(null);
           setPopupOpen(false);
@@ -310,9 +333,19 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
       <PinCreate
         isOpen={pinCreateModalOpen}
         location={newPinLocation}
-        onSubmit={async (...args) => {
+        onSubmit={async (data) => {
           setJustCreatedPin(true);
-          await handleCreateSubmit(...args);
+          // Adapt PinCreate's data format to handleCreateSubmit's expected format
+          await handleCreateSubmit(
+            {
+              name: data.name,
+              description: data.description,
+              musicLink: data.musicLink,
+              isPrivate: data.isPrivate,
+              mood: data.mood as MoodType | undefined,
+            },
+            { lat: data.lat, lng: data.lng }
+          );
           setTimeout(() => setJustCreatedPin(false), 1000); // Reset flag after 1s
         }}
         onCancel={() => {
