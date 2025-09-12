@@ -3,6 +3,7 @@ import { useIsMobile } from '@common';
 import VibeEditModal from '../components/modals/VibeEditModal';
 import { PinEditSheet } from '../mobile/PinEditSheet';
 import { VibeData } from '../types/vibe';
+import { MoodType } from '@common/types/moods';
 
 interface PinEditProps {
   vibe: {
@@ -70,7 +71,7 @@ export const PinEdit: React.FC<PinEditProps> = ({
     description: vibe.description,
     musicLink: vibe.musicLink,
     isPrivate: vibe.isPrivate,
-    mood: vibe.mood ? vibe.mood.id : undefined, // Convert to MoodType string
+    mood: vibe.mood ? (vibe.mood.id as MoodType) : undefined, // Convert to MoodType string
   } : null;
 
   return (

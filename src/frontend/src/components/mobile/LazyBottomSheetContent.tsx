@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useState, useEffect } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { createIntersectionObserver } from '../../utils/performance';
 
 interface LazyBottomSheetContentProps {
@@ -109,21 +109,20 @@ export const withLazyBottomSheet = <P extends object>(
     preload?: boolean;
   }
 ) => {
-  const LazyComponent = lazy(() => Promise.resolve({ default: Component }));
-  
-  return React.forwardRef<any, P & { isOpen?: boolean }>((props, ref) => {
+  // We gate rendering via LazyBottomSheetContent; no additional React.lazy needed
+  return function LazyBottomSheetWrapped(props: P & { isOpen?: boolean }) {
     const { isOpen = false, ...componentProps } = props;
-    
+
     return (
       <LazyBottomSheetContent
         isOpen={isOpen}
         fallback={options?.fallback}
         preload={options?.preload}
       >
-        <LazyComponent ref={ref} {...(componentProps as P)} />
+        <Component {...(componentProps as P)} />
       </LazyBottomSheetContent>
     );
-  });
+  };
 };
 
 // Lazy loading wrapper for form components

@@ -27,7 +27,7 @@ const DEFAULT_ZOOM = 10;
 interface DesktopInteractiveMapProps {
   onViewUserProfile: (userId: string | null) => void;
   selectedPin?: SelectedPin | null;
-  onPinSelected?: (pin: Pin) => void;
+  onPinSelected?: (pin: SelectedPin) => void;
   onClearSelection?: () => void;
   suppressAutoCenterOnLoad?: boolean;
   onMapReady?: () => void;

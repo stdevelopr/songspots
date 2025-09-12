@@ -3,6 +3,7 @@ import { toNat } from '@common/utils/nat';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Pin, SelectedPin } from '../types/map';
+import { MoodType } from '@common/types/moods';
 import { useLocation } from '@common';
 import { useInternetIdentity } from 'ic-use-internet-identity';
 import type { Vibe as BackendVibe } from '@backend/backend.did';
@@ -33,7 +34,7 @@ const DEFAULT_ZOOM = 10;
 interface MobileInteractiveMapProps {
   onViewUserProfile: (userId: string | null) => void;
   selectedPin?: SelectedPin | null;
-  onPinSelected?: (pin: Pin) => void;
+  onPinSelected?: (pin: SelectedPin) => void;
   onClearSelection?: () => void;
   suppressAutoCenterOnLoad?: boolean;
   onMapReady?: () => void;
@@ -379,7 +380,15 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
               }
             : null
         }
-        onSubmit={handleEditSubmit}
+        onSubmit={async (data) => {
+          await handleEditSubmit({
+            name: data.name,
+            description: data.description,
+            musicLink: data.musicLink,
+            isPrivate: data.isPrivate,
+            mood: data.mood as MoodType | undefined,
+          });
+        }}
         onCancel={() => {
           setPinToEdit(null);
           setPopupOpen(false);
@@ -390,9 +399,18 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
       <PinCreate
         isOpen={pinCreateModalOpen}
         location={newPinLocation}
-        onSubmit={async (...args) => {
+        onSubmit={async (data) => {
           setJustCreatedPin(true);
-          await handleCreateSubmit(...args);
+          await handleCreateSubmit(
+            {
+              name: data.name,
+              description: data.description,
+              musicLink: data.musicLink,
+              isPrivate: data.isPrivate,
+              mood: data.mood as MoodType | undefined,
+            },
+            { lat: data.lat, lng: data.lng }
+          );
           setTimeout(() => setJustCreatedPin(false), 1000);
         }}
         onCancel={() => {

@@ -117,13 +117,16 @@ export const debounce = <T extends (...args: any[]) => any>(
 };
 
 // Request animation frame with fallback
-export const requestAnimationFrame = window.requestAnimationFrame || 
-  window.webkitRequestAnimationFrame || 
+// Safari vendor-prefixed fallbacks (typed via any to avoid DOM lib mismatches)
+export const requestAnimationFrame =
+  window.requestAnimationFrame ||
+  (window as any).webkitRequestAnimationFrame ||
   ((callback: FrameRequestCallback) => setTimeout(callback, 16));
 
 // Cancel animation frame with fallback
-export const cancelAnimationFrame = window.cancelAnimationFrame || 
-  window.webkitCancelAnimationFrame || 
+export const cancelAnimationFrame =
+  window.cancelAnimationFrame ||
+  (window as any).webkitCancelAnimationFrame ||
   clearTimeout;
 
 // Performance monitoring
@@ -214,8 +217,8 @@ export const createMemoryManager = () => {
     set: (key: string, value: any) => {
       if (cache.size >= maxSize) {
         // Remove oldest entry
-        const firstKey = cache.keys().next().value;
-        cache.delete(firstKey);
+        const firstKey = cache.keys().next().value as string;
+        if (firstKey !== undefined) cache.delete(firstKey);
       }
       cache.set(key, value);
     },
