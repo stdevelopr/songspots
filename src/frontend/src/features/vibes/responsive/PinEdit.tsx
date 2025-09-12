@@ -12,7 +12,7 @@ interface PinEditProps {
     description: string;
     musicLink: string;
     isPrivate: boolean;
-    mood: { id: string; name: string; emoji: string } | null;
+    mood?: MoodType;
   } | null;
   isOpen: boolean;
   onSubmit: (data: {
@@ -37,9 +37,20 @@ export const PinEdit: React.FC<PinEditProps> = ({
   const isMobile = useIsMobile();
 
   if (isMobile) {
+    // Adapt vibe for mobile sheet which expects mood as string
+    const mobileVibe = vibe
+      ? {
+          id: vibe.id,
+          name: vibe.name,
+          description: vibe.description,
+          musicLink: vibe.musicLink,
+          isPrivate: vibe.isPrivate,
+          mood: vibe.mood ?? '',
+        }
+      : null;
     return (
       <PinEditSheet
-        vibe={vibe}
+        vibe={mobileVibe}
         isOpen={isOpen}
         onSubmit={onSubmit}
         onCancel={onCancel}
@@ -65,14 +76,17 @@ export const PinEdit: React.FC<PinEditProps> = ({
   };
 
   // Adapt vibe data for modal
-  const modalVibe = vibe ? {
-    id: vibe.id,
-    name: vibe.name,
-    description: vibe.description,
-    musicLink: vibe.musicLink,
-    isPrivate: vibe.isPrivate,
-    mood: vibe.mood ? (vibe.mood.id as MoodType) : undefined, // Convert to MoodType string
-  } : null;
+  const modalVibe = vibe
+    ? {
+        id: vibe.id,
+        name: vibe.name,
+        description: vibe.description,
+        musicLink: vibe.musicLink,
+        isPrivate: vibe.isPrivate,
+        mood: vibe.mood,
+      }
+    : null;
+
 
   return (
     <VibeEditModal

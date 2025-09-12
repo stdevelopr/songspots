@@ -16,7 +16,7 @@ const MoodSelector: React.FC<MoodSelectorProps> = ({ selectedMood, onMoodSelect 
       </label>
       
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-4">
-        {/* Clear selection option */}
+        {/* Clear selection option (Default) */}
         <button
           type="button"
           onClick={() => onMoodSelect(undefined)}
@@ -24,25 +24,25 @@ const MoodSelector: React.FC<MoodSelectorProps> = ({ selectedMood, onMoodSelect 
             !selectedMood ? 'selected' : ''
           } relative p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105`}
           style={{
-            borderColor: !selectedMood ? '#4A90E2' : '#E5E7EB',
-            backgroundColor: !selectedMood ? '#F0F9FF' : 'white',
+            borderColor: !selectedMood ? '#3b82f6' : '#E5E7EB',
+            backgroundColor: !selectedMood ? 'rgba(59, 130, 246, 0.08)' : 'white',
           }}
         >
           <div className="text-center">
-            <div className="text-2xl mb-1">🎯</div>
+            <div className="text-2xl mb-1">⭕️</div>
             <div className="text-xs font-medium text-gray-600">Default</div>
           </div>
         </button>
 
         {/* Mood options */}
         {moods.map((mood) => (
-          <button
-            key={mood.id}
-            type="button"
-            onClick={() => onMoodSelect(mood.id)}
-            className={`mood-option ${
-              selectedMood === mood.id ? 'selected' : ''
-            } relative p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105`}
+            <button
+              key={mood.id}
+              type="button"
+              onClick={() => onMoodSelect(mood.id as MoodType)}
+              className={`mood-option ${
+                selectedMood === mood.id ? 'selected' : ''
+              } relative p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105`}
             style={{
               borderColor: selectedMood === mood.id ? mood.colors.primary : '#E5E7EB',
               backgroundColor: selectedMood === mood.id ? `${mood.colors.primary}15` : 'white',

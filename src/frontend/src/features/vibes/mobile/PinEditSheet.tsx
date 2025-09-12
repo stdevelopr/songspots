@@ -10,7 +10,7 @@ interface PinEditSheetProps {
     description: string;
     musicLink: string;
     isPrivate: boolean;
-    mood: { id: string; name: string; emoji: string } | null;
+    mood: string;
   } | null;
   isOpen: boolean;
   onSubmit: (data: {
@@ -49,7 +49,7 @@ export const PinEditSheet: React.FC<PinEditSheetProps> = ({
         description: vibe.description || '',
         musicLink: vibe.musicLink || '',
         isPrivate: vibe.isPrivate || false,
-        mood: vibe.mood?.id || '',
+        mood: vibe.mood || '',
       });
     }
   }, [vibe]);
@@ -126,6 +126,35 @@ export const PinEditSheet: React.FC<PinEditSheetProps> = ({
             Mood
           </label>
           <div className="grid grid-cols-2 gap-3">
+            {/* Default (no mood) option */}
+            {(() => {
+              const isSelected = formData.mood === '';
+              return (
+                <button
+                  key="default"
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, mood: '' }))}
+                  className={`
+                    touch-target p-3 rounded-xl border-2 transition-all duration-200
+                    ${isSelected 
+                      ? 'border-2 shadow-lg transform scale-105' 
+                      : 'border border-gray-200 hover:border-gray-300'
+                    }
+                  `}
+                  style={{
+                    borderColor: isSelected ? '#3b82f6' : undefined, // tailwind blue-500
+                    backgroundColor: isSelected ? 'rgba(59, 130, 246, 0.08)' : 'white',
+                  }}
+                >
+                  <div className="text-center space-y-1">
+                    <div className="text-2xl">⭕️</div>
+                    <div className="text-mobile-sm font-medium text-gray-900">
+                      Default
+                    </div>
+                  </div>
+                </button>
+              );
+            })()}
             {moods.map((mood) => {
               const isSelected = formData.mood === mood.id;
               
