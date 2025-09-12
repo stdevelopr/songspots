@@ -300,12 +300,76 @@
   border-radius: 2px;
   margin: 12px auto 8px;
   flex-shrink: 0;
+  cursor: grab;
+  /* Add visual feedback for draggable area */
+  transition: background-color var(--mobile-duration-fast) var(--mobile-easing-standard);
+}
+
+.bottom-sheet-handle:active,
+.gesture-area:active .bottom-sheet-handle {
+  cursor: grabbing;
+  background: var(--mobile-text-secondary);
 }
 
 .bottom-sheet-header {
-  padding: 0 var(--mobile-space-3) var(--mobile-space-2);
+  position: relative;
+  padding: var(--mobile-space-2) var(--mobile-space-3);
   border-bottom: 1px solid var(--mobile-border);
   flex-shrink: 0;
+  /* Make header draggable with better touch target */
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  user-select: none;
+}
+
+.bottom-sheet-header h3 {
+  color: var(--mobile-text-primary);
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.125rem;
+  line-height: 1.25;
+}
+
+.bottom-sheet-header:active {
+  cursor: grabbing;
+}
+
+.bottom-sheet-close-button {
+  position: absolute;
+  top: 50%;
+  right: var(--mobile-space-3);
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--mobile-text-secondary);
+  cursor: pointer;
+  padding: var(--mobile-space-1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--mobile-duration-fast) var(--mobile-easing-standard);
+  /* Ensure good touch target */
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.bottom-sheet-close-button:hover {
+  background-color: var(--mobile-surface-secondary);
+  color: var(--mobile-text-primary);
+}
+
+.bottom-sheet-close-button:focus {
+  outline: 2px solid var(--mobile-primary);
+  outline-offset: 2px;
+}
+
+.bottom-sheet-close-button:active {
+  background-color: var(--mobile-surface-tertiary);
+  transform: translateY(-50%) scale(0.95);
 }
 
 .bottom-sheet-content {

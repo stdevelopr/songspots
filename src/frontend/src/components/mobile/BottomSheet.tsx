@@ -264,11 +264,43 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
         )}
 
         {/* Header */}
-        {title && (
-          <div className="bottom-sheet-header">
+        <div 
+          className="bottom-sheet-header gesture-area"
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+        >
+          {title && (
             <h3 id={`bottom-sheet-title-${titleId}`} className="text-mobile-lg font-semibold text-center">{title}</h3>
-          </div>
-        )}
+          )}
+          <button
+            className="bottom-sheet-close-button"
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent drag when clicking close button
+              onClose();
+            }}
+            onMouseDown={(e) => e.stopPropagation()} // Prevent drag when pressing close button
+            onTouchStart={(e) => e.stopPropagation()} // Prevent drag when touching close button
+            aria-label="Close"
+            type="button"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M18 6L6 18M6 6L18 18"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
 
         {/* Content */}
         <div ref={contentRef} className="bottom-sheet-content">
