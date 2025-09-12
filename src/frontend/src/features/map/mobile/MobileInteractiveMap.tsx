@@ -18,6 +18,7 @@ import { MobileHeader } from '../../../components/mobile/MobileHeader';
 import { FilterDrawer } from './FilterDrawer';
 import { MobileMapControls } from './MobileMapControls';
 import { BottomSheet } from '../../../components/mobile/BottomSheet';
+import { MapSkeleton } from '../../../components/mobile/SkeletonLoader';
 
 // Import responsive components (automatically choose mobile sheets vs desktop modals)
 import { PinDetails } from '../../vibes/responsive/PinDetails';
@@ -72,6 +73,7 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
   const [newPinLocation, setNewPinLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [justCreatedPin, setJustCreatedPin] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const skipNextAutoCenterRef = useRef(false);
   const hasAutoCenteredRef = useRef(false);
   const { showToast } = useToast();
@@ -146,7 +148,8 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
     clearAllFilters,
     showAllPins,
     filteredPins,
-    hasActiveFilters
+    hasActiveFilters,
+    dominantMood
   } = moodFilter;
 
   // Handle vibe layer rendering for non-profile mode with filtering support
@@ -255,13 +258,17 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
     );
   }
 
+  // Skeleton loading removed - causing issues
+
   return (
     <div className="flex flex-col h-screen bg-gray-50">
       {/* Mobile Header */}
       <MobileHeader
         title="Vibes Map"
         showPinCount={pins.length > 0}
-        pinCount={pins.length}
+        pinCount={hasActiveFilters ? filteredPins.length : pins.length}
+        dominantMood={dominantMood}
+        hasActiveFilters={hasActiveFilters}
         rightAction={
           identity ? {
             icon: (
@@ -291,6 +298,17 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
       <div className="flex-1 relative">
         <div ref={mapRef} className="w-full h-full" />
         
+        {/* Loading overlay during transitions */}
+        {isLoadingTransition && (
+          <div className="absolute inset-0 bg-gray-50 bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 shadow-lg flex flex-col items-center space-y-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent"></div>
+              <p className="text-mobile-sm text-gray-600">Loading vibes...</p>
+            </div>
+          </div>
+        )}
+        
+        
         {/* Mobile Map Controls */}
         <MobileMapControls
           status={status}
@@ -301,6 +319,8 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
             request(true);
           }}
           onCreate={handleCreateAtCenter}
+          onFilter={() => setFilterDrawerOpen(true)}
+          filterCount={hasActiveFilters ? selectedMoods.size : 0}
           isRefreshing={refreshing}
           showCounts={pins.length > 0}
           publicCount={publicCount}
@@ -310,13 +330,15 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
           isInitialLoading={isInitialLoading}
         />
 
-        {/* Filter Drawer */}
+        {/* Filter Drawer - controlled from toolbar */}
         {pins.length > 0 && (
           <FilterDrawer
             selectedMoods={selectedMoods}
             onMoodToggle={toggleMood}
             onClearAll={clearAllFilters}
             onShowAll={showAllPins}
+            isOpen={filterDrawerOpen}
+            onOpenChange={setFilterDrawerOpen}
           />
         )}
       </div>

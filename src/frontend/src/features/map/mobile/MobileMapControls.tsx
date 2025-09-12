@@ -1,5 +1,5 @@
 import React from 'react';
-import { FloatingActionButton, FABGroup } from '../../../components/mobile/FloatingActionButton';
+import { SimpleBottomToolbar, ToolbarButton } from '../../../components/mobile/SimpleBottomToolbar';
 import { LocationStatus, UserLocation } from '../types/map';
 
 interface MobileMapControlsProps {
@@ -14,6 +14,10 @@ interface MobileMapControlsProps {
   showCounts?: boolean;
   publicCount?: number;
   privateCount?: number;
+  
+  // Filter controls
+  onFilter?: () => void;
+  filterCount?: number;
   
   // Identity
   hasIdentity: boolean;
@@ -32,12 +36,14 @@ export const MobileMapControls: React.FC<MobileMapControlsProps> = ({
   showCounts = false,
   publicCount = 0,
   privateCount = 0,
+  onFilter,
+  filterCount = 0,
   hasIdentity,
   isLoadingTransition = false,
   isInitialLoading = false,
 }) => {
-  // Don't show controls during loading transitions
-  if (isLoadingTransition || isInitialLoading) {
+  // Show controls even during loading - only hide during true initial loading
+  if (isInitialLoading && !userLocation) {
     return null;
   }
 
@@ -96,52 +102,64 @@ export const MobileMapControls: React.FC<MobileMapControlsProps> = ({
   const totalPins = publicCount + privateCount;
 
   return (
-    <FABGroup direction="up" className="bottom-4 right-4 bottom-safe right-safe">
-      {/* Pin count FAB (when there are pins) */}
-      {showCounts && totalPins > 0 && (
-        <FloatingActionButton
+    <SimpleBottomToolbar>
+      {/* Location Button - Always show */}
+      <ToolbarButton
+        icon={getLocationIcon()}
+        label={getLocationLabel()}
+        onClick={onMyLocation}
+        disabled={isLocationDisabled}
+        loading={isRefreshing}
+        variant="primary"
+      />
+
+      {/* Filter Button (when there are pins) */}
+      {onFilter && totalPins > 0 && (
+        <ToolbarButton
           icon={
-            <div className="text-center">
-              <div className="text-mobile-sm font-bold">{totalPins}</div>
-              <div className="text-mobile-xs opacity-80">
-                {totalPins === 1 ? 'spot' : 'spots'}
-              </div>
+            <div className="relative">
+              <span className="text-xl">🎭</span>
+              {filterCount > 0 && (
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
+              )}
             </div>
           }
-          onClick={() => {}} // Could open a spots list
-          label={`${totalPins} vibe ${totalPins === 1 ? 'spot' : 'spots'}`}
-          variant="secondary"
-          size="medium"
-          disabled={true} // Just informational for now
+          label="Filters"
+          onClick={onFilter}
+          badge={filterCount > 0 ? filterCount : undefined}
+          variant={filterCount > 0 ? 'primary' : 'secondary'}
         />
       )}
 
-      {/* Create Vibe FAB */}
-      {onCreate && (
-        <FloatingActionButton
+      {/* Create Vibe Button */}
+      {onCreate && hasIdentity && (
+        <ToolbarButton
           icon={
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
           }
+          label="Add Spot"
           onClick={onCreate}
-          label="Add vibe at map center"
-          variant="secondary"
-          size="medium"
+          variant="primary"
         />
       )}
 
-      {/* Location FAB */}
-      <FloatingActionButton
-        icon={getLocationIcon()}
-        onClick={onMyLocation}
-        label={getLocationLabel()}
-        variant="primary"
-        size="large"
-        disabled={isLocationDisabled}
-        loading={isRefreshing}
-      />
-    </FABGroup>
+      {/* Pin count (when there are pins) */}
+      {showCounts && totalPins > 0 && (
+        <ToolbarButton
+          icon={
+            <div className="text-center">
+              <div className="text-lg font-bold leading-none">{totalPins}</div>
+            </div>
+          }
+          label={`${totalPins} ${totalPins === 1 ? 'Spot' : 'Spots'}`}
+          onClick={() => {}} // Could open a spots list
+          disabled={true} // Just informational for now
+          variant="secondary"
+        />
+      )}
+    </SimpleBottomToolbar>
   );
 };
 
@@ -162,7 +180,7 @@ export const CompactMobileMapControls: React.FC<CompactMobileMapControlsProps> =
   const isLocationDisabled = isRefreshing || status === 'unavailable';
 
   return (
-    <div className="fixed bottom-4 right-4 bottom-safe right-safe flex flex-col gap-2">
+    <div className="fixed bottom-4 right-4 pb-safe pr-safe flex flex-col gap-2">
       {/* Pin count badge */}
       {typeof pinCount === 'number' && pinCount > 0 && (
         <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg border border-gray-200">
@@ -173,23 +191,20 @@ export const CompactMobileMapControls: React.FC<CompactMobileMapControlsProps> =
       )}
 
       {/* Location button */}
-      <FloatingActionButton
-        icon={
-          isRefreshing ? (
-            <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
-          ) : (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-            </svg>
-          )
-        }
+      <button
         onClick={onMyLocation}
-        label="My Location"
-        variant="primary"
-        size="medium"
         disabled={isLocationDisabled}
-        loading={isRefreshing}
-      />
+        className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center shadow-lg disabled:opacity-50"
+        aria-label="My Location"
+      >
+        {isRefreshing ? (
+          <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
+        ) : (
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+          </svg>
+        )}
+      </button>
     </div>
   );
 };

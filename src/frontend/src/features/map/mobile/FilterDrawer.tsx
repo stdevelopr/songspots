@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
-import { MoodType, getAllMoods } from '@common/types/moods';
+import React, { useState, useRef, useCallback } from 'react';
+import { MoodType, getAllMoods } from '../../common/types/moods';
 import { BottomSheet } from '../../../components/mobile/BottomSheet';
 import { FloatingActionButton } from '../../../components/mobile/FloatingActionButton';
+import { haptics } from '../../../utils/haptics';
 
 interface FilterDrawerProps {
   selectedMoods: Set<MoodType>;
   onMoodToggle: (mood: MoodType) => void;
   onClearAll: () => void;
   onShowAll: () => void;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
   className?: string;
 }
 
@@ -16,9 +19,13 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
   onMoodToggle,
   onClearAll,
   onShowAll,
+  isOpen: externalIsOpen,
+  onOpenChange,
   className = '',
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
+  const setIsOpen = onOpenChange || setInternalIsOpen;
   const moods = getAllMoods();
   const hasFilters = selectedMoods.size > 0;
 
@@ -27,7 +34,15 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
   };
 
   const handleMoodToggle = (mood: MoodType) => {
+    const wasSelected = selectedMoods.has(mood);
     onMoodToggle(mood);
+    
+    // Provide haptic feedback based on action
+    if (wasSelected) {
+      haptics.tap(); // Light feedback when deselecting
+    } else {
+      haptics.buttonPress(); // Stronger feedback when selecting
+    }
   };
 
   const handleClearAll = () => {
@@ -42,23 +57,25 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
 
   return (
     <>
-      {/* Filter FAB */}
-      <FloatingActionButton
-        icon={
-          <div className="relative">
-            <span className="text-xl">🎭</span>
-            {hasFilters && (
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full" />
-            )}
-          </div>
-        }
-        onClick={handleToggleDrawer}
-        label="Mood Filters"
-        variant="secondary"
-        position="bottom-left"
-        badge={hasFilters ? selectedMoods.size : undefined}
-        className={className}
-      />
+      {/* Filter FAB - only show when not controlled externally */}
+      {externalIsOpen === undefined && (
+        <FloatingActionButton
+          icon={
+            <div className="relative">
+              <span className="text-xl">🎭</span>
+              {hasFilters && (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full" />
+              )}
+            </div>
+          }
+          onClick={handleToggleDrawer}
+          label="Mood Filters"
+          variant="secondary"
+          position="bottom-left"
+          badge={hasFilters ? selectedMoods.size : undefined}
+          className={`pb-safe pl-safe ${className}`}
+        />
+      )}
 
       {/* Filter Drawer */}
       <BottomSheet
@@ -69,8 +86,14 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
         initialSnapPoint={0}
         showHandle={true}
         closeOnOverlayClick={true}
+        aria-describedby="filter-instructions"
       >
         <div className="space-y-6">
+          {/* Screen reader instructions */}
+          <div id="filter-instructions" className="sr-only">
+            Use the following buttons to filter vibe spots by mood. Selected moods will highlight in color with a checkmark.
+          </div>
+          
           {/* Active filters summary */}
           {hasFilters && (
             <div className="bg-blue-50 rounded-lg p-4">
@@ -119,16 +142,23 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
                     onClick={() => handleMoodToggle(mood.id)}
                     className={`
                       touch-target p-4 rounded-xl border-2 transition-all duration-200
+                      active:scale-95 transform-gpu
                       ${
                         isSelected
-                          ? 'border-2 shadow-lg transform scale-105'
-                          : 'border border-gray-200 hover:border-gray-300'
+                          ? 'border-2 shadow-lg scale-105 ring-2 ring-opacity-20'
+                          : 'border border-gray-200 hover:border-gray-300 hover:shadow-md active:shadow-lg'
                       }
                     `}
                     style={{
                       borderColor: isSelected ? mood.colors.primary : undefined,
                       backgroundColor: isSelected ? `${mood.colors.primary}15` : 'white',
+                      ...(isSelected && {
+                        '--tw-ring-color': mood.colors.primary,
+                      } as React.CSSProperties),
                     }}
+                    role="checkbox"
+                    aria-checked={isSelected}
+                    aria-label={`${mood.name} mood filter. ${mood.description}${isSelected ? '. Currently selected' : '. Not selected'}`}
                   >
                     <div className="text-center space-y-2">
                       <div className="text-3xl">{mood.emoji}</div>

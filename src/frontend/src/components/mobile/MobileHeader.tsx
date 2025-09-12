@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useRef, useCallback } from 'react';
+import { MoodType, getMoodById } from '../../features/common/types/moods';
+import { haptics } from '../../utils/haptics';
 
 export interface MobileHeaderProps {
   title?: string;
@@ -15,6 +17,9 @@ export interface MobileHeaderProps {
   };
   showPinCount?: boolean;
   pinCount?: number;
+  dominantMood?: MoodType;
+  hasActiveFilters?: boolean;
+  onSwipeDown?: () => void;
   className?: string;
   style?: React.CSSProperties;
 }
@@ -26,9 +31,43 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
   rightAction,
   showPinCount = false,
   pinCount = 0,
+  dominantMood,
+  hasActiveFilters = false,
+  onSwipeDown,
   className = '',
   style,
 }) => {
+  // Get mood styling for pin count
+  const moodStyling = dominantMood ? getMoodById(dominantMood) : null;
+  
+  // Touch gesture handling
+  const touchStartRef = useRef<{ y: number; time: number } | null>(null);
+  
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (!onSwipeDown) return;
+    
+    touchStartRef.current = {
+      y: e.touches[0].clientY,
+      time: Date.now()
+    };
+  }, [onSwipeDown]);
+  
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!onSwipeDown || !touchStartRef.current) return;
+    
+    const deltaY = e.changedTouches[0].clientY - touchStartRef.current.y;
+    const deltaTime = Date.now() - touchStartRef.current.time;
+    const velocity = deltaY / deltaTime;
+    
+    // Detect downward swipe (swipe to refresh)
+    if (deltaY > 50 && velocity > 0.5) {
+      haptics.buttonPress();
+      onSwipeDown();
+    }
+    
+    touchStartRef.current = null;
+  }, [onSwipeDown]);
+  
   return (
     <header
       className={`
@@ -37,6 +76,8 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
         ${className}
       `}
       style={style}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Left side */}
       <div className="flex items-center flex-1">
@@ -68,8 +109,38 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
       {/* Center - Pin count (optional) */}
       {showPinCount && (
         <div className="flex-shrink-0 mx-3">
-          <div className="bg-gray-100 rounded-full px-3 py-1">
-            <span className="text-mobile-sm font-medium text-gray-700">
+          <div 
+            className={`
+              rounded-full px-3 py-1 transition-all duration-300
+              ${hasActiveFilters && moodStyling ? 'shadow-md' : ''}
+            `}
+            style={{
+              background: hasActiveFilters && moodStyling 
+                ? `${moodStyling.colors.primary}15`
+                : 'rgb(243 244 246)',
+              borderColor: hasActiveFilters && moodStyling 
+                ? moodStyling.colors.primary
+                : 'transparent',
+              borderWidth: hasActiveFilters && moodStyling ? '2px' : '0px',
+            }}
+            role="status"
+            aria-label={
+              hasActiveFilters && moodStyling
+                ? `${pinCount} ${pinCount === 1 ? 'spot' : 'spots'} filtered by ${moodStyling.name} mood`
+                : `${pinCount} vibe ${pinCount === 1 ? 'spot' : 'spots'} visible on map`
+            }
+          >
+            <span 
+              className="text-mobile-sm font-medium transition-colors duration-300"
+              style={{
+                color: hasActiveFilters && moodStyling
+                  ? moodStyling.colors.primary
+                  : 'rgb(55 65 81)',
+              }}
+            >
+              {hasActiveFilters && moodStyling && (
+                <span className="mr-1">{moodStyling.emoji}</span>
+              )}
               {pinCount} {pinCount === 1 ? 'spot' : 'spots'}
             </span>
           </div>

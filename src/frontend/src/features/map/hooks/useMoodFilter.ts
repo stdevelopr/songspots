@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { MoodType } from '@common/types/moods';
+import { MoodType } from '../../common/types/moods';
 
 interface PinWithMood {
   mood?: MoodType;
@@ -58,6 +58,36 @@ export const useMoodFilter = <T extends PinWithMood>(pins: T[]) => {
     return counts;
   }, [pins]);
 
+  const dominantMood = useMemo(() => {
+    if (hasActiveFilters && selectedMoods.size === 1) {
+      // If only one mood is selected, use that
+      return Array.from(selectedMoods)[0];
+    } else if (hasActiveFilters && selectedMoods.size > 1) {
+      // If multiple moods selected, find the one with most filtered pins
+      let maxCount = 0;
+      let dominant: MoodType | undefined;
+      Array.from(selectedMoods).forEach(mood => {
+        const count = filteredPins.filter(pin => pin.mood === mood).length;
+        if (count > maxCount) {
+          maxCount = count;
+          dominant = mood;
+        }
+      });
+      return dominant;
+    } else {
+      // No filters active, find overall dominant mood
+      let maxCount = 0;
+      let dominant: MoodType | undefined;
+      moodCounts.forEach((count, mood) => {
+        if (count > maxCount) {
+          maxCount = count;
+          dominant = mood;
+        }
+      });
+      return maxCount > 0 ? dominant : undefined;
+    }
+  }, [hasActiveFilters, selectedMoods, filteredPins, moodCounts]);
+
   return {
     selectedMoods,
     toggleMood,
@@ -66,6 +96,7 @@ export const useMoodFilter = <T extends PinWithMood>(pins: T[]) => {
     filteredPins,
     hasActiveFilters,
     moodCounts,
+    dominantMood,
     totalPins: pins.length,
     visiblePins: filteredPins.length,
   };
