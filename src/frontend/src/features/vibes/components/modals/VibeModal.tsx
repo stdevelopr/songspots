@@ -149,39 +149,62 @@ const VibeModal: React.FC<VibeModalProps> = ({
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">
-                Privacy Setting
-              </label>
-              <div className="space-y-1.5 sm:space-y-2">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="editPrivacy"
-                    value="public"
-                    checked={!isPrivate}
-                    onChange={() => setIsPrivate(false)}
-                    disabled={isSubmitting}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 disabled:opacity-50"
-                  />
-                  <span className="ml-2 sm:ml-3 text-xs sm:text-sm text-gray-700">
-                    <span className="font-medium">🌐 Public</span> - Visible to everyone
-                  </span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="editPrivacy"
-                    value="private"
-                    checked={isPrivate}
-                    onChange={() => setIsPrivate(true)}
-                    disabled={isSubmitting}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 disabled:opacity-50"
-                  />
-                  <span className="ml-2 sm:ml-3 text-xs sm:text-sm text-gray-700">
-                    <span className="font-medium">🔒 Private</span> - Only visible to you
-                  </span>
-                </label>
+            {/* Privacy Toggle */}
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center flex-1">
+                  <div className="text-xl mr-3">
+                    {isPrivate ? '🔒' : '🌍'}
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                      {isPrivate ? 'Private Spot' : 'Public Spot'}
+                      {isPrivate && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                          Private
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-gray-600 mt-1">
+                      {isPrivate 
+                        ? 'Only visible to you when logged in' 
+                        : 'Visible to everyone on the map'
+                      }
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Enhanced Toggle Switch */}
+                <button
+                  type="button"
+                  onClick={() => setIsPrivate(!isPrivate)}
+                  disabled={isSubmitting}
+                  className={`
+                    relative w-12 h-6 rounded-full transition-all duration-300 ease-in-out
+                    focus:outline-none focus:ring-4 focus:ring-opacity-25 disabled:opacity-50
+                    ${isPrivate 
+                      ? 'bg-gradient-to-r from-purple-500 to-purple-600 shadow-md focus:ring-purple-300' 
+                      : 'bg-gray-300 focus:ring-blue-300'
+                    }
+                  `}
+                >
+                  <div className={`
+                    absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md
+                    transition-all duration-300 ease-in-out flex items-center justify-center
+                    ${isPrivate ? 'translate-x-6' : 'translate-x-0'}
+                  `}>
+                    {isPrivate ? (
+                      <svg className="w-3 h-3 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <svg className="w-3 h-3 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                        <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
+                </button>
               </div>
             </div>
 

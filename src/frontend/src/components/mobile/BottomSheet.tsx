@@ -204,21 +204,21 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
     transform: `translateY(${dragOffset}px)`,
     transition: (isDragging || prefersReducedMotion)
       ? 'none'
-      : 'transform var(--mobile-duration-normal) var(--mobile-easing-decelerate)',
+      : 'transform var(--vibes-duration-normal) var(--vibes-easing-decelerate)',
   };
 
   return createPortal(
     <>
       {/* Overlay */}
       <div
-        className={`bottom-sheet-overlay ${isOpen ? 'open' : ''}`}
+        className={`bottom-sheet-overlay ${isOpen ? 'open' : ''} vibe-animate-backdrop-enter`}
         onClick={closeOnOverlayClick ? onClose : undefined}
       />
       
       {/* Sheet */}
       <div
         ref={sheetRef}
-        className={`bottom-sheet ${isOpen ? 'open' : ''} ${className}`}
+        className={`bottom-sheet ${isOpen ? 'open' : ''} ${className} vibe-animate-slide-in-up vibe-gpu`}
         style={sheetStyle}
         role="dialog"
         aria-modal="true"

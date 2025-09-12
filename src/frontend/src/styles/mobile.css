@@ -140,6 +140,28 @@
   transition-timing-function: var(--mobile-easing-standard);
 }
 
+/* Enhanced mobile touch interactions */
+.mobile-interactive {
+  transition: all var(--vibes-duration-fast) var(--vibes-easing-standard);
+  transform: translateZ(0);
+}
+
+.mobile-interactive:active {
+  transform: scale(0.98) translateZ(0);
+}
+
+/* Smooth scroll enhancements */
+.mobile-scroll-smooth {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.mobile-scroll-smooth::-webkit-scrollbar {
+  display: none;
+}
+
 /* ===== MOBILE COLOR PALETTE ===== */
 :root {
   --mobile-primary: #007AFF;
@@ -168,7 +190,7 @@
   }
 
   .mobile-button:active {
-    transform: scale(0.96);
+    transform: scale(0.96) translateZ(0);
     opacity: 0.8;
   }
 
@@ -189,6 +211,13 @@
     padding: var(--mobile-space-3);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     border: 1px solid var(--mobile-border);
+    transition: all var(--vibes-duration-normal) var(--vibes-easing-standard);
+    transform: translateZ(0);
+  }
+
+  .mobile-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px) translateZ(0);
   }
 
   /* Bottom toolbar styles */
@@ -207,7 +236,7 @@
   }
 
   .mobile-toolbar-action:active {
-    transform: scale(0.95);
+    transform: scale(0.95) translateZ(0);
     background-color: rgba(0, 0, 0, 0.05);
     border-radius: 8px;
   }

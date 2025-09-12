@@ -18,18 +18,12 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   return (
     <div
       className={`
-        bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200
+        ${animate ? 'vibe-animate-shimmer' : 'bg-gray-200'}
         ${rounded ? 'rounded' : ''}
-        ${animate ? 'animate-pulse' : ''}
         ${width} ${height}
         ${className}
+        vibe-gpu
       `}
-      style={{
-        backgroundSize: '200% 100%',
-        animation: animate 
-          ? 'shimmer 1.5s ease-in-out infinite, pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-          : undefined,
-      }}
     />
   );
 };
@@ -81,12 +75,11 @@ export const MapSkeleton: React.FC = () => {
           ].map((pos, i) => (
             <div 
               key={i}
-              className="absolute w-8 h-8 animate-bounce"
+              className="absolute w-8 h-8 vibe-animate-breathe"
               style={{ 
                 top: pos.top, 
                 left: pos.left,
-                animationDelay: `${i * 0.2}s`,
-                animationDuration: '2s',
+                animationDelay: `${i * 0.4}s`,
               }}
             >
               <Skeleton className="w-8 h-8 rounded-full shadow-lg" />

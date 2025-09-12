@@ -1,6 +1,374 @@
-/* Consolidated animations */
+/* ===== VIBES ANIMATION SYSTEM ===== */
 
-/* Scale-in */
+/* Animation timing and easing variables */
+:root {
+  --vibes-duration-instant: 100ms;
+  --vibes-duration-fast: 200ms;
+  --vibes-duration-normal: 300ms;
+  --vibes-duration-slow: 500ms;
+  --vibes-duration-slower: 800ms;
+  
+  --vibes-easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+  --vibes-easing-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
+  --vibes-easing-accelerate: cubic-bezier(0.4, 0.0, 1, 1);
+  --vibes-easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --vibes-easing-elastic: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ===== ENTRANCE ANIMATIONS ===== */
+
+/* Gentle scale-in for cards and modals */
+@keyframes vibe-scale-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.94) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Smooth fade-up for content */
+@keyframes vibe-fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Bouncy scale for interactive elements */
+@keyframes vibe-bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Slide in from edges */
+@keyframes vibe-slide-in-left {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes vibe-slide-in-right {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes vibe-slide-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== MICRO-INTERACTIONS ===== */
+
+/* Gentle hover lift */
+@keyframes vibe-lift {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-2px) scale(1.02); }
+}
+
+/* Ripple effect */
+@keyframes vibe-ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Pulse glow */
+@keyframes vibe-pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+}
+
+/* Wiggle for attention */
+@keyframes vibe-wiggle {
+  0%, 7%, 14%, 21% { transform: rotate(0deg); }
+  3.5% { transform: rotate(-3deg); }
+  10.5%, 17.5% { transform: rotate(3deg); }
+}
+
+/* ===== LOADING ANIMATIONS ===== */
+
+/* Shimmer effect for skeleton loading */
+@keyframes vibe-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Smooth spin */
+@keyframes vibe-spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* Breathing effect */
+@keyframes vibe-breathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+}
+
+/* Music visualization bars */
+@keyframes vibe-music-1 {
+  0%, 100% { height: 4px; }
+  25% { height: 12px; }
+  50% { height: 8px; }
+  75% { height: 16px; }
+}
+
+@keyframes vibe-music-2 {
+  0%, 100% { height: 8px; }
+  25% { height: 4px; }
+  50% { height: 16px; }
+  75% { height: 6px; }
+}
+
+@keyframes vibe-music-3 {
+  0%, 100% { height: 12px; }
+  25% { height: 16px; }
+  50% { height: 4px; }
+  75% { height: 14px; }
+}
+
+/* ===== TRANSITION ANIMATIONS ===== */
+
+/* Smooth page transitions */
+@keyframes vibe-page-enter {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes vibe-page-exit {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+}
+
+/* Modal backdrop */
+@keyframes vibe-backdrop-enter {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* ===== ACCESSIBILITY: RESPECT REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  .vibe-animate-scale-in,
+  .vibe-animate-fade-up,
+  .vibe-animate-bounce-in,
+  .vibe-animate-slide-in-left,
+  .vibe-animate-slide-in-right,
+  .vibe-animate-slide-in-up,
+  .vibe-animate-lift,
+  .vibe-animate-wiggle,
+  .vibe-animate-breathe,
+  .vibe-animate-page-enter,
+  .vibe-animate-page-exit,
+  .vibe-animate-spin,
+  .vibe-animate-music,
+  .vibe-animate-pulse-glow {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  /* Still allow opacity changes for accessibility */
+  .vibe-animate-fade-up,
+  .vibe-animate-scale-in,
+  .vibe-animate-bounce-in {
+    opacity: 1;
+    transform: none !important;
+  }
+}
+
+/* ===== APPLY ANIMATIONS (when motion is allowed) ===== */
+@media (prefers-reduced-motion: no-preference) {
+  .vibe-animate-scale-in {
+    animation: vibe-scale-in var(--vibes-duration-normal) var(--vibes-easing-decelerate);
+  }
+
+  .vibe-animate-fade-up {
+    animation: vibe-fade-up var(--vibes-duration-normal) var(--vibes-easing-standard);
+  }
+
+  .vibe-animate-bounce-in {
+    animation: vibe-bounce-in var(--vibes-duration-slow) var(--vibes-easing-bounce);
+  }
+
+  .vibe-animate-slide-in-left {
+    animation: vibe-slide-in-left var(--vibes-duration-normal) var(--vibes-easing-decelerate);
+  }
+
+  .vibe-animate-slide-in-right {
+    animation: vibe-slide-in-right var(--vibes-duration-normal) var(--vibes-easing-decelerate);
+  }
+
+  .vibe-animate-slide-in-up {
+    animation: vibe-slide-in-up var(--vibes-duration-normal) var(--vibes-easing-decelerate);
+  }
+
+  .vibe-animate-wiggle {
+    animation: vibe-wiggle 0.8s ease-in-out;
+  }
+
+  .vibe-animate-spin {
+    animation: vibe-spin 1s linear infinite;
+  }
+
+  .vibe-animate-breathe {
+    animation: vibe-breathe 2s ease-in-out infinite;
+  }
+
+  .vibe-animate-pulse-glow {
+    animation: vibe-pulse-glow 2s ease-in-out infinite;
+  }
+
+  .vibe-animate-music .bar-1 {
+    animation: vibe-music-1 0.6s ease-in-out infinite;
+    animation-delay: 0s;
+  }
+
+  .vibe-animate-music .bar-2 {
+    animation: vibe-music-2 0.8s ease-in-out infinite;
+    animation-delay: 0.2s;
+  }
+
+  .vibe-animate-music .bar-3 {
+    animation: vibe-music-3 0.7s ease-in-out infinite;
+    animation-delay: 0.4s;
+  }
+
+  .vibe-animate-page-enter {
+    animation: vibe-page-enter var(--vibes-duration-normal) var(--vibes-easing-standard);
+  }
+
+  .vibe-animate-page-exit {
+    animation: vibe-page-exit var(--vibes-duration-normal) var(--vibes-easing-accelerate);
+  }
+
+  .vibe-animate-backdrop-enter {
+    animation: vibe-backdrop-enter var(--vibes-duration-fast) ease-out;
+  }
+
+  /* Shimmer for skeleton loading */
+  .vibe-animate-shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: vibe-shimmer 1.5s infinite;
+  }
+}
+
+/* ===== HOVER & INTERACTION STATES ===== */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .vibe-hover-lift:hover {
+    animation: vibe-lift var(--vibes-duration-fast) var(--vibes-easing-standard) forwards;
+  }
+
+  .vibe-hover-lift:active {
+    transform: translateY(0) scale(0.98);
+  }
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+/* Smooth transitions */
+.vibe-transition-fast {
+  transition: all var(--vibes-duration-fast) var(--vibes-easing-standard);
+}
+
+.vibe-transition-normal {
+  transition: all var(--vibes-duration-normal) var(--vibes-easing-standard);
+}
+
+.vibe-transition-slow {
+  transition: all var(--vibes-duration-slow) var(--vibes-easing-standard);
+}
+
+/* Transform GPU acceleration */
+.vibe-gpu {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Ripple container */
+.vibe-ripple-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.vibe-ripple-container::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  transform: scale(0);
+  opacity: 0;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px;
+}
+
+.vibe-ripple-container:active::after {
+  animation: vibe-ripple 0.6s ease-out;
+}
+
+/* ===== LEGACY SUPPORT ===== */
+/* Keep existing animations for backward compatibility */
+
 @keyframes scale-in {
   0% {
     opacity: 0;
@@ -12,24 +380,6 @@
   }
 }
 
-/* Respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .animate-scale-in,
-  .animate-fade-in,
-  .animate-spin-slow,
-  .bounce-music {
-    animation: none !important;
-  }
-}
-
-/* Apply animations only when motion is allowed */
-@media (prefers-reduced-motion: no-preference) {
-  .animate-scale-in {
-    animation: scale-in 0.2s ease-out;
-  }
-}
-
-/* Fade-in */
 @keyframes fade-in {
   0% {
     opacity: 0;
@@ -41,26 +391,12 @@
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .animate-fade-in {
-    animation: fade-in 0.3s ease-out;
-  }
-}
-
-/* Slow spin */
 @keyframes spin-slow {
   100% {
     transform: rotate(360deg);
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .animate-spin-slow {
-    animation: spin-slow 1.5s linear infinite;
-  }
-}
-
-/* Music bounce */
 @keyframes bounce-music {
   0%, 100% {
     transform: translateY(0);
@@ -80,6 +416,18 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .animate-scale-in {
+    animation: scale-in 0.2s ease-out;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 1.5s linear infinite;
+  }
+
   .bounce-music {
     animation: bounce-music 0.6s;
   }

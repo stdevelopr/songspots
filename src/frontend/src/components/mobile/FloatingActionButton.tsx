@@ -85,8 +85,8 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
         ${sizeClasses[size]}
         ${positionClasses[position]}
         ${getVariantStyles()}
-        transition-all duration-200 ease-out
-        relative overflow-hidden
+        vibe-transition-fast vibe-hover-lift vibe-ripple-container vibe-gpu
+        relative overflow-hidden vibe-animate-bounce-in
         ${className}
       `}
       style={style}
@@ -98,17 +98,17 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
     >
       {/* Loading spinner */}
       {loading ? (
-        <div className="animate-spin rounded-full border-2 border-current border-t-transparent w-5 h-5 transition-opacity duration-200" />
+        <div className="vibe-animate-spin rounded-full border-2 border-current border-t-transparent w-5 h-5 vibe-transition-normal" />
       ) : (
         <>
           {/* Icon with hover effects */}
-          <div className="flex items-center justify-center transition-transform duration-150 group-hover:scale-110">
+          <div className="flex items-center justify-center vibe-transition-fast group-hover:scale-110">
             {icon}
           </div>
           
           {/* Badge with animation */}
           {badge && !loading && (
-            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1 animate-pulse shadow-md">
+            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1 vibe-animate-bounce-in shadow-md">
               <span className="font-medium">
                 {typeof badge === 'number' && badge > 99 ? '99+' : badge}
               </span>
@@ -116,7 +116,7 @@ export const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
           )}
           
           {/* Interactive ring effect */}
-          <div className="absolute inset-0 rounded-full ring-0 ring-blue-400 transition-all duration-200 group-hover:ring-4 group-hover:ring-opacity-30 group-active:ring-2" />
+          <div className="absolute inset-0 rounded-full ring-0 ring-blue-400 vibe-transition-normal group-hover:ring-4 group-hover:ring-opacity-30 group-active:ring-2" />
         </>
       )}
     </button>

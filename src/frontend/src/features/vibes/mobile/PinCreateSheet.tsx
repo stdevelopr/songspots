@@ -26,14 +26,13 @@ export const PinCreateSheet: React.FC<PinCreateSheetProps> = ({
   isSubmitting,
 }) => {
   const moods = useMemo(() => getAllMoods(), []); // Memoize moods array
-  const defaultMood = useMemo(() => moods[0]?.id || '', [moods]);
   
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     musicLink: '',
     isPrivate: false,
-    mood: defaultMood,
+    mood: '', // Start with no mood selected
   });
 
   // Reset form when opening
@@ -44,14 +43,25 @@ export const PinCreateSheet: React.FC<PinCreateSheetProps> = ({
         description: '',
         musicLink: '',
         isPrivate: false,
-        mood: defaultMood,
+        mood: '', // Start with no mood selected
       });
     }
-  }, [isOpen, defaultMood]);
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!location) return;
+
+    // Validate required fields
+    if (!formData.mood) {
+      alert('Please select a mood for your vibe spot');
+      return;
+    }
+
+    if (!formData.name.trim()) {
+      alert('Please enter a name for your vibe spot');
+      return;
+    }
 
     try {
       await onSubmit({
@@ -124,6 +134,11 @@ export const PinCreateSheet: React.FC<PinCreateSheetProps> = ({
           <label className="block text-mobile-base font-semibold text-gray-900 mb-3">
             What's the vibe? *
           </label>
+          {!formData.mood && (
+            <p className="text-mobile-sm text-gray-500 mb-3">
+              Choose a mood that best describes this spot
+            </p>
+          )}
           <div className="grid grid-cols-2 gap-3">
             {moods.map((mood) => {
               const isSelected = formData.mood === mood.id;
@@ -134,7 +149,8 @@ export const PinCreateSheet: React.FC<PinCreateSheetProps> = ({
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, mood: mood.id }))}
                   className={`
-                    touch-target p-3 rounded-xl border-2 transition-all duration-200
+                    touch-target p-3 rounded-xl border-2 vibe-transition-normal vibe-hover-lift
+                    mobile-interactive vibe-gpu
                     ${isSelected 
                       ? 'border-2 shadow-lg transform scale-105' 
                       : 'border border-gray-200 hover:border-gray-300'
@@ -198,30 +214,70 @@ export const PinCreateSheet: React.FC<PinCreateSheetProps> = ({
         </div>
 
         {/* Privacy Toggle */}
-        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-          <div className="flex-1">
-            <h4 className="text-mobile-base font-semibold text-gray-900">
-              Private Spot
-            </h4>
-            <p className="text-mobile-sm text-gray-600">
-              Only you can see this spot
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setFormData(prev => ({ ...prev, isPrivate: !prev.isPrivate }))}
-            className={`
-              relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-              ${formData.isPrivate ? 'bg-blue-600' : 'bg-gray-200'}
-            `}
-          >
-            <span
+        <div className="mobile-card vibe-transition-normal vibe-hover-lift">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center flex-1">
+              <div className="text-2xl mr-3">
+                {formData.isPrivate ? '🔒' : '🌍'}
+              </div>
+              <div className="flex-1">
+                <div className="text-mobile-base font-semibold text-gray-900 flex items-center gap-2">
+                  {formData.isPrivate ? 'Private Spot' : 'Public Spot'}
+                  {formData.isPrivate && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 vibe-animate-bounce-in">
+                      Private
+                    </span>
+                  )}
+                </div>
+                <div className="text-mobile-sm text-gray-600 mt-1">
+                  {formData.isPrivate 
+                    ? 'Only visible to you when logged in' 
+                    : 'Visible to everyone on the map'
+                  }
+                </div>
+              </div>
+            </div>
+            
+            {/* Enhanced Toggle Switch */}
+            <button
+              type="button"
+              onClick={() => setFormData(prev => ({ ...prev, isPrivate: !prev.isPrivate }))}
               className={`
-                inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-                ${formData.isPrivate ? 'translate-x-6' : 'translate-x-1'}
+                relative w-16 h-8 rounded-full transition-all duration-300 ease-in-out
+                vibe-gpu focus:outline-none focus:ring-4 focus:ring-opacity-25 touch-target
+                ${formData.isPrivate 
+                  ? 'bg-gradient-to-r from-purple-500 to-purple-600 shadow-lg focus:ring-purple-300' 
+                  : 'bg-gray-300 focus:ring-blue-300'
+                }
               `}
-            />
-          </button>
+            >
+              <div className={`
+                absolute top-1/2 left-1 w-6 h-6 bg-white rounded-full shadow-lg
+                transition-all duration-300 ease-in-out vibe-gpu flex items-center justify-center
+                -translate-y-1/2 ${formData.isPrivate ? 'translate-x-8' : 'translate-x-0'}
+              `}>
+                {formData.isPrivate ? (
+                  <svg className="w-3 h-3 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                  </svg>
+                ) : (
+                  <svg className="w-3 h-3 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                    <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                  </svg>
+                )}
+              </div>
+              
+              {/* Animated background glow effect */}
+              <div className={`
+                absolute inset-0 rounded-full transition-opacity duration-300
+                ${formData.isPrivate 
+                  ? 'bg-purple-400 opacity-20 vibe-animate-pulse-glow' 
+                  : 'opacity-0'
+                }
+              `} />
+            </button>
+          </div>
         </div>
 
         {/* Action Buttons */}

@@ -308,16 +308,14 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
         />
 
         {/* Filter Drawer - controlled from toolbar */}
-        {pins.length > 0 && (
-          <FilterDrawer
-            selectedMoods={selectedMoods}
-            onMoodToggle={toggleMood}
-            onClearAll={clearAllFilters}
-            onShowAll={showAllPins}
-            isOpen={filterDrawerOpen}
-            onOpenChange={setFilterDrawerOpen}
-          />
-        )}
+        <FilterDrawer
+          selectedMoods={selectedMoods}
+          onMoodToggle={toggleMood}
+          onClearAll={clearAllFilters}
+          onShowAll={showAllPins}
+          isOpen={filterDrawerOpen}
+          onOpenChange={setFilterDrawerOpen}
+        />
       </div>
 
       {/* Responsive Pin Interactions - Mobile uses bottom sheets, desktop uses modals */}

@@ -128,7 +128,7 @@ export const MobileMapControls: React.FC<MobileMapControlsProps> = ({
           label="Filters"
           onClick={onFilter}
           badge={filterCount > 0 ? filterCount : undefined}
-          variant={filterCount > 0 ? 'primary' : 'secondary'}
+          variant="primary"
         />
       )}
 

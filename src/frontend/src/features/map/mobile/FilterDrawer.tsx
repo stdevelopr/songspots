@@ -26,24 +26,28 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [interactionsDisabled, setInteractionsDisabled] = useState(false);
   const openTimeRef = React.useRef<number>(0);
+  const animationCompleteRef = React.useRef<boolean>(false);
   
-  // Prevent accidental clicks using a time-based approach
+  // Prevent accidental clicks during opening animation
   React.useEffect(() => {
     const isCurrentlyOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
     
     if (isCurrentlyOpen) {
       openTimeRef.current = Date.now();
       setInteractionsDisabled(true);
+      animationCompleteRef.current = false;
       
-      // Allow interactions after sufficient delay
+      // Enable interactions after animation completes
       const timer = setTimeout(() => {
         setInteractionsDisabled(false);
-      }, 800); // Longer delay to ensure all animations and events settle
+        animationCompleteRef.current = true;
+      }, 350); // Slightly longer than CSS animation duration
       
       return () => clearTimeout(timer);
     } else {
       setInteractionsDisabled(false);
       openTimeRef.current = 0;
+      animationCompleteRef.current = false;
     }
   }, [externalIsOpen, internalIsOpen]);
   const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
@@ -112,7 +116,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
         snapPoints={[0.9]}
         initialSnapPoint={0}
         showHandle={true}
-        closeOnOverlayClick={true}
+        closeOnOverlayClick={false}
         aria-describedby="filter-instructions"
       >
         <div className="space-y-6 max-h-full overflow-y-auto px-1">
@@ -160,17 +164,15 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
             <h4 className="text-mobile-lg font-semibold text-gray-900">Choose Moods</h4>
 
             <div className="grid grid-cols-2 gap-3 px-1">
-              {moods.map((mood) => {
+              {moods.map((mood, index) => {
                 const isSelected = selectedMoods.has(mood.id);
 
                 return (
                   <button
                     key={mood.id}
                     onClick={(e) => {
-                      const timeSinceOpen = Date.now() - openTimeRef.current;
-                      
-                      // Prevent clicks if interactions are disabled OR if it's too soon after opening
-                      if (interactionsDisabled || timeSinceOpen < 800) {
+                      // Prevent clicks if interactions are disabled or animation hasn't completed
+                      if (interactionsDisabled || !animationCompleteRef.current) {
                         e.preventDefault();
                         e.stopPropagation();
                         return;
@@ -179,9 +181,9 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
                       handleMoodToggle(mood.id);
                     }}
                     className={`
-                      touch-target p-4 rounded-xl border-2 transition-all duration-200
-                      active:scale-95 transform-gpu
-                      ${interactionsDisabled ? 'pointer-events-none' : ''}
+                      touch-target p-4 rounded-xl border-2 vibe-transition-normal vibe-hover-lift
+                      mobile-interactive vibe-gpu vibe-animate-fade-up
+                      ${interactionsDisabled ? 'pointer-events-none opacity-60 cursor-wait' : 'cursor-pointer'}
                       ${
                         isSelected
                           ? 'border-2 shadow-md ring-2 ring-opacity-30 ring-inset'
@@ -189,6 +191,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
                       }
                     `}
                     style={{
+                      animationDelay: `${index * 50}ms`,
                       borderColor: isSelected ? mood.colors.primary : undefined,
                       backgroundColor: isSelected ? `${mood.colors.primary}15` : 'white',
                       ...(isSelected && {
@@ -206,7 +209,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
 
                       {/* Selection indicator */}
                       {isSelected && (
-                        <div className="flex justify-center">
+                        <div className="flex justify-center vibe-animate-bounce-in">
                           <div
                             className="w-6 h-6 rounded-full flex items-center justify-center"
                             style={{ backgroundColor: mood.colors.primary }}

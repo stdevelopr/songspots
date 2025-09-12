@@ -55,11 +55,12 @@ export const ActionSheet: React.FC<ActionSheetProps> = ({
       initialSnapPoint={0}
       showHandle={true}
       closeOnOverlayClick={true}
+      className="vibe-animate-scale-in"
     >
       <div className="space-y-4">
         {/* Header */}
         {(title || message) && (
-          <div className="text-center space-y-2 px-4">
+          <div className="text-center space-y-2 px-4 vibe-animate-fade-up">
             {title && <h2 className="text-mobile-lg font-bold text-gray-900">{title}</h2>}
             {message && <p className="text-mobile-base text-gray-600 leading-relaxed">{message}</p>}
           </div>
@@ -75,7 +76,8 @@ export const ActionSheet: React.FC<ActionSheetProps> = ({
                 disabled={option.disabled}
                 className={`${getButtonClass(option.style)} ${
                   option.disabled ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
+                } vibe-animate-fade-up vibe-hover-lift vibe-ripple-container`}
+                style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div className="flex items-center justify-center gap-2">
                   {option.icon && <span className="flex-shrink-0">{option.icon}</span>}
@@ -101,7 +103,8 @@ export const ActionSheet: React.FC<ActionSheetProps> = ({
                 disabled={option.disabled}
                 className={`${getButtonClass(option.style)} ${
                   option.disabled ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
+                } vibe-animate-fade-up vibe-hover-lift vibe-ripple-container`}
+                style={{ animationDelay: `${(regularOptions.length + index) * 50}ms` }}
               >
                 <div className="flex items-center justify-center gap-2">
                   {option.icon && <span className="flex-shrink-0">{option.icon}</span>}
