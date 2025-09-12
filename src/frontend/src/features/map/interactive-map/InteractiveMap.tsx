@@ -23,6 +23,7 @@ interface InteractiveMapProps {
   profileMode?: boolean;
   onShowLoginPrompt?: (action?: string) => void;
   isAuthenticated?: boolean;
+  onLogout?: () => void;
 }
 
 /**

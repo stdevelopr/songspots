@@ -14,7 +14,6 @@ import { useVibeLayer } from '@features/vibes';
 import { useToast } from '@common';
 
 // Mobile components
-import { MobileHeader } from '../../../components/mobile/MobileHeader';
 import { FilterDrawer } from './FilterDrawer';
 import { MobileMapControls } from './MobileMapControls';
 import { BottomSheet } from '../../../components/mobile/BottomSheet';
@@ -48,6 +47,7 @@ interface MobileInteractiveMapProps {
   setSelectedPin: React.Dispatch<React.SetStateAction<SelectedPin | null>>;
   profileMode?: boolean;
   onShowLoginPrompt?: (action?: string) => void;
+  onLogout?: () => void;
 }
 
 export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
@@ -65,6 +65,7 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
   setSelectedPin,
   profileMode = false,
   onShowLoginPrompt,
+  onLogout,
   onClearSelection,
   suppressAutoCenterOnLoad,
 }) => {
@@ -78,7 +79,7 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
   const hasAutoCenteredRef = useRef(false);
   const { showToast } = useToast();
 
-  const { identity } = useInternetIdentity();
+  const { identity, login } = useInternetIdentity();
   const isMobile = useIsMobile();
   const currentUser = identity?.getPrincipal().toString();
   const { userLocation, status, refreshing, request } = useLocation();
@@ -261,41 +262,9 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
   // Skeleton loading removed - causing issues
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      {/* Mobile Header */}
-      <MobileHeader
-        title="Vibes Map"
-        showPinCount={pins.length > 0}
-        pinCount={hasActiveFilters ? filteredPins.length : pins.length}
-        dominantMood={dominantMood}
-        hasActiveFilters={hasActiveFilters}
-        rightAction={
-          identity ? {
-            icon: (
-              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-medium">
-                  {identity.getPrincipal().toString().slice(0, 2).toUpperCase()}
-                </span>
-              </div>
-            ),
-            onClick: () => onViewUserProfile(null),
-            label: 'User Profile'
-          } : {
-            icon: (
-              <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            ),
-            onClick: () => {
-              onShowLoginPrompt?.('access your vibes');
-            },
-            label: 'Sign In'
-          }
-        }
-      />
-
-      {/* Map Container */}
-      <div className="flex-1 relative">
+    <div className="h-screen bg-gray-50 relative">
+      {/* Map Container - Full screen */}
+      <div className="absolute inset-0">
         <div ref={mapRef} className="w-full h-full" />
         
         {/* Loading overlay during transitions */}
@@ -321,10 +290,17 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
           onCreate={handleCreateAtCenter}
           onFilter={() => setFilterDrawerOpen(true)}
           filterCount={hasActiveFilters ? selectedMoods.size : 0}
+          onProfile={() => onViewUserProfile(null)}
+          onLogin={async () => {
+            try {
+              await login();
+            } catch (error) {
+              console.error('Login failed:', error);
+            }
+          }}
+          onLogout={onLogout}
+          userInitials={identity?.getPrincipal().toString().slice(0, 2).toUpperCase()}
           isRefreshing={refreshing}
-          showCounts={pins.length > 0}
-          publicCount={publicCount}
-          privateCount={privateCount}
           hasIdentity={!!identity}
           isLoadingTransition={isLoadingTransition}
           isInitialLoading={isInitialLoading}

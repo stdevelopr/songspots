@@ -13,8 +13,8 @@ export const SimpleBottomToolbar: React.FC<SimpleToolbarProps> = ({
     <div className={`
       fixed bottom-0 left-0 right-0 
       bg-white border-t border-gray-200
-      px-4 py-3
-      pb-[calc(0.75rem+env(safe-area-inset-bottom))]
+      px-4 py-2
+      pb-[calc(0.5rem+env(safe-area-inset-bottom))]
       flex items-center justify-around gap-4
       z-[9999]
       shadow-lg
@@ -29,6 +29,7 @@ interface ToolbarButtonProps {
   icon: React.ReactNode;
   label: string;
   onClick: () => void;
+  onLongPress?: () => void;
   disabled?: boolean;
   loading?: boolean;
   badge?: number;
@@ -39,14 +40,54 @@ export const ToolbarButton: React.FC<ToolbarButtonProps> = ({
   icon,
   label,
   onClick,
+  onLongPress,
   disabled = false,
   loading = false,
   badge,
   variant = 'secondary'
 }) => {
+  const longPressTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  const [isLongPressing, setIsLongPressing] = React.useState(false);
+
+  const handleTouchStart = () => {
+    if (!onLongPress || disabled || loading) return;
+    
+    longPressTimerRef.current = setTimeout(() => {
+      setIsLongPressing(true);
+      onLongPress();
+      // Add haptic feedback if available
+      if (navigator.vibrate) navigator.vibrate(50);
+    }, 800); // 800ms for long press
+  };
+
+  const handleTouchEnd = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+    
+    if (!isLongPressing && !disabled && !loading) {
+      onClick();
+    }
+    
+    setIsLongPressing(false);
+  };
+
+  const handleTouchCancel = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+    setIsLongPressing(false);
+  };
   return (
     <button
-      onClick={onClick}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchCancel}
+      onMouseDown={handleTouchStart}
+      onMouseUp={handleTouchEnd}
+      onMouseLeave={handleTouchCancel}
       disabled={disabled || loading}
       className={`
         relative flex flex-col items-center justify-center
@@ -64,7 +105,7 @@ export const ToolbarButton: React.FC<ToolbarButtonProps> = ({
       aria-label={label}
     >
       {/* Icon */}
-      <div className="relative mb-1">
+      <div className="relative mb-0.5">
         {loading ? (
           <div className="animate-spin rounded-full h-6 w-6 border-2 border-current border-t-transparent" />
         ) : (
@@ -82,7 +123,7 @@ export const ToolbarButton: React.FC<ToolbarButtonProps> = ({
       </div>
       
       {/* Label */}
-      <span className="text-xs font-medium leading-none">
+      <span className="text-[10px] font-medium leading-none">
         {label}
       </span>
     </button>

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef } from 'react';
 import { MoodType, getAllMoods } from '../../common/types/moods';
 import { BottomSheet } from '../../../components/mobile/BottomSheet';
 import { FloatingActionButton } from '../../../components/mobile/FloatingActionButton';
@@ -24,6 +24,28 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
   className = '',
 }) => {
   const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const [interactionsDisabled, setInteractionsDisabled] = useState(false);
+  const openTimeRef = React.useRef<number>(0);
+  
+  // Prevent accidental clicks using a time-based approach
+  React.useEffect(() => {
+    const isCurrentlyOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
+    
+    if (isCurrentlyOpen) {
+      openTimeRef.current = Date.now();
+      setInteractionsDisabled(true);
+      
+      // Allow interactions after sufficient delay
+      const timer = setTimeout(() => {
+        setInteractionsDisabled(false);
+      }, 800); // Longer delay to ensure all animations and events settle
+      
+      return () => clearTimeout(timer);
+    } else {
+      setInteractionsDisabled(false);
+      openTimeRef.current = 0;
+    }
+  }, [externalIsOpen, internalIsOpen]);
   const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
   const setIsOpen = onOpenChange || setInternalIsOpen;
   const moods = getAllMoods();
@@ -55,6 +77,11 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
     setIsOpen(false);
   };
 
+  const handleClose = () => {
+    // Close without applying any filter actions
+    setIsOpen(false);
+  };
+
   return (
     <>
       {/* Filter FAB - only show when not controlled externally */}
@@ -80,7 +107,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
       {/* Filter Drawer */}
       <BottomSheet
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={handleClose}
         title="Filter by Mood"
         snapPoints={[0.9]}
         initialSnapPoint={0}
@@ -88,7 +115,7 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
         closeOnOverlayClick={true}
         aria-describedby="filter-instructions"
       >
-        <div className="space-y-6">
+        <div className="space-y-6 max-h-full overflow-y-auto px-1">
           {/* Screen reader instructions */}
           <div id="filter-instructions" className="sr-only">
             Use the following buttons to filter vibe spots by mood. Selected moods will highlight in color with a checkmark.
@@ -132,20 +159,32 @@ export const FilterDrawer: React.FC<FilterDrawerProps> = ({
           <div className="space-y-4">
             <h4 className="text-mobile-lg font-semibold text-gray-900">Choose Moods</h4>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 px-1">
               {moods.map((mood) => {
                 const isSelected = selectedMoods.has(mood.id);
 
                 return (
                   <button
                     key={mood.id}
-                    onClick={() => handleMoodToggle(mood.id)}
+                    onClick={(e) => {
+                      const timeSinceOpen = Date.now() - openTimeRef.current;
+                      
+                      // Prevent clicks if interactions are disabled OR if it's too soon after opening
+                      if (interactionsDisabled || timeSinceOpen < 800) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return;
+                      }
+                      
+                      handleMoodToggle(mood.id);
+                    }}
                     className={`
                       touch-target p-4 rounded-xl border-2 transition-all duration-200
                       active:scale-95 transform-gpu
+                      ${interactionsDisabled ? 'pointer-events-none' : ''}
                       ${
                         isSelected
-                          ? 'border-2 shadow-lg scale-105 ring-2 ring-opacity-20'
+                          ? 'border-2 shadow-md ring-2 ring-opacity-30 ring-inset'
                           : 'border border-gray-200 hover:border-gray-300 hover:shadow-md active:shadow-lg'
                       }
                     `}

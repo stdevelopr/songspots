@@ -10,17 +10,16 @@ import {
 } from 'react-router-dom';
 
 import {
-  LoginButton,
   AppHeader,
   WelcomeModal,
   LoginPromptModal,
-  DeviceInfoDisplay,
   ThreeLayoutExample,
   useGetAllPins,
   Loader,
 } from './features/common';
 import ProfilePage from './features/profile/ProfilePage';
 import { useInternetIdentity } from 'ic-use-internet-identity';
+import { useResponsive } from './hooks/useResponsive';
 import { useQueryClient } from '@tanstack/react-query';
 import InteractiveMap from './features/map/interactive-map';
 import VibeInfoPopupDemo from './features/dev/VibeInfoPopupDemo';
@@ -43,6 +42,7 @@ function App() {
   const navigate = useNavigate();
   // Removed route-only short-circuit; rely on router for dev screens
   const { identity, status, clear, login } = useInternetIdentity();
+  const { isMobile, isTablet } = useResponsive();
 
   const queryClient = useQueryClient();
   const isAuthenticated = !!identity;
@@ -195,8 +195,8 @@ function App() {
     navigate('/profile');
   };
 
-  const handleLogout = async () => {
-    await clear();
+  const handleLogout = () => {
+    clear();
     navigate('/');
     setProfileUserId(null);
     setSelectedVibe(null);
@@ -221,18 +221,6 @@ function App() {
   };
 
   const [fromProfile, setFromProfile] = useState(false);
-  const handleViewVibeOnMap = (
-    vibeId: string,
-    lat: number,
-    lng: number,
-    fromProfileFlag?: boolean
-  ) => {
-    setSelectedVibe({ id: vibeId, lat, lng });
-    setIsLoadingMapTransition(true); // Show loading indicator only when navigating to map
-    navigate('/');
-    setProfileUserId(null);
-    setFromProfile(!!fromProfileFlag);
-  };
 
   const handleMapReady = () => {
     // Hide loading indicator when map is ready and centered
@@ -286,13 +274,16 @@ function App() {
     <div className="h-screen w-screen flex flex-col touch-manipulation">
       {/* Initial loading overlay - covers entire app until all conditions are met */}
 
-      <AppHeader
-        onProfileClick={handleProfileClick}
-        onLogout={handleLogout}
-        currentView={currentView}
-        isAuthenticated={isAuthenticated}
-        onBackToMap={handleBackToMap}
-      />
+      {/* Hide header when using mobile map component (mobile OR tablet) for full-screen experience */}
+      {!((isMobile || isTablet) && currentView === 'map') && (
+        <AppHeader
+          onProfileClick={handleProfileClick}
+          onLogout={handleLogout}
+          currentView={currentView}
+          isAuthenticated={isAuthenticated}
+          onBackToMap={handleBackToMap}
+        />
+      )}
 
       <main className="flex-1 relative overflow-hidden min-h-0 w-full">
         {/* Loading overlay for map transitions - only show when transitioning to map */}
@@ -339,6 +330,7 @@ function App() {
                 fromProfile={fromProfile}
                 onShowLoginPrompt={handleShowLoginPrompt}
                 isAuthenticated={isAuthenticated}
+                onLogout={handleLogout}
               />
             }
           />
