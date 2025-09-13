@@ -11,6 +11,11 @@ declare const styles: {
   readonly "emojiMain": string;
   readonly "countBadge": string;
   readonly "badgePop": string;
+  readonly "proximityCluster": string;
+  readonly "proximityClusterEntrance": string;
+  readonly "proximityHoverRotate": string;
+  readonly "proximityPulse": string;
+  readonly "proximityIndicatorPulse": string;
   readonly "partyBounce": string;
   readonly "loading": string;
   readonly "loadingPulse": string;

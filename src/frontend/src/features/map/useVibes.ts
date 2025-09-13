@@ -17,6 +17,7 @@ export const useVibes = ({
   currentUser,
   onViewUserProfile,
   onVibeSelected,
+  onMultipleVibesSelected,
   userLocation,
   selectedVibe,
   onMapReady,
@@ -31,6 +32,7 @@ export const useVibes = ({
   currentUser: string | undefined;
   onViewUserProfile: IOnViewUserProfile;
   onVibeSelected: ((vibe: Vibe) => void) | undefined;
+  onMultipleVibesSelected?: ((vibes: Vibe[]) => void) | undefined;
   userLocation: { lat: number; lng: number } | null;
   selectedVibe: SelectedVibe | null | undefined;
   onMapReady: (() => void) | undefined;
@@ -51,6 +53,7 @@ export const useVibes = ({
   const { showToast } = useToast();
 
   // Always call useVibeLayer but pass undefined vibes when skipped
+  console.log('useVibes useVibeLayer call:', { skipVibeLayer, vibesLength: vibes.length, hasVibes: !!vibes?.length });
   useVibeLayer({
     isMobile,
     map: mapInstance,
@@ -88,21 +91,37 @@ export const useVibes = ({
   const userMarkerRef = useRef<L.Marker | null>(null);
   useEffect(() => {
     if (!mapInstance || !userLocation) return;
-    if (userMarkerRef.current) mapInstance.removeLayer(userMarkerRef.current);
+    
+    if (userMarkerRef.current) {
+      mapInstance.removeLayer(userMarkerRef.current);
+      userMarkerRef.current = null;
+    }
+    
     const icon = L.divIcon({
-      className: markerStyles.userLocationMarker,
-      html: `<div class="${markerStyles.userLocationPin}"><div class="${markerStyles.userLocationPulse}"></div><div class="${markerStyles.userLocationDot}"></div></div>`,
+      className: '',
+      html: `
+        <div style="position: relative; width: 28px; height: 28px; pointer-events: none;">
+          <div style="width: 28px; height: 28px; background: rgba(59, 130, 246, 0.3); border-radius: 50%; position: absolute; top: 0; left: 0; animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite; pointer-events: none;"></div>
+          <div style="width: 14px; height: 14px; background: #3b82f6; border: 3px solid #ffffff; border-radius: 50%; position: absolute; top: 7px; left: 7px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); pointer-events: none;"></div>
+        </div>
+      `,
       iconSize: [28, 28],
       iconAnchor: [14, 14],
     });
+    
     userMarkerRef.current = L.marker([userLocation.lat, userLocation.lng], {
       icon,
       pane: 'userLocation',
       keyboard: false,
-      riseOnHover: true,
-      zIndexOffset: 1000,
+      riseOnHover: false,
+      interactive: false,
+      bubblingMouseEvents: false,
+      zIndexOffset: -1000, // Put it below other markers
     }).addTo(mapInstance);
-    // Ensure visibility via dedicated pane and zIndexOffset
+    
+    // Completely disable all events on the user location marker
+    userMarkerRef.current.off();
+    
   }, [mapInstance, userLocation]);
 
   useEffect(() => {

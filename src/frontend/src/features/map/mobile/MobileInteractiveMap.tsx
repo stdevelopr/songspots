@@ -26,6 +26,7 @@ import { PinDetails } from '../../vibes/responsive/PinDetails';
 import { PinEdit } from '../../vibes/responsive/PinEdit';
 import { PinCreate } from '../../vibes/responsive/PinCreate';
 import { DeleteConfirmation } from '../../vibes/responsive/DeleteConfirmation';
+import { VibeSelectionSheet } from '../../vibes/mobile/VibeSelectionSheet';
 
 import mapStyles from '../interactive-map/MapContainer.module.css';
 
@@ -77,6 +78,8 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
   const [justCreatedPin, setJustCreatedPin] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const [vibeSelectionOpen, setVibeSelectionOpen] = useState(false);
+  const [multipleVibes, setMultipleVibes] = useState<Pin[]>([]);
   const skipNextAutoCenterRef = useRef(false);
   const hasAutoCenteredRef = useRef(false);
   const { showToast } = useToast();
@@ -139,6 +142,10 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
     currentUser,
     onViewUserProfile,
     onVibeSelected: onPinSelected,
+    onMultipleVibesSelected: (vibes) => {
+      setMultipleVibes(vibes);
+      setVibeSelectionOpen(true);
+    },
     userLocation,
     selectedVibe: selectedPin,
     onMapReady,
@@ -167,6 +174,14 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
   // Handle vibe layer rendering for non-profile mode with filtering support
   const vibesToRender = !profileMode ? (hasActiveFilters ? filteredPins : pins) : undefined;
 
+  console.log('MobileInteractiveMap useVibeLayer call:', { 
+    profileMode, 
+    hasActiveFilters, 
+    pinsLength: pins.length,
+    filteredPinsLength: filteredPins.length,
+    vibesToRenderLength: vibesToRender?.length 
+  });
+
   useVibeLayer({
     map: mapInstance,
     vibes: vibesToRender,
@@ -194,6 +209,10 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
       }
       // Notify parent for URL sync
       onPinSelected?.({ id: vibe.id, lat: vibe.lat, lng: vibe.lng });
+    },
+    onMultipleVibesSelected: (vibes) => {
+      setMultipleVibes(vibes);
+      setVibeSelectionOpen(true);
     },
     isMobile,
   });
@@ -429,6 +448,33 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
           setNewPinLocation(null);
         }}
         isSubmitting={createPinMutation.isPending}
+      />
+
+      {/* Multiple Vibes Selection Sheet */}
+      <VibeSelectionSheet
+        vibes={multipleVibes}
+        isOpen={vibeSelectionOpen}
+        onClose={() => {
+          setVibeSelectionOpen(false);
+          setMultipleVibes([]);
+        }}
+        onVibeSelect={(vibe) => {
+          // Handle individual vibe selection from multiple options
+          if (mapInstance) {
+            mapInstance.panTo([vibe.lat, vibe.lng], { animate: true });
+            const handleMoveEnd = () => {
+              setSelectedPinDetail(vibe);
+              setPinDetailModalOpen(true);
+              mapInstance.off('moveend', handleMoveEnd);
+            };
+            mapInstance.on('moveend', handleMoveEnd);
+          } else {
+            setSelectedPinDetail(vibe);
+            setPinDetailModalOpen(true);
+          }
+          // Notify parent for URL sync
+          onPinSelected?.({ id: vibe.id, lat: vibe.lat, lng: vibe.lng });
+        }}
       />
     </div>
   );
