@@ -154,7 +154,7 @@ export function useVibeLayer({
       };
       
       const proximityThreshold = getProximityThreshold(zoomLevel);
-      const isVeryTightZoom = zoomLevel >= 20; // Only show selection at max zoom level
+      const isAtMaxZoom = zoomLevel >= 19; // At maximum zoom level
       const locationGroups = new Map<string, typeof itemsToRender>();
       const processedItems = new Set<string>();
       
@@ -193,7 +193,7 @@ export function useVibeLayer({
         visualThresholdMeters: Math.round(visualThreshold * 111000),
         proximityThreshold,
         proximityThresholdMeters: Math.round(proximityThreshold * 111000), // Convert to meters
-        isVeryTightZoom,
+        isAtMaxZoom,
         groupCount: locationGroups.size,
         groups: Array.from(locationGroups.entries()).map(([key, items]) => ({
           key,
@@ -271,14 +271,17 @@ export function useVibeLayer({
             console.log('Multiple vibes cluster clicked!', { 
               items: items.length, 
               zoomLevel, 
-              isVeryTightZoom,
+              isAtMaxZoom,
               proximityThreshold,
               proximityThresholdMeters: Math.round(proximityThreshold * 111000)
             });
             
-            // If we're at very tight zoom (18+), always show selection since items are truly at same position
-            if (isVeryTightZoom) {
-              console.log('At max zoom - showing selection for same-position items');
+            // If at maximum zoom, show selection instead of trying to zoom further
+            if (isAtMaxZoom) {
+              console.log('At maximum zoom - showing selection for cluster:', { 
+                itemCount: items.length, 
+                zoomLevel 
+              });
               if (onMultipleVibesSelected) {
                 onMultipleVibesSelected(items);
               } else {

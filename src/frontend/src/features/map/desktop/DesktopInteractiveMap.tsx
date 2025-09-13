@@ -19,6 +19,7 @@ import { MoodFilter } from '../components/MoodFilter';
 import { useVibeLayer } from '@features/vibes';
 import { useToast } from '@common';
 import { MoodType } from '@common/types/moods';
+import { VibeSelection } from '../../vibes/responsive/VibeSelection';
 import mapStyles from '../interactive-map/MapContainer.module.css';
 import { ZoomControls } from '../components/ZoomControls';
 
@@ -48,6 +49,8 @@ interface DesktopInteractiveMapProps {
 export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (props) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [pinToDelete, setPinToDelete] = useState<Pin | null>(null);
+  const [vibeSelectionOpen, setVibeSelectionOpen] = useState(false);
+  const [multipleVibes, setMultipleVibes] = useState<Pin[]>([]);
   const skipNextAutoCenterRef = React.useRef(false);
   const hasAutoCenteredRef = React.useRef(false);
   const {
@@ -114,6 +117,10 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
     currentUser,
     onViewUserProfile,
     onVibeSelected: onPinSelected,
+    onMultipleVibesSelected: (vibes) => {
+      setMultipleVibes(vibes);
+      setVibeSelectionOpen(true);
+    },
     userLocation,
     selectedVibe: selectedPin,
     onMapReady,
@@ -168,6 +175,10 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
       }
       // Notify parent for URL sync
       onPinSelected?.({ id: vibe.id, lat: vibe.lat, lng: vibe.lng });
+    },
+    onMultipleVibesSelected: (vibes) => {
+      setMultipleVibes(vibes);
+      setVibeSelectionOpen(true);
     },
     isMobile,
   });
@@ -384,6 +395,33 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
           setNewPinLocation(null);
         }}
         isSubmitting={createPinMutation.isPending}
+      />
+
+      {/* Multiple Vibes Selection - Responsive */}
+      <VibeSelection
+        vibes={multipleVibes}
+        isOpen={vibeSelectionOpen}
+        onClose={() => {
+          setVibeSelectionOpen(false);
+          setMultipleVibes([]);
+        }}
+        onVibeSelect={(vibe) => {
+          // Handle individual vibe selection from multiple options
+          if (mapInstance) {
+            mapInstance.panTo([vibe.lat, vibe.lng], { animate: true });
+            const handleMoveEnd = () => {
+              setSelectedPinDetail(vibe);
+              setPinDetailModalOpen(true);
+              mapInstance.off('moveend', handleMoveEnd);
+            };
+            mapInstance.on('moveend', handleMoveEnd);
+          } else {
+            setSelectedPinDetail(vibe);
+            setPinDetailModalOpen(true);
+          }
+          // Notify parent for URL sync
+          onPinSelected?.({ id: vibe.id, lat: vibe.lat, lng: vibe.lng });
+        }}
       />
     </div>
   );
