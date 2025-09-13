@@ -128,6 +128,19 @@ export function useVibeLayer({
             const targetZoom = Math.min(zoomLevel + zoomInOnClusterBy, maxDetailZoom);
             if (onClusterClick) onClusterClick(cluster.lat, cluster.lng, targetZoom);
 
+            // Determine practical max zoom (Leaflet default can be Infinity)
+            const rawMax = map.getMaxZoom?.();
+            const mapMaxZoom = (rawMax == null || !isFinite(rawMax as number)) ? 20 : (rawMax as number);
+            const currentZoom = map.getZoom?.() ?? zoomLevel;
+
+            // If we're already at or beyond the next target zoom (closest zoom), open multiselect
+            if (currentZoom >= Math.min(mapMaxZoom, targetZoom)) {
+              if (onMultipleVibesSelected) {
+                onMultipleVibesSelected(cluster.items);
+                return;
+              }
+            }
+
             // Build bounds from all items in this cluster
             const points = cluster.items.map(it => L.latLng(it.lat, it.lng));
             const bounds = L.latLngBounds(points);
@@ -181,7 +194,10 @@ export function useVibeLayer({
       };
       
       const proximityThreshold = getProximityThreshold(zoomLevel);
-      const isAtMaxZoom = zoomLevel >= 19; // At maximum zoom level
+      // Use the map's configured max zoom (handle Infinity by falling back to 20)
+      const rawMapMax = map?.getMaxZoom?.();
+      const mapMaxZoom = (rawMapMax == null || !isFinite(rawMapMax as number)) ? 20 : (rawMapMax as number);
+      const isAtMaxZoom = !!map && (map.getZoom() >= mapMaxZoom);
       const locationGroups = new Map<string, typeof itemsToRender>();
       const processedItems = new Set<string>();
       
@@ -302,6 +318,12 @@ export function useVibeLayer({
               proximityThreshold,
               proximityThresholdMeters: Math.round(proximityThreshold * 111000)
             });
+
+            // If already at the closest zoom, open the multiselect directly
+            if (isAtMaxZoom && onMultipleVibesSelected) {
+              onMultipleVibesSelected(items);
+              return;
+            }
 
             // Try to fit bounds to all items first so none fall off-screen
             const points = items.map(it => L.latLng(it.lat, it.lng));
