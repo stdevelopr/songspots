@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BottomSheet } from '../../../components/mobile/BottomSheet';
 import { getAllMoods } from '@common/types/moods';
+import { isValidMusicLink } from '@common/utils/validateLinks';
 import type { Pin } from '../../map/types/map';
 
 interface PinEditSheetProps {
@@ -39,6 +40,7 @@ export const PinEditSheet: React.FC<PinEditSheetProps> = ({
     isPrivate: false,
     mood: '',
   });
+  const [linkError, setLinkError] = useState<string>('');
 
   const moods = getAllMoods();
 
@@ -51,6 +53,7 @@ export const PinEditSheet: React.FC<PinEditSheetProps> = ({
         isPrivate: vibe.isPrivate || false,
         mood: vibe.mood || '',
       });
+      setLinkError('');
     }
   }, [vibe]);
 
@@ -59,9 +62,17 @@ export const PinEditSheet: React.FC<PinEditSheetProps> = ({
     if (!vibe) return;
 
     try {
+      const name = formData.name.trim();
+      const description = formData.description.trim();
+      const rawLink = formData.musicLink.trim();
+      const musicLink = isValidMusicLink(rawLink) ? rawLink : '';
       await onSubmit({
         id: vibe.id,
-        ...formData,
+        name,
+        description,
+        musicLink,
+        isPrivate: formData.isPrivate,
+        mood: formData.mood,
       });
     } catch (error) {
       console.error('Failed to update vibe:', error);
@@ -192,16 +203,43 @@ export const PinEditSheet: React.FC<PinEditSheetProps> = ({
           <label htmlFor="musicLink" className="block text-mobile-base font-semibold text-gray-900 mb-2">
             Music Link
           </label>
-          <input
-            id="musicLink"
-            type="url"
-            value={formData.musicLink}
-            onChange={(e) => setFormData(prev => ({ ...prev, musicLink: e.target.value }))}
-            placeholder="https://spotify.com/..."
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-mobile-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-          <p className="text-mobile-xs text-gray-500 mt-1">
-            Share a song that captures this spot's vibe
+          <div className="relative">
+            <input
+              id="musicLink"
+              type="url"
+              value={formData.musicLink}
+              onChange={(e) => {
+                const value = e.target.value;
+                setFormData(prev => ({ ...prev, musicLink: value }));
+                if (value.trim() && !isValidMusicLink(value)) {
+                  setLinkError('Use a valid Spotify or YouTube link');
+                } else {
+                  setLinkError('');
+                }
+              }}
+              placeholder="https://spotify.com/... or https://youtu.be/..."
+              aria-invalid={!!linkError}
+              aria-describedby="musicLink-help"
+              className={`w-full px-4 py-3 pr-10 border rounded-lg text-mobile-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                linkError ? 'border-red-400' : 'border-gray-300'
+              }`}
+            />
+            {formData.musicLink && (
+              <button
+                type="button"
+                aria-label="Clear music link"
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, musicLink: '' }));
+                  setLinkError('');
+                }}
+                className="absolute inset-y-0 right-2 my-auto h-7 px-2 text-gray-500 hover:text-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          <p id="musicLink-help" className={`text-mobile-xs mt-1 ${linkError ? 'text-red-600' : 'text-gray-500'}`}>
+            {linkError || "Share a song that captures this spot's vibe"}
           </p>
         </div>
 

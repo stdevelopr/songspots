@@ -17,6 +17,7 @@ export const useMap = () => {
     const map = L.map(mapRef.current, {
       maxBounds: [[-90, -180], [90, 180]],
       maxBoundsViscosity: 1.0,
+      zoomControl: false,
     }).setView(initialCenter, initialZoom);
 
     // Add tile layer
@@ -24,6 +25,13 @@ export const useMap = () => {
       maxZoom: 19,
       minZoom: 2,
     }).addTo(map);
+
+    // Create a dedicated pane for the user location marker above regular markers
+    const userPane = map.createPane('userLocation');
+    if (userPane) {
+      userPane.style.zIndex = '700'; // default markerPane is 600
+      userPane.style.pointerEvents = 'none'; // do not intercept clicks
+    }
 
     setMapInstance(map);
   }, []);

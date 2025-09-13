@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { BottomSheet } from '../../../components/mobile/BottomSheet';
 import { getAllMoods } from '@common/types/moods';
+import { reverseGeocode } from '@common/utils/geocode';
 
 interface PinCreateSheetProps {
   isOpen: boolean;
@@ -34,6 +35,8 @@ export const PinCreateSheet: React.FC<PinCreateSheetProps> = ({
     isPrivate: false,
     mood: '', // Start with no mood selected
   });
+  const [address, setAddress] = useState<string>('');
+  const [isAddressLoading, setIsAddressLoading] = useState<boolean>(false);
 
   // Reset form when opening
   useEffect(() => {
@@ -45,8 +48,32 @@ export const PinCreateSheet: React.FC<PinCreateSheetProps> = ({
         isPrivate: false,
         mood: '', // Start with no mood selected
       });
+      setAddress('');
+      setIsAddressLoading(false);
     }
   }, [isOpen]);
+
+  // Fetch human-readable address when location changes
+  useEffect(() => {
+    let cancelled = false;
+    const fetchAddress = async () => {
+      if (!location) {
+        setAddress('');
+        setIsAddressLoading(false);
+        return;
+      }
+      setIsAddressLoading(true);
+      const label = await reverseGeocode(location.lat, location.lng);
+      if (!cancelled) {
+        setAddress(label);
+        setIsAddressLoading(false);
+      }
+    };
+    fetchAddress();
+    return () => {
+      cancelled = true;
+    };
+  }, [location]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,7 +114,8 @@ export const PinCreateSheet: React.FC<PinCreateSheetProps> = ({
       closeOnOverlayClick={false}
     >
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Location Info */}
+        {/* Location Info */
+        }
         {location && (
           <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
             <div className="flex items-center gap-3">
@@ -101,7 +129,9 @@ export const PinCreateSheet: React.FC<PinCreateSheetProps> = ({
                   Creating spot at this location
                 </p>
                 <p className="text-mobile-xs text-blue-600">
-                  {location.lat.toFixed(6)}, {location.lng.toFixed(6)}
+                  {isAddressLoading
+                    ? 'Fetching address…'
+                    : address || `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`}
                 </p>
               </div>
             </div>

@@ -19,6 +19,7 @@ import { FilterDrawer } from './FilterDrawer';
 import { MobileMapControls } from './MobileMapControls';
 import { BottomSheet } from '../../../components/mobile/BottomSheet';
 import { MapSkeleton } from '../../../components/mobile/SkeletonLoader';
+import { ZoomControls } from '../components/ZoomControls';
 
 // Import responsive components (automatically choose mobile sheets vs desktop modals)
 import { PinDetails } from '../../vibes/responsive/PinDetails';
@@ -100,6 +101,15 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
       onShowLoginPrompt?.('create your first vibe spot');
       return;
     }
+    // Prefer user's current location (to show their current address in the sheet)
+    if (status === 'granted' && userLocation) {
+      setPinToEdit(null);
+      setNewPinLocation({ lat: userLocation.lat, lng: userLocation.lng });
+      setPinCreateModalOpen(true);
+      setPopupOpen(true);
+      return;
+    }
+    // Fallback to map center if location not available
     const c = mapInstance.getCenter();
     setPinToEdit(null);
     setNewPinLocation({ lat: c.lat, lng: c.lng });
@@ -267,6 +277,8 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
       {/* Map Container - Full screen */}
       <div className="absolute inset-0">
         <div ref={mapRef} className="w-full h-full" />
+        {/* Custom Zoom Controls */}
+        <ZoomControls map={mapInstance} />
         
         {/* Loading overlay during transitions */}
         {isLoadingTransition && (

@@ -92,12 +92,17 @@ export const useVibes = ({
     const icon = L.divIcon({
       className: markerStyles.userLocationMarker,
       html: `<div class="${markerStyles.userLocationPin}"><div class="${markerStyles.userLocationPulse}"></div><div class="${markerStyles.userLocationDot}"></div></div>`,
-      iconSize: [24, 24],
-      iconAnchor: [12, 12],
+      iconSize: [28, 28],
+      iconAnchor: [14, 14],
     });
-    userMarkerRef.current = L.marker([userLocation.lat, userLocation.lng], { icon }).addTo(
-      mapInstance
-    );
+    userMarkerRef.current = L.marker([userLocation.lat, userLocation.lng], {
+      icon,
+      pane: 'userLocation',
+      keyboard: false,
+      riseOnHover: true,
+      zIndexOffset: 1000,
+    }).addTo(mapInstance);
+    // Ensure visibility via dedicated pane and zIndexOffset
   }, [mapInstance, userLocation]);
 
   useEffect(() => {

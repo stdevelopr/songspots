@@ -1,5 +1,8 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { BottomSheet } from '../../../components/mobile/BottomSheet';
+import { MusicEmbed } from '@common';
+import { useGetUserProfileByPrincipal } from '@common';
 import { useAccessibility } from '../../../utils/accessibility';
 import { haptics } from '../../../utils/haptics';
 import type { Pin } from '../../map/types/map';
@@ -23,6 +26,16 @@ export const PinDetailSheet: React.FC<PinDetailSheetProps> = ({
   onDelete,
 }) => {
   const { announce, generateId } = useAccessibility();
+  const ownerPrincipal = vibe?.owner?.toString?.() || '';
+  const { data: ownerProfile } = useGetUserProfileByPrincipal(ownerPrincipal);
+  const displayName = (ownerProfile?.name || '').trim() || `${ownerPrincipal.slice(0, 6)}...${ownerPrincipal.slice(-4)}`;
+  const initials = React.useMemo(() => {
+    const n = (ownerProfile?.name || '').trim();
+    if (!n) return ownerPrincipal.slice(0, 2).toUpperCase();
+    const parts = n.split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return n.slice(0, 2).toUpperCase();
+  }, [ownerProfile?.name, ownerPrincipal]);
 
   useEffect(() => {
     if (isOpen && vibe) {
@@ -65,13 +78,17 @@ export const PinDetailSheet: React.FC<PinDetailSheetProps> = ({
           <div className="flex-1">
             <h2 className="text-mobile-xl font-bold text-gray-900 leading-tight">{vibe.name}</h2>
             {vibe.owner && (
-              <button
-                onClick={handleViewProfile}
-                className="text-mobile-sm text-blue-600 hover:text-blue-800 font-medium mt-1"
-                aria-label={`View profile of ${vibe.owner.toString()}`}
+              <Link
+                to={`/profile/${encodeURIComponent(vibe.owner.toString())}`}
+                onClick={() => handleViewProfile()}
+                className="mt-1 inline-flex items-center gap-2 text-mobile-xs text-gray-500 hover:text-blue-700"
+                aria-label={`View profile of ${displayName}`}
               >
-                View Profile
-              </button>
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white text-[10px] font-semibold">
+                  {initials}
+                </span>
+                <span>by {displayName}</span>
+              </Link>
             )}
           </div>
           <div className="flex items-center gap-2 ml-4">
@@ -106,59 +123,24 @@ export const PinDetailSheet: React.FC<PinDetailSheetProps> = ({
           </div>
         )}
 
-        {/* Music Link */}
+        {/* Music / Video Embed */}
         {vibe.musicLink && (
           <div>
-            <h3 className="text-mobile-base font-semibold text-gray-900 mb-2">Music</h3>
-            <a
-              href={vibe.musicLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200"
-            >
-              <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
-                <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM15.657 6.343a1 1 0 011.414 0A9.972 9.972 0 0119 12a9.972 9.972 0 01-1.929 5.657 1 1 0 11-1.414-1.414A7.971 7.971 0 0017 12a7.971 7.971 0 00-1.343-4.243 1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                  <path
-                    fillRule="evenodd"
-                    d="M13.828 8.172a1 1 0 011.414 0A5.983 5.983 0 0117 12a5.983 5.983 0 01-1.758 3.828 1 1 0 01-1.414-1.414A3.987 3.987 0 0015 12a3.987 3.987 0 00-1.172-2.828 1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <p className="text-mobile-sm font-medium text-blue-900">Listen to Music</p>
-                <p className="text-mobile-xs text-blue-600 truncate">{vibe.musicLink}</p>
-              </div>
-              <svg
-                className="w-4 h-4 text-blue-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                />
-              </svg>
-            </a>
+            <h3 className="text-mobile-base font-semibold text-gray-900 mb-2">Media</h3>
+            <div className="rounded-xl overflow-hidden border border-gray-200">
+              <MusicEmbed musicLink={vibe.musicLink} />
+            </div>
           </div>
         )}
 
-        {/* Action Buttons */}
+        {/* Owner Action Buttons */}
         {vibe.isOwner && (
           <div className="space-y-3 pt-4 border-t border-gray-200">
             <button
               onClick={handleEdit}
-              className="w-full mobile-button-secondary touch-target text-mobile-base font-medium"
+              className="w-full mobile-button-secondary touch-target text-mobile-base font-medium flex items-center justify-center"
             >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -171,9 +153,9 @@ export const PinDetailSheet: React.FC<PinDetailSheetProps> = ({
 
             <button
               onClick={handleDelete}
-              className="w-full bg-red-50 text-red-600 border border-red-200 rounded-lg touch-target text-mobile-base font-medium hover:bg-red-100 transition-colors"
+              className="w-full bg-red-50 text-red-600 border border-red-200 rounded-lg touch-target text-mobile-base font-medium hover:bg-red-100 transition-colors flex items-center justify-center"
             >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

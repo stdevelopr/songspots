@@ -20,6 +20,7 @@ import { useVibeLayer } from '@features/vibes';
 import { useToast } from '@common';
 import { MoodType } from '@common/types/moods';
 import mapStyles from '../interactive-map/MapContainer.module.css';
+import { ZoomControls } from '../components/ZoomControls';
 
 const DEFAULT_CENTER: [number, number] = [40.7128, -74.006];
 const DEFAULT_ZOOM = 10;
@@ -301,6 +302,8 @@ export const DesktopInteractiveMap: React.FC<DesktopInteractiveMapProps> = (prop
         />
 
         <div ref={mapRef} className="w-full h-full z-0" />
+        {/* Custom Zoom Controls */}
+        <ZoomControls map={mapInstance} className="bottom-6 right-6" />
       </div>
 
       {/* Delete Confirmation Interface - Responsive */}
