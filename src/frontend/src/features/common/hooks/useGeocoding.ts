@@ -8,12 +8,20 @@ interface GeocodingResult {
 
 const addressCache = new Map<string, string>();
 
-export function useReverseGeocode(latitude: string | number, longitude: string | number): GeocodingResult {
+export function useReverseGeocode(latitude: string | number, longitude: string | number, presetAddress?: string | null): GeocodingResult {
   const [address, setAddress] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // If a preset address is provided, use it and skip fetching
+    if (presetAddress && presetAddress.trim().length > 0) {
+      setAddress(presetAddress);
+      setIsLoading(false);
+      setError(null);
+      return;
+    }
+
     if (!latitude || !longitude) {
       setAddress(null);
       return;
@@ -116,7 +124,7 @@ export function useReverseGeocode(latitude: string | number, longitude: string |
     // Debounce the API call
     const timeoutId = setTimeout(fetchAddress, 300);
     return () => clearTimeout(timeoutId);
-  }, [latitude, longitude]);
+  }, [latitude, longitude, presetAddress]);
 
   return { address, isLoading, error };
 }

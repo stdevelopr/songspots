@@ -5,9 +5,10 @@ interface InfoGridProps {
   latitude: string | number;
   longitude: string | number;
   formatDate: () => string;
+  address?: string;
 }
 
-const InfoGrid: React.FC<InfoGridProps> = ({ latitude, longitude, formatDate }) => {
+const InfoGrid: React.FC<InfoGridProps> = ({ latitude, longitude, formatDate, address }) => {
   return (
     <div className="flex gap-3 mb-3">
       <div className="flex-1 bg-white/80 rounded-md p-2 border border-gray-100 transition-all duration-300">
@@ -19,7 +20,7 @@ const InfoGrid: React.FC<InfoGridProps> = ({ latitude, longitude, formatDate }) 
           Location
         </span>
         <div className="text-[10px] text-gray-600 transition-colors duration-300">
-          <LocationDisplay latitude={String(latitude)} longitude={String(longitude)} showIcon={false} />
+          <LocationDisplay latitude={String(latitude)} longitude={String(longitude)} showIcon={false} presetAddress={address} />
         </div>
       </div>
 

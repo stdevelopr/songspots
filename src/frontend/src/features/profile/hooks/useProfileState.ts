@@ -36,6 +36,7 @@ export const useProfileState = ({ userId }: UseProfileStateProps) => {
     id: pin.id,
     latitude: pin.latitude,
     longitude: pin.longitude,
+    address: (pin as any).address,
     name: pin.name,
     description: pin.description,
     musicLink: pin.musicLink,

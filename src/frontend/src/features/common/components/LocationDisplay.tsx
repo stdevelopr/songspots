@@ -6,6 +6,7 @@ interface LocationDisplayProps {
   longitude: string;
   showIcon?: boolean;
   className?: string;
+  presetAddress?: string;
 }
 
 const LocationDisplay: React.FC<LocationDisplayProps> = ({
@@ -13,18 +14,19 @@ const LocationDisplay: React.FC<LocationDisplayProps> = ({
   longitude,
   showIcon = true,
   className = '',
+  presetAddress,
 }) => {
-  const { address, isLoading, error } = useReverseGeocode(latitude, longitude);
+  const { address, isLoading, error } = useReverseGeocode(latitude, longitude, presetAddress);
 
   // Fallback coordinates display
   const fallbackCoords = `${parseFloat(latitude).toFixed(4)}, ${parseFloat(longitude).toFixed(4)}`;
 
   if (isLoading) {
     return (
-      <div className={`flex items-center gap-2 ${className}`}>
+      <div className={`flex items-start gap-2 min-w-0 max-w-full overflow-hidden ${className}`}>
         {showIcon && (
           <svg
-            className="w-4 h-4 text-gray-400 animate-pulse"
+            className="w-4 h-4 text-gray-400 animate-pulse flex-shrink-0 mt-0.5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -37,16 +39,17 @@ const LocationDisplay: React.FC<LocationDisplayProps> = ({
             />
           </svg>
         )}
-        <span className="text-gray-500 animate-pulse">Loading address...</span>
+        <span className="text-gray-500 animate-pulse line-clamp-2 break-words block">Loading address...</span>
       </div>
     );
   }
 
+  const titleText = address || `${latitude}, ${longitude}`;
   return (
-    <div className={`flex items-center gap-2 ${className}`} title={`${latitude}, ${longitude}`}>
+    <div className={`flex items-start gap-2 min-w-0 max-w-full overflow-hidden ${className}`} title={titleText}>
       {showIcon && (
         <svg
-          className="w-4 h-4 text-gray-600"
+          className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -59,7 +62,7 @@ const LocationDisplay: React.FC<LocationDisplayProps> = ({
           />
         </svg>
       )}
-      <span>{address || fallbackCoords}</span>
+      <span className="line-clamp-2 break-words block">{address || fallbackCoords}</span>
     </div>
   );
 };

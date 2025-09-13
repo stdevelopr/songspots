@@ -6,6 +6,7 @@ export interface Spot {
   isPrivate: boolean;
   latitude: string;
   longitude: string;
+  address?: string;
 }
 
 export interface PinLike {
@@ -17,4 +18,3 @@ export interface PinLike {
   latitude: string | number;
   longitude: string | number;
 }
-

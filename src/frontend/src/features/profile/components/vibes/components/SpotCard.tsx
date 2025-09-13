@@ -76,7 +76,14 @@ const SpotCard: React.FC<SpotCardProps> = ({
       )}
 
       <div className="text-xs text-gray-500">
-        <LocationDisplay latitude={spot.latitude} longitude={spot.longitude} showIcon={true} className="text-gray-500" />
+        <LocationDisplay
+          latitude={spot.latitude}
+          longitude={spot.longitude}
+          showIcon={true}
+          className="text-gray-500"
+          // Use stored address if available to avoid live geocoding
+          presetAddress={(spot as any).address}
+        />
       </div>
     </div>
   );
