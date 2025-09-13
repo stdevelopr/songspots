@@ -104,7 +104,7 @@ const SocialMediaManager: React.FC<SocialMediaManagerProps> = ({
 
     // Optional: Could add toast notification here if needed
     if (removedCount > 0) {
-      console.log(`${removedCount} social media link(s) with empty URLs were not saved`);
+      // cleaned logs
     }
   };
 

@@ -166,7 +166,7 @@ const ProfileMobileLayout: React.FC<ProfileMobileLayoutProps> = ({
       };
 
       await actor.saveUserProfile(mergedProfile as UserProfile);
-      console.log('Social links saved');
+      // cleaned logs
     } catch (err) {
       console.error('Failed to save social links', err);
     }

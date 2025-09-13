@@ -113,7 +113,8 @@ persistent actor {
   // ** Start of application specific logic, TODO: adapt to your needs **
   // This is an example to how to protect data creation, update and deletion
 
-  type Vibe = {
+  // Legacy V1 vibe without address (for stable upgrade compatibility)
+  type VibeV1 = {
     id : Nat;
     name : Text;
     description : Text;
@@ -122,15 +123,33 @@ persistent actor {
     longitude : Text;
     owner : Principal;
     isPrivate : Bool;
+    mood : ?Text;
+  };
+
+  // Current V2 vibe with address persisted
+  type Vibe = {
+    id : Nat;
+    name : Text;
+    description : Text;
+    musicLink : Text;
+    latitude : Text;
+    longitude : Text;
+    address : Text;
+    owner : Principal;
+    isPrivate : Bool;
     mood : ?Text; // Optional mood field (energetic, chill, creative, etc.)
   };
 
   transient let vibeMap = Map.Make<Nat>(Nat.compare);
-  var vibesStable : [(Nat, Vibe)] = [];
+  // Keep legacy stable var name and type compatible with V1
+  var vibesStable : [(Nat, VibeV1)] = [];
+  // New stable snapshot including address persisted for future upgrades
+  var vibesStableV2 : [(Nat, Vibe)] = [];
   var nextVibeIdStable : Nat = 0;
   transient var vibes : Map.Map<Nat, Vibe> = vibeMap.empty<Vibe>();
   transient var nextVibeId : Nat = 0;
 
+  // Backward-compatible API (V1 signature): address defaults to empty
   public shared ({ caller }) func createVibe(name : Text, description : Text, musicLink : Text, latitude : Text, longitude : Text, isPrivate : Bool, mood : ?Text) : async () {
     if (not (MultiUserSystem.hasPermission(multiUserState, caller, #user, false))) {
       Debug.trap("Unauthorized: Only authenticated users can create vibes");
@@ -142,6 +161,7 @@ persistent actor {
       musicLink;
       latitude;
       longitude;
+      address = "";
       owner = caller;
       isPrivate;
       mood;
@@ -150,7 +170,51 @@ persistent actor {
     nextVibeId += 1;
   };
 
+  // New API with address parameter (V2)
+  public shared ({ caller }) func createVibeWithAddress(name : Text, description : Text, musicLink : Text, latitude : Text, longitude : Text, address : Text, isPrivate : Bool, mood : ?Text) : async () {
+    if (not (MultiUserSystem.hasPermission(multiUserState, caller, #user, false))) {
+      Debug.trap("Unauthorized: Only authenticated users can create vibes");
+    };
+    let newVibe : Vibe = {
+      id = nextVibeId;
+      name;
+      description;
+      musicLink;
+      latitude;
+      longitude;
+      address;
+      owner = caller;
+      isPrivate;
+      mood;
+    };
+    vibes := vibeMap.put(vibes, nextVibeId, newVibe);
+    nextVibeId += 1;
+  };
+
+  // Backward-compatible API (V1 signature): preserve existing address if present, else empty
   public shared ({ caller }) func updateVibe(id : Nat, name : Text, description : Text, musicLink : Text, latitude : Text, longitude : Text, isPrivate : Bool, mood : ?Text) : async () {
+    if (not (MultiUserSystem.hasPermission(multiUserState, caller, #user, false))) {
+      Debug.trap("Unauthorized: Only authenticated users can update vibes");
+    };
+    let existing : ?Vibe = vibeMap.get(vibes, id);
+    let addr : Text = switch (existing) { case null { "" }; case (?v) { v.address } };
+    let updatedVibe : Vibe = {
+      id;
+      name;
+      description;
+      musicLink;
+      latitude;
+      longitude;
+      address = addr;
+      owner = caller;
+      isPrivate;
+      mood;
+    };
+    vibes := vibeMap.put(vibes, id, updatedVibe);
+  };
+
+  // New API with address parameter (V2)
+  public shared ({ caller }) func updateVibeWithAddress(id : Nat, name : Text, description : Text, musicLink : Text, latitude : Text, longitude : Text, address : Text, isPrivate : Bool, mood : ?Text) : async () {
     if (not (MultiUserSystem.hasPermission(multiUserState, caller, #user, false))) {
       Debug.trap("Unauthorized: Only authenticated users can update vibes");
     };
@@ -161,6 +225,7 @@ persistent actor {
       musicLink;
       latitude;
       longitude;
+      address;
       owner = caller;
       isPrivate;
       mood;
@@ -222,17 +287,62 @@ persistent actor {
 
   system func preupgrade() {
     userProfilesStable := Iter.toArray(principalMap.entries(userProfiles));
-    vibesStable := Iter.toArray(vibeMap.entries(vibes));
+    // Persist legacy V1 projection for compatibility
+    vibesStable := Iter.toArray(
+      Iter.map<(Nat, Vibe), (Nat, VibeV1)>(
+        vibeMap.entries(vibes),
+        func(entry : (Nat, Vibe)) : (Nat, VibeV1) {
+          let (k, v) = entry;
+          (k, {
+            id = v.id;
+            name = v.name;
+            description = v.description;
+            musicLink = v.musicLink;
+            latitude = v.latitude;
+            longitude = v.longitude;
+            owner = v.owner;
+            isPrivate = v.isPrivate;
+            mood = v.mood;
+          })
+        }
+      )
+    );
+    // Persist full V2 snapshot including address
+    vibesStableV2 := Iter.toArray(vibeMap.entries(vibes));
     nextVibeIdStable := nextVibeId;
   };
 
   system func postupgrade() {
     userProfiles := principalMap.fromIter(userProfilesStable.vals());
-    vibes := vibeMap.fromIter(vibesStable.vals());
+    // Prefer V2 snapshot if available, else migrate from legacy V1
+    if (vibesStableV2.size() > 0) {
+      vibes := vibeMap.fromIter(vibesStableV2.vals());
+    } else {
+      let migrated = Iter.map<(Nat, VibeV1), (Nat, Vibe)>(
+        vibesStable.vals(),
+        func(entry : (Nat, VibeV1)) : (Nat, Vibe) {
+          let (k, v1) = entry;
+          (k, {
+            id = v1.id;
+            name = v1.name;
+            description = v1.description;
+            musicLink = v1.musicLink;
+            latitude = v1.latitude;
+            longitude = v1.longitude;
+            address = ""; // unknown for legacy data
+            owner = v1.owner;
+            isPrivate = v1.isPrivate;
+            mood = v1.mood;
+          })
+        }
+      );
+      vibes := vibeMap.fromIter(migrated);
+    };
     nextVibeId := nextVibeIdStable;
     
     // Clear stable arrays to save memory
     userProfilesStable := [];
     vibesStable := [];
+    vibesStableV2 := [];
   };
 };

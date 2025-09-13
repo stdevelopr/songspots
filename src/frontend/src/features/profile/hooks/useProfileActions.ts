@@ -96,7 +96,7 @@ export const useProfileActions = ({
         socialMedia: currentSocialMedia,
       };
 
-      console.log('Saving profile with data:', profileData);
+      // cleaned logs
       await saveProfileMutation.mutateAsync(profileData);
 
       setIsEditing(false);

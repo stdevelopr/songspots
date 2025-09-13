@@ -13,7 +13,7 @@ export function useActor() {
   const actorQuery = useQuery<ActorSubclass<_SERVICE>>({
     queryKey: [ACTOR_QUERY_KEY, identity?.getPrincipal().toString()],
     queryFn: async () => {
-      console.log('Creating actor...', { isAuthenticated: !!identity });
+      // cleaned logs
 
       const isIC =
         process.env.DFX_NETWORK === 'ic' ||
@@ -24,7 +24,7 @@ export function useActor() {
 
       if (!identity) {
         // Return anonymous actor if not authenticated
-        console.log('Creating anonymous actor', canisterId);
+        // cleaned logs
         return await createActor(canisterId, {
           agentOptions: {
             // IC in prod: same-origin boundary; local dev: replica
@@ -33,10 +33,7 @@ export function useActor() {
         });
       }
 
-      console.log(
-        'Creating authenticated actor with identity:',
-        identity.getPrincipal().toString()
-      );
+      // cleaned logs
 
       const actorOptions = {
         agentOptions: {
@@ -48,14 +45,14 @@ export function useActor() {
 
       try {
         const actor = await createActor(canisterId, actorOptions);
-        console.log('Actor created successfully, initializing auth...');
+        // cleaned logs
         await actor.initializeAuth();
-        console.log('Auth initialized successfully');
+        // cleaned logs
         
         // Test authentication by calling a simple authenticated method
         try {
           await actor.getCurrentUserRole();
-          console.log('Authentication verification successful');
+          // cleaned logs
         } catch (authError) {
           console.error('Authentication verification failed:', authError);
           // Clear identity and force re-login
@@ -74,10 +71,10 @@ export function useActor() {
                            errorMessage.includes('EcdsaP256 signature could not be verified');
         
         if (isAuthError) {
-          console.log('Authentication/signature error detected - clearing invalid authentication state');
+          // cleaned logs
           try {
             await clear();
-            console.log('Authentication state cleared successfully');
+            // cleaned logs
           } catch (clearError) {
             console.error('Failed to clear authentication:', clearError);
           }

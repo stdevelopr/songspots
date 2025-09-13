@@ -67,12 +67,17 @@ export interface Vibe {
   'description' : string,
   'isPrivate' : boolean,
   'longitude' : string,
+  'address' : string,
   'musicLink' : string,
 }
 export interface _SERVICE {
   'assignRole' : ActorMethod<[Principal, UserRole], undefined>,
   'createVibe' : ActorMethod<
     [string, string, string, string, string, boolean, [] | [string]],
+    undefined
+  >,
+  'createVibeWithAddress' : ActorMethod<
+    [string, string, string, string, string, string, boolean, [] | [string]],
     undefined
   >,
   'deleteVibe' : ActorMethod<[bigint], undefined>,
@@ -101,7 +106,30 @@ export interface _SERVICE {
   'saveUserProfile' : ActorMethod<[UserProfile], undefined>,
   'setApproval' : ActorMethod<[Principal, ApprovalStatus], undefined>,
   'updateVibe' : ActorMethod<
-    [bigint, string, string, string, string, string, boolean, [] | [string]],
+    [
+      bigint,
+      string,
+      string,
+      string,
+      string,
+      string,
+      boolean,
+      [] | [string],
+    ],
+    undefined
+  >,
+  'updateVibeWithAddress' : ActorMethod<
+    [
+      bigint,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      boolean,
+      [] | [string],
+    ],
     undefined
   >,
 }

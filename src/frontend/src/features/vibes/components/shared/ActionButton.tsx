@@ -17,7 +17,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   className = '',
   children,
 }) => {
-  console.log('ActionButton rendering:', { type, className, ariaLabel });
+  // cleaned logs
   
   const baseStyles = "inline-flex items-center justify-center rounded-xl text-white font-medium transition-all duration-200 border shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2";
   
@@ -37,7 +37,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   );
 
   const finalClassName = `${baseStyles} ${typeStyles[type]} ${className}`;
-  console.log('Final className:', finalClassName);
+  // cleaned logs
 
   return (
     <button

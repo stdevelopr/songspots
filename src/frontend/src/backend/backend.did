@@ -1,5 +1,6 @@
 type Vibe = 
  record {
+   address: text;
    description: text;
    id: nat;
    isPrivate: bool;
@@ -92,6 +93,8 @@ service : {
   assignRole: (user: principal, newRole: UserRole) -> ();
   createVibe: (name: text, description: text, musicLink: text, latitude:
    text, longitude: text, isPrivate: bool, mood: opt text) -> ();
+  createVibeWithAddress: (name: text, description: text, musicLink: text, latitude:
+   text, longitude: text, address: text, isPrivate: bool, mood: opt text) -> ();
   deleteVibe: (id: nat) -> ();
   fileDelete: (path: text) -> ();
   fileList: () -> (vec FileMetadata) query;
@@ -114,4 +117,6 @@ service : {
   setApproval: (user: principal, approval: ApprovalStatus) -> ();
   updateVibe: (id: nat, name: text, description: text, musicLink: text,
    latitude: text, longitude: text, isPrivate: bool, mood: opt text) -> ();
+  updateVibeWithAddress: (id: nat, name: text, description: text, musicLink: text,
+   latitude: text, longitude: text, address: text, isPrivate: bool, mood: opt text) -> ();
 }

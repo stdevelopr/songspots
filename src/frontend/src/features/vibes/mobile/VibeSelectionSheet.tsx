@@ -75,6 +75,9 @@ export const VibeSelectionSheet: React.FC<VibeSelectionSheetProps> = ({
                   <h3 className="text-mobile-base font-semibold text-gray-900 mb-1">
                     {displayName}
                   </h3>
+                  {('address' in vibe) && (vibe as any).address && (
+                    <p className="text-mobile-xs text-gray-600 truncate mb-1">{(vibe as any).address}</p>
+                  )}
                   
                   {vibe.description && (
                     <p className="text-mobile-sm text-gray-600 line-clamp-2">

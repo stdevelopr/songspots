@@ -54,7 +54,7 @@ export const triggerHaptic = (type: HapticType = 'light'): void => {
     navigator.vibrate(pattern);
   } catch (error) {
     // Silently fail if haptics aren't supported
-    console.debug('Haptic feedback not available:', error);
+    // cleaned logs
   }
 };
 

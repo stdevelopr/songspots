@@ -18,6 +18,7 @@ export const idlFactory = ({ IDL }) => {
     'description' : IDL.Text,
     'isPrivate' : IDL.Bool,
     'longitude' : IDL.Text,
+    'address' : IDL.Text,
     'musicLink' : IDL.Text,
   });
   const ApprovalStatus = IDL.Variant({
@@ -92,6 +93,20 @@ export const idlFactory = ({ IDL }) => {
         [],
         [],
       ),
+    'createVibeWithAddress' : IDL.Func(
+        [
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Bool,
+          IDL.Opt(IDL.Text),
+        ],
+        [],
+        [],
+      ),
     'deleteVibe' : IDL.Func([IDL.Nat], [], []),
     'fileDelete' : IDL.Func([IDL.Text], [], []),
     'fileList' : IDL.Func([], [IDL.Vec(FileMetadata)], ['query']),
@@ -130,6 +145,21 @@ export const idlFactory = ({ IDL }) => {
     'updateVibe' : IDL.Func(
         [
           IDL.Nat,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Bool,
+          IDL.Opt(IDL.Text),
+        ],
+        [],
+        [],
+      ),
+    'updateVibeWithAddress' : IDL.Func(
+        [
+          IDL.Nat,
+          IDL.Text,
           IDL.Text,
           IDL.Text,
           IDL.Text,

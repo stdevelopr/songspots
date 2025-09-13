@@ -53,7 +53,7 @@ export const useVibes = ({
   const { showToast } = useToast();
 
   // Always call useVibeLayer but pass undefined vibes when skipped
-  console.log('useVibes useVibeLayer call:', { skipVibeLayer, vibesLength: vibes.length, hasVibes: !!vibes?.length });
+  // cleaned logs
   useVibeLayer({
     isMobile,
     map: mapInstance,
@@ -91,12 +91,12 @@ export const useVibes = ({
   const userMarkerRef = useRef<L.Marker | null>(null);
   useEffect(() => {
     if (!mapInstance || !userLocation) return;
-    
+
     if (userMarkerRef.current) {
       mapInstance.removeLayer(userMarkerRef.current);
       userMarkerRef.current = null;
     }
-    
+
     const icon = L.divIcon({
       className: '',
       html: `
@@ -108,7 +108,7 @@ export const useVibes = ({
       iconSize: [28, 28],
       iconAnchor: [14, 14],
     });
-    
+
     userMarkerRef.current = L.marker([userLocation.lat, userLocation.lng], {
       icon,
       pane: 'userLocation',
@@ -118,14 +118,21 @@ export const useVibes = ({
       bubblingMouseEvents: false,
       zIndexOffset: -1000, // Put it below other markers
     }).addTo(mapInstance);
-    
+
     // Completely disable all events on the user location marker
     userMarkerRef.current.off();
-    
   }, [mapInstance, userLocation]);
 
   useEffect(() => {
     if (!backendVibes?.length) return;
+    // Single informative log of raw markers from backend (id/lat/lng/name)
+    try {
+      // eslint-disable-next-line no-console
+      console.log(
+        '[Vibes] Backend markers received:',
+        backendVibes.map((v) => v)
+      );
+    } catch {}
     setVibes(
       backendVibes.map((v) => {
         const vibeId = v.id.toString();
@@ -137,6 +144,7 @@ export const useVibes = ({
           name: v.name || undefined,
           description: v.description || undefined,
           musicLink: v.musicLink || undefined,
+          address: (v as any).address || undefined,
           isPrivate: v.isPrivate,
           isOwner: currentUser ? v.owner.toString() === currentUser : false,
           owner: v.owner,
@@ -207,6 +215,7 @@ export const useVibes = ({
         musicLink: vibeData.musicLink ?? '', // text
         latitude: String(vibeToEdit.lat), // text
         longitude: String(vibeToEdit.lng), // text
+        address: vibeToEdit.address ?? '', // keep existing address on update
         isPrivate: !!vibeData.isPrivate, // bool
         mood: vibeData.mood ? [vibeData.mood] : [], // Backend expects ?Text (optional array)
       });
@@ -256,12 +265,20 @@ export const useVibes = ({
         return;
       }
       // Use determined coordinates for the vibe
+      // Resolve address once and store server-side to avoid future lookups
+      let address = '';
+      try {
+        const { reverseGeocode } = await import('@common/utils/geocode');
+        address = await reverseGeocode(lat, lng);
+      } catch {}
+
       await createVibeMutation.mutateAsync({
         name: vibeData.name ?? '',
         description: vibeData.description ?? '',
         musicLink: vibeData.musicLink ?? '',
         latitude: String(lat),
         longitude: String(lng),
+        address: address || '',
         isPrivate: !!vibeData.isPrivate,
         mood: vibeData.mood ? [vibeData.mood] : [], // Backend expects ?Text (optional array)
       });

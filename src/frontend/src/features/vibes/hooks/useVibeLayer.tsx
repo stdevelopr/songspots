@@ -65,13 +65,7 @@ export function useVibeLayer({
     if (vibes && vibes.length) items = vibes as (Pin | Vibe)[];
     else if (pins && pins.length) items = pins as (Pin | Vibe)[];
     
-    console.log('useVibeLayer itemsToRender:', {
-      totalItems: items.length,
-      hasVibes: !!vibes?.length,
-      hasPins: !!pins?.length,
-      hasMultipleVibesCallback: !!onMultipleVibesSelected,
-      items: items.map(item => ({ id: item.id, lat: item.lat, lng: item.lng, name: item.name }))
-    });
+    // cleaned logs
     
     return items;
   }, [pins, vibes, onMultipleVibesSelected]);

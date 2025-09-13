@@ -31,7 +31,7 @@ export const announceToScreenReader = (message: string, priority: 'polite' | 'as
       }
     }, 1000);
   } catch (error) {
-    console.debug('Screen reader announcement failed:', error);
+    // cleaned logs
   }
 };
 

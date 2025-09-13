@@ -28,6 +28,7 @@ export interface Pin {
   name?: string;
   description?: string;
   musicLink?: string;
+  address?: string;
   isPrivate?: boolean;
   isOwner?: boolean;
   owner: { toString(): string };
@@ -43,6 +44,7 @@ export interface Vibe {
   name?: string;
   description?: string;
   musicLink?: string;
+  address?: string;
   isPrivate?: boolean;
   isOwner?: boolean;
   owner: { toString(): string };

@@ -174,13 +174,7 @@ export const MobileInteractiveMap: React.FC<MobileInteractiveMapProps> = ({
   // Handle vibe layer rendering for non-profile mode with filtering support
   const vibesToRender = !profileMode ? (hasActiveFilters ? filteredPins : pins) : undefined;
 
-  console.log('MobileInteractiveMap useVibeLayer call:', { 
-    profileMode, 
-    hasActiveFilters, 
-    pinsLength: pins.length,
-    filteredPinsLength: filteredPins.length,
-    vibesToRenderLength: vibesToRender?.length 
-  });
+  // cleaned logs
 
   useVibeLayer({
     map: mapInstance,
