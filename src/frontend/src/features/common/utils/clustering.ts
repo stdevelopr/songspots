@@ -41,7 +41,7 @@ function getClusterRadius(zoomLevel: number): number {
 }
 
 // Calculate the overall "feeling" of a cluster based on mood distribution
-function calculateClusterMood(distribution: Record<MoodType | 'none', number>): {
+export function calculateClusterMood(distribution: Record<MoodType | 'none', number>): {
   clusterMood: MoodType | 'none';
   confidence: number;
   blend: string;
