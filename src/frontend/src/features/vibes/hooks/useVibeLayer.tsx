@@ -50,6 +50,16 @@ export function useVibeLayer({
   const layerRef = useRef<L.LayerGroup | null>(null);
   const currentZoomRef = useRef<number>(10);
 
+  // Compute reasonable padding for fitBounds so expanded markers stay on-screen
+  const getFitPadding = () => {
+    if (!map) return { padding: L.point(60, 60) } as L.FitBoundsOptions;
+    const size = map.getSize();
+    // Use ~8% of width and ~10% of height for padding
+    const padX = Math.max(40, Math.round(size.x * 0.08));
+    const padY = Math.max(48, Math.round(size.y * 0.10));
+    return { padding: L.point(padX, padY) } as L.FitBoundsOptions;
+  };
+
   const itemsToRender = useMemo<(Pin | Vibe)[]>(() => {
     let items: (Pin | Vibe)[] = [];
     if (vibes && vibes.length) items = vibes as (Pin | Vibe)[];
@@ -112,12 +122,29 @@ export function useVibeLayer({
           
           const clusterMarker = L.marker([cluster.lat, cluster.lng], { icon: clusterIcon });
           
-          // Cluster click behavior - zoom in to show individual pins
+          // Cluster click behavior - zoom to fit all items with padding
           clusterMarker.on('click', (e) => {
             e.originalEvent?.stopPropagation();
             const targetZoom = Math.min(zoomLevel + zoomInOnClusterBy, maxDetailZoom);
             if (onClusterClick) onClusterClick(cluster.lat, cluster.lng, targetZoom);
-            map.setView([cluster.lat, cluster.lng], targetZoom);
+
+            // Build bounds from all items in this cluster
+            const points = cluster.items.map(it => L.latLng(it.lat, it.lng));
+            const bounds = L.latLngBounds(points);
+            const isZeroArea =
+              Math.abs(bounds.getNorth() - bounds.getSouth()) < 1e-9 &&
+              Math.abs(bounds.getEast() - bounds.getWest()) < 1e-9;
+
+            if (!isZeroArea) {
+              map.fitBounds(bounds, {
+                ...getFitPadding(),
+                maxZoom: maxDetailZoom,
+                animate: true,
+              });
+            } else {
+              // Fallback for identical coords: zoom in centered
+              map.setView([cluster.lat, cluster.lng], targetZoom, { animate: true });
+            }
           });
           
           clusterMarker.addTo(layer);
@@ -265,7 +292,7 @@ export function useVibeLayer({
           
           const clusterMarker = L.marker([firstItem.lat, firstItem.lng], { icon: clusterIcon });
           
-          // Smart click behavior: zoom in or show selection based on zoom level and proximity
+          // Smart click behavior: fit bounds to items when possible
           clusterMarker.on('click', (e) => {
             e.originalEvent?.stopPropagation();
             console.log('Multiple vibes cluster clicked!', { 
@@ -275,7 +302,23 @@ export function useVibeLayer({
               proximityThreshold,
               proximityThresholdMeters: Math.round(proximityThreshold * 111000)
             });
-            
+
+            // Try to fit bounds to all items first so none fall off-screen
+            const points = items.map(it => L.latLng(it.lat, it.lng));
+            const bounds = L.latLngBounds(points);
+            const isZeroArea =
+              Math.abs(bounds.getNorth() - bounds.getSouth()) < 1e-9 &&
+              Math.abs(bounds.getEast() - bounds.getWest()) < 1e-9;
+
+            if (!isZeroArea) {
+              map?.fitBounds(bounds, {
+                ...getFitPadding(),
+                maxZoom: 20,
+                animate: true,
+              });
+              return;
+            }
+
             // If at maximum zoom, show selection instead of trying to zoom further
             if (isAtMaxZoom) {
               console.log('At maximum zoom - showing selection for cluster:', { 
@@ -293,7 +336,7 @@ export function useVibeLayer({
                 }
               }
             } else {
-              // Calculate the zoom level needed for proper visual separation
+              // Calculate the zoom level needed for proper visual separation (identical coords)
               const calculateRequiredZoom = () => {
                 // Find the closest pair of items in the cluster
                 let minDistance = Infinity;
